@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interact District 3220 — Original Image Downloader</title>
+<style>
+  :root{
+    --rotary-blue:#17458f;
+    --rotary-gold:#f7a81b;
+    --ink:#1a1a2e;
+    --muted:#6b7280;
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --ok:#15803d;
+    --err:#b91c1c;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);
+  }
+  header{
+    background:linear-gradient(135deg,var(--rotary-blue),#0d2c5e);color:#fff;
+    padding:28px 24px;position:sticky;top:0;z-index:10;box-shadow:0 4px 16px rgba(0,0,0,.18)
+  }
+  header h1{margin:0 0 6px;font-size:1.4rem}
+  header p{margin:0;opacity:.85;font-size:.9rem}
+  .toolbar{
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:16px
+  }
+  button{
+    font:inherit;border:none;border-radius:8px;padding:10px 18px;cursor:pointer;font-weight:600;transition:transform .08s,opacity .2s
+  }
+  button:active{transform:translateY(1px)}
+  .btn-primary{background:var(--rotary-gold);color:#1a1a2e}
+  .btn-ghost{background:rgba(255,255,255,.15);color:#fff}
+  .stat{font-size:.85rem;opacity:.9}
+  main{padding:24px;max-width:1200px;margin:0 auto}
+  .group{margin-bottom:36px}
+  .group h2{
+    font-size:1.05rem;text-transform:capitalize;border-left:4px solid var(--rotary-gold);
+    padding-left:10px;margin:0 0 14px;color:var(--rotary-blue)
+  }
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+  .card{
+    background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06);
+    display:flex;flex-direction:column
+  }
+  .thumb{
+    height:140px;background:#eef1f7 center/contain no-repeat;display:flex;align-items:center;justify-content:center
+  }
+  .thumb img{max-width:100%;max-height:100%;display:block}
+  .meta{padding:10px 12px;flex:1;display:flex;flex-direction:column;gap:6px}
+  .fname{font-size:.78rem;font-weight:600;word-break:break-all}
+  .falt{font-size:.72rem;color:var(--muted);line-height:1.3}
+  .card button{border-radius:0;padding:9px;font-size:.8rem;background:var(--rotary-blue);color:#fff;width:100%}
+  .status{font-size:.72rem;font-weight:600}
+  .status.ok{color:var(--ok)}
+  .status.err{color:var(--err)}
+  a.fallback{font-size:.72rem;color:var(--rotary-blue)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Interact District 3220 — Original Image Downloader</h1>
+  <p>Downloads the full-resolution originals from the live Wix site. Just open this file in a browser.</p>
+  <div class="toolbar">
+    <button class="btn-primary" id="downloadAll">⬇ Download All</button>
+    <button class="btn-ghost" id="openAll">Open All in Tabs (fallback)</button>
+    <span class="stat" id="counter"></span>
+  </div>
+</header>
+<main id="app"></main>
+
+<script src="images-manifest.js"></script>
+<script>
+  const app = document.getElementById("app");
+  const counter = document.getElementById("counter");
+
+  // Group manifest by category
+  const groups = {};
+  IMAGE_MANIFEST.forEach((it, idx) => {
+    it._idx = idx;
+    (groups[it.category] = groups[it.category] || []).push(it);
+  });
+
+  counter.textContent = IMAGE_MANIFEST.length + " images across " + Object.keys(groups).length + " categories";
+
+  Object.keys(groups).forEach((cat) => {
+    const section = document.createElement("section");
+    section.className = "group";
+    section.innerHTML = '<h2>' + cat.replace(/-/g, ' ') + ' (' + groups[cat].length + ')</h2>';
+    const grid = document.createElement("div");
+    grid.className = "grid";
+
+    groups[cat].forEach((it) => {
+      const url = originalUrl(it.id);
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML =
+        '<div class="thumb"><img loading="lazy" src="' + url + '" alt="' + (it.alt || '') + '"></div>' +
+        '<div class="meta">' +
+          '<span class="fname">' + it.name + '</span>' +
+          '<span class="falt">' + (it.alt || '') + '</span>' +
+          '<a class="fallback" href="' + url + '" target="_blank" rel="noopener">view original ↗</a>' +
+          '<span class="status" id="st-' + it._idx + '"></span>' +
+        '</div>' +
+        '<button data-idx="' + it._idx + '">Download</button>';
+      card.querySelector("button").addEventListener("click", () => downloadItem(it));
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);
+    app.appendChild(section);
+  });
+
+  function setStatus(idx, text, cls) {
+    const el = document.getElementById("st-" + idx);
+    if (el) { el.textContent = text; el.className = "status " + (cls || ""); }
+  }
+
+  // Fetch the image as a blob and trigger a browser download with the friendly filename.
+  async function downloadItem(it) {
+    const url = originalUrl(it.id);
+    setStatus(it._idx, "downloading…", "");
+    try {
+      const res = await fetch(url, { mode: "cors" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = it.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      setStatus(it._idx, "✓ saved", "ok");
+      return true;
+    } catch (err) {
+      // CORS or network issue — fall back to opening the original in a new tab.
+      setStatus(it._idx, "✗ " + err.message + " — use 'view original'", "err");
+      return false;
+    }
+  }
+
+  document.getElementById("downloadAll").addEventListener("click", async () => {
+    for (const it of IMAGE_MANIFEST) {
+      // Sequential with a tiny gap so the browser doesn't drop downloads.
+      await downloadItem(it);
+      await new Promise((r) => setTimeout(r, 350));
+    }
+  });
+
+  document.getElementById("openAll").addEventListener("click", () => {
+    IMAGE_MANIFEST.forEach((it) => window.open(originalUrl(it.id), "_blank"));
+  });
+</script>
+</body>
+</html>
