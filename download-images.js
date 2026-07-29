@@ -3,7 +3,7 @@
  * Interact District 3220 — Bulk image downloader (Node.js)
  * --------------------------------------------------------
  * Downloads every ORIGINAL full-resolution image listed in
- * images-manifest.js into ./images/<category>/<friendly-name>.
+ * images-manifest.js into ./public/images/<category>/<friendly-name>.
  *
  * Usage:
  *   node download-images.js
@@ -16,7 +16,9 @@ const fs = require("fs");
 const path = require("path");
 const { IMAGE_MANIFEST, originalUrl } = require("./images-manifest.js");
 
-const OUT_DIR = path.join(__dirname, "images");
+// Lives under public/ so Next.js serves these directly and next/image can
+// optimise them. Moved from ./images when the site build was scaffolded.
+const OUT_DIR = path.join(__dirname, "public", "images");
 
 function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });

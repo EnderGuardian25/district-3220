@@ -1,0 +1,324 @@
+@import 'tailwindcss';
+
+/* Dark mode is driven by a data-theme attribute on <html>, stamped before first
+   paint by the inline script in app/layout.tsx. That lets us follow the OS
+   preference by default AND allow an explicit override, with no theme flash. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ==========================================================================
+   PRIMITIVES
+   Ramps only — never reference these directly in components. Use the semantic
+   tokens below, so light/dark switching is automatic.
+   ========================================================================== */
+@theme {
+  --color-navy-50: #f4f7fa;
+  --color-navy-100: #e5ebf2;
+  --color-navy-200: #c8d5e4;
+  --color-navy-300: #9fb3cc;
+  --color-navy-400: #6e88ab;
+  --color-navy-500: #4a6489;
+  --color-navy-600: #33496b;
+  --color-navy-700: #223451;
+  --color-navy-800: #16243b;
+  --color-navy-900: #0a1628;
+  --color-navy-950: #050c17;
+
+  --color-signal-50: #eff5ff;
+  --color-signal-100: #dbe7fe;
+  --color-signal-200: #bad1fd;
+  --color-signal-300: #8db2fb;
+  --color-signal-400: #5b90f8;
+  --color-signal-500: #2e7df6;
+  --color-signal-600: #155fd9;
+  --color-signal-700: #124aad;
+  --color-signal-800: #133e8a;
+  --color-signal-900: #14356d;
+
+  /* Official Interact brand cyan, sampled from the supplied logo (#01B4E6).
+     Note it CANNOT carry text on the light background — 2.25:1 — so light-mode
+     text and links use cyan-700. Full-strength cyan is for graphics, glows and
+     dark-mode accents, where logotypes are exempt from contrast rules anyway. */
+  --color-cyan-50: #ecfbff;
+  --color-cyan-100: #d0f4fe;
+  --color-cyan-200: #a6eafd;
+  --color-cyan-300: #6edbfa;
+  --color-cyan-400: #2ec6f2;
+  --color-cyan-500: #01b4e6;
+  --color-cyan-600: #0193bc;
+  --color-cyan-700: #026b87;
+  --color-cyan-800: #075a70;
+  --color-cyan-900: #0b4859;
+
+  /* Warm neutrals. Cool grey + blue is what made this read like a dashboard;
+     a little warmth in the surfaces reads more human without touching the
+     navy brand colour, which still carries all the text. */
+  --color-sand-50: #faf9f7;
+  --color-sand-100: #f7f6f3;
+  --color-sand-200: #f1efea;
+  --color-sand-300: #e6e3dc;
+  --color-sand-400: #d5d1c7;
+  --color-ink-900: #0a0e14;
+  --color-ink-800: #141a24;
+  --color-ink-700: #1e242e;
+  --color-ink-100: #edebe6;
+  --color-ink-300: #a9afb9;
+
+  /* Softer shape language — sharp small radii read utilitarian. */
+  --radius-control: 0.875rem; /* 14px — buttons, inputs */
+  --radius-card: 1.5rem; /* 24px — cards */
+  --radius-panel: 1.75rem; /* 28px — large panels */
+
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+
+  /* Display sizes. Tight tracking is what stops Outfit reading generic at scale. */
+  --text-display: clamp(2.75rem, 7vw, 5.25rem);
+  --text-display--line-height: 1.06;
+  --text-display--letter-spacing: -0.032em;
+
+  --text-title: clamp(1.75rem, 3.4vw, 2.75rem);
+  --text-title--line-height: 1.12;
+  --text-title--letter-spacing: -0.024em;
+
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Background poster as a CSS background rather than an <img>.
+   The server can't know the theme, so a React-rendered <img> guesses, paints
+   the wrong poster, then swaps — fetching both. Browsers only fetch the
+   background-image whose selector actually matches, and ThemeScript stamps
+   data-theme before first paint, so exactly one is ever requested. */
+.site-bg-poster {
+  background-image: url('/videos/bg-light-poster.avif');
+  background-size: cover;
+  background-position: center;
+}
+
+[data-theme='dark'] .site-bg-poster {
+  background-image: url('/videos/bg-dark-poster.avif');
+}
+
+/* ==========================================================================
+   HERO APERTURE REVEAL — geometry
+   Single source of truth for the pin runway, in CSS rather than JS.
+   It previously lived as a constant exported from the 'use client' hero-reveal
+   module and read by the server-rendered page; Next replaces client modules
+   with a reference proxy, so the constant arrived `undefined` and produced
+   `margin-top: -NaNsvh`. Keeping it here means both sides can't disagree.
+   NOTE: must be >= the WIPE_VH used in hero-reveal.tsx, or the aperture would
+   still be opening when the pin releases.
+   ========================================================================== */
+:root {
+  /* Pin travel. Must be >= the WIPE_VH in hero-reveal.tsx so the aperture is
+     fully open before the pin releases. */
+  --hero-runway: 100svh;
+}
+
+/* The runway: one viewport of stage plus the travel the pin needs. */
+.hero-runway {
+  height: calc(100svh + var(--hero-runway));
+}
+
+/* Pulls the following content up so it sits BEHIND the pinned hero and is what
+   shows through the aperture. Without it the content is a viewport lower and
+   the hole reveals only the page background. */
+.hero-runway-offset {
+  margin-top: calc(-1 * var(--hero-runway));
+}
+
+/* Static cover over the hero, opened by the scroll-driven aperture wipe.
+   A FLAT page colour, not a video frame — a still frame clashed with the
+   assembly photo alongside it. The mask itself is written per-frame from JS
+   (see HeroStaticCover), because the radius depends on measured element size. */
+.hero-lid {
+  background: var(--hero-lid);
+  will-change: mask-image;
+}
+
+/* The background video fades in over its poster, so a slow connection degrades
+   to a still image rather than to a blank frame. */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   SEMANTIC TOKENS
+   Values are the verified set from design/DECISIONS.md §3. The ratios in the
+   comments are computed, not estimated — do not "tidy" these to rounder ramp
+   steps without re-checking, two of them are deliberately non-obvious.
+   ========================================================================== */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-content: var(--content);
+  --color-content-muted: var(--content-muted);
+  --color-hairline: var(--hairline);
+  --color-control-border: var(--control-border);
+  --color-accent: var(--accent);
+  --color-accent-on: var(--accent-on);
+  --color-accent-text: var(--accent-text);
+  --color-focus: var(--focus);
+  --color-danger: var(--danger);
+}
+
+:root {
+  color-scheme: light;
+  --bg: var(--color-sand-100); /* warm ivory, not cool grey */
+  --surface: #ffffff;
+  --content: var(--color-navy-900); /* 16.78 on bg */
+  --content-muted: var(--color-navy-600); /* 8.43 on bg */
+  --hairline: var(--color-sand-300); /* decorative — exempt from 1.4.11 */
+  /* Stays cool navy deliberately: every warm grey tested topped out at 2.72
+     against the ivory bg and failed the 3:1 control-boundary rule. 3.37 here. */
+  --control-border: var(--color-navy-400);
+
+  /* cyan-700, NOT the brand cyan-500: #01B4E6 is 2.25 on this bg and fails
+     badly. cyan-700 gives 5.65 as text and 6.08 with a white label on it. */
+  --accent: var(--color-cyan-700);
+  --accent-on: #ffffff; /* 6.08 on the fill */
+  --accent-text: var(--color-cyan-700); /* 5.65 on bg */
+  --focus: var(--color-cyan-700); /* 5.65 */
+
+  /* #DC2626 is 4.49 on this bg — fails by 0.01. This is 5.16. */
+  --danger: #cc1f1f;
+
+  /* Light mode's ivory already matches its high-key video, so no override. */
+  --hero-lid: var(--bg);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  /* Near-neutral surfaces with a faint navy cast, warmed slightly. Saturated
+     navy surfaces collapse text contrast and read as a dated intranet. */
+  --bg: var(--color-ink-900); /* #0A0E14 */
+  --surface: var(--color-ink-800); /* #141A24 */
+  --content: var(--color-ink-100); /* warm off-white — 16.23 on bg */
+  --content-muted: var(--color-ink-300); /* 8.77 on bg */
+  --hairline: var(--color-ink-700);
+  --control-border: var(--color-navy-500); /* 3.20 — cool, for the same reason */
+
+  /* Dark mode can use the true brand cyan — it's excellent on near-black. */
+  --accent: var(--color-cyan-500); /* brand #01B4E6 */
+  --accent-on: var(--color-navy-900); /* navy label on bright fill — 7.49 */
+  --accent-text: var(--color-cyan-500); /* 8.09 on bg, 7.21 on surface */
+  --focus: var(--color-cyan-400); /* 9.78 on bg */
+  --danger: #f87171; /* 7.09 on bg */
+
+  /* The hero lid reads too grey against the blue-navy video background, because
+     --bg is a near-neutral ink. navy-900 is the blue-leaning ramp step that sits
+     closest to the veiled video, so the static hero and the revealed background
+     belong to the same family. */
+  --hero-lid: var(--color-navy-900);
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+@layer base {
+  * {
+    min-width: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  /* Lenis owns the scroll when it's active, so hand it over. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  html.lenis {
+    scroll-behavior: auto;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  /* The base colour lives on <html> and <body> stays transparent, so the fixed
+     SiteBackground layer (z-index -10) is visible. An opaque body would paint
+     straight over it. */
+  html {
+    background: var(--bg);
+  }
+
+  body {
+    background: transparent;
+    color: var(--content);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  /* Never remove focus outright — only replace it where a custom ring exists. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-on);
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* ==========================================================================
+   MOTION
+   Every animation must be reachable by this switch. The audience is largely on
+   mid-range Android phones, so this is a real performance lever, not just a11y.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@utility container-page {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 80rem;
+  padding-inline: 1.25rem;
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+  }
+}

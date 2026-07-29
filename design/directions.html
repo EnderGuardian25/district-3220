@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interact District 3220 — Design Directions</title>
+<link rel="icon" href="data:,">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Inter+Tight:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOOL CHROME — deliberately neutral so it never biases a sample
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font: 400 15px/1.6 'Inter', system-ui, sans-serif;
+  color: #16181d;
+  background: #fbfbfc;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: -0.02em; }
+p { margin: 0; }
+a { color: inherit; }
+code {
+  font: 500 0.85em ui-monospace, 'SF Mono', Menlo, monospace;
+  background: #eceef1;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+.masthead { padding: 56px 0 32px; border-bottom: 1px solid #e4e6ea; }
+.masthead .eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #8a8f99; margin-bottom: 14px;
+}
+.masthead h1 { font-size: clamp(28px, 4vw, 40px); line-height: 1.1; }
+.masthead .lede { margin-top: 14px; max-width: 68ch; color: #52575f; font-size: 16px; }
+
+/* --- sticky picker ------------------------------------------------ */
+.picker {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(251,251,252,0.86);
+  backdrop-filter: blur(12px) saturate(1.4);
+  border-bottom: 1px solid #e4e6ea;
+  padding: 14px 0;
+}
+.picker-row { display: flex; flex-wrap: wrap; gap: 22px 32px; align-items: center; }
+.picker-group { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.picker-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #8a8f99; white-space: nowrap;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font: 500 13px/1 'Inter', sans-serif;
+  padding: 8px 12px; border-radius: 7px;
+  border: 1px solid #dcdfe4; background: #fff; color: #3d424a;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.chip:hover { border-color: #b6bbc3; }
+.chip[aria-pressed="true"] { background: #16181d; border-color: #16181d; color: #fff; }
+.chip:focus-visible { outline: 2px solid #2E7DF6; outline-offset: 2px; }
+.chip .dot {
+  width: 11px; height: 11px; border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.14);
+}
+
+section.block { padding: 64px 0; border-bottom: 1px solid #e4e6ea; }
+.block-head { margin-bottom: 32px; max-width: 72ch; }
+.block-head h2 { font-size: 22px; }
+.block-head p { margin-top: 10px; color: #52575f; }
+.note {
+  margin-top: 16px; padding: 14px 16px; border-radius: 9px;
+  background: #fff8e8; border: 1px solid #f0dfb4; color: #6b5418;
+  font-size: 14px; max-width: 78ch;
+}
+.note strong { font-weight: 600; }
+
+/* ============================================================
+   LIVE PREVIEW — driven by --p-* (palette) and --f-* (font) vars
+   ============================================================ */
+/* Frames stack full-width rather than side-by-side: at 1440px a side-by-side
+   pair gives each mock only ~580px, which trips the mobile container queries
+   and hides the desktop accordion entirely. */
+.preview-frames { display: grid; gap: 24px; grid-template-columns: 1fr; }
+
+.frame {
+  border: 1px solid #e0e2e7; border-radius: 14px; overflow: hidden;
+  background: #fff;
+}
+.frame-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 14px; border-bottom: 1px solid #e0e2e7; background: #f6f7f8;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #8a8f99;
+}
+
+/* --- the mock itself --------------------------------------------- */
+.mock {
+  background: var(--p-bg);
+  color: var(--p-text);
+  font-family: var(--f-body);
+  container-type: inline-size;
+}
+.mock-inner { padding: 40px 36px 44px; }
+@container (max-width: 560px) { .mock-inner { padding: 28px 22px 32px; } }
+
+.mock-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; padding: 16px 36px;
+  border-bottom: 1px solid var(--p-border);
+}
+@container (max-width: 560px) { .mock-nav { padding: 14px 22px; } }
+.mock-logo {
+  font-family: var(--f-display); font-size: 17px; font-weight: var(--f-display-wt);
+  letter-spacing: -0.01em; color: var(--p-text);
+}
+.mock-nav-links { display: flex; gap: 20px; font-size: 13px; color: var(--p-muted); }
+@container (max-width: 700px) { .mock-nav-links { display: none; } }
+.mock-nav-links span[data-active] { color: var(--p-accent-text); font-weight: 500; }
+
+.eyebrow-line {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.13em;
+  text-transform: uppercase; color: var(--p-accent-text);
+}
+.eyebrow-line::before {
+  content: ""; width: 22px; height: 1px; background: var(--p-accent-text);
+}
+
+.mock h3.display {
+  font-family: var(--f-display);
+  font-weight: var(--f-display-wt);
+  font-size: clamp(34px, 7cqw, 62px);
+  line-height: var(--f-display-lh);
+  letter-spacing: var(--f-display-ls);
+  margin: 20px 0 0;
+  color: var(--p-text);
+  text-wrap: balance;
+}
+.mock h3.display em {
+  font-style: var(--f-display-em, italic);
+  color: var(--p-accent-text);
+}
+.mock .lede-body {
+  margin-top: 18px; max-width: 46ch;
+  font-size: 15.5px; line-height: 1.65; color: var(--p-muted);
+}
+
+.mock-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+.btn {
+  font-family: var(--f-body); font-size: 14px; font-weight: 500;
+  padding: 12px 20px; border-radius: 8px; border: 1px solid transparent;
+  cursor: pointer; transition: filter .15s, background .15s;
+}
+.btn-primary { background: var(--p-accent); color: var(--p-accent-on); }
+.btn-primary:hover { filter: brightness(0.93); }
+.btn-ghost {
+  background: transparent; color: var(--p-text);
+  border-color: var(--p-border-strong);
+}
+.btn-ghost:hover { background: var(--p-surface); }
+
+.mock-stats {
+  display: flex; flex-wrap: wrap; gap: 34px;
+  margin-top: 40px; padding-top: 26px;
+  border-top: 1px solid var(--p-border);
+}
+.stat .n {
+  font-family: var(--f-display); font-weight: var(--f-display-wt);
+  font-size: 30px; line-height: 1; color: var(--p-text);
+  letter-spacing: var(--f-display-ls);
+}
+.stat .l {
+  margin-top: 7px; font-size: 11px; font-weight: 500;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--p-muted);
+}
+
+/* --- accordion strip -------------------------------------------- */
+.acc-section {
+  padding: 34px 36px 40px; background: var(--p-surface);
+  border-top: 1px solid var(--p-border);
+}
+@container (max-width: 560px) { .acc-section { padding: 26px 22px 30px; } }
+.acc-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.acc-head h4 {
+  font-family: var(--f-display); font-weight: var(--f-display-wt);
+  font-size: 24px; letter-spacing: var(--f-display-ls); color: var(--p-text);
+}
+.acc-head .hint { font-size: 12px; color: var(--p-muted); }
+
+.acc { display: flex; gap: 8px; height: 260px; }
+.acc-panel {
+  position: relative; flex: 0 0 78px; border-radius: 11px; overflow: hidden;
+  cursor: pointer; border: 1px solid var(--p-border);
+  background: var(--panel-bg);
+  transition: flex-basis .55s cubic-bezier(.22,1,.36,1);
+}
+.acc-panel[aria-expanded="true"] { flex: 1 1 auto; }
+.acc-panel::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 30%, var(--p-scrim) 100%);
+}
+/* Dashed inset marks these as awaiting real photography, so the placeholder
+   colour never gets mistaken for the design. */
+.acc-panel::before {
+  content: ""; position: absolute; inset: 7px; border-radius: 7px;
+  border: 1px dashed rgba(255,255,255,.22); pointer-events: none;
+}
+.acc-panel .acc-num {
+  position: absolute; top: 12px; left: 13px; z-index: 2;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  color: rgba(255,255,255,.72);
+}
+.acc-panel .acc-label {
+  position: absolute; z-index: 2; left: 14px; bottom: 14px;
+  color: #fff; font-family: var(--f-body);
+}
+.acc-panel .acc-label .t {
+  font-size: 14px; font-weight: 600; white-space: nowrap;
+}
+.acc-panel .acc-label .d {
+  font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,.82);
+  max-width: 34ch; margin-top: 6px;
+  opacity: 0; transition: opacity .3s .2s;
+}
+.acc-panel[aria-expanded="true"] .acc-label .d { opacity: 1; }
+.acc-panel:not([aria-expanded="true"]) .acc-label {
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  left: 14px; bottom: 14px; top: 34px; overflow: hidden;
+}
+/* "International Understanding" overruns the vertical rail at 14px, so the
+   collapsed label steps down a size and drops its description. */
+.acc-panel:not([aria-expanded="true"]) .acc-label .t {
+  font-size: 12px; letter-spacing: 0.005em;
+}
+.acc-panel:not([aria-expanded="true"]) .acc-label .d { display: none; }
+.acc-panel:focus-visible { outline: 2px solid var(--p-accent); outline-offset: 2px; }
+@container (max-width: 620px) {
+  .acc { flex-direction: column; height: auto; }
+  .acc-panel { flex: 0 0 66px; }
+  .acc-panel[aria-expanded="true"] { flex: 0 0 210px; }
+  /* Collapsed panels are only 66px tall, so a bottom-anchored label collides
+     with the top-left number. Centre the label and move the number right. */
+  .acc-panel:not([aria-expanded="true"]) .acc-label {
+    writing-mode: horizontal-tb; transform: translateY(-50%);
+    top: 50%; bottom: auto; left: 16px;
+  }
+  .acc-panel:not([aria-expanded="true"]) .acc-num {
+    top: 50%; left: auto; right: 14px; transform: translateY(-50%);
+  }
+}
+
+/* ============================================================
+   PALETTE CATALOGUE
+   ============================================================ */
+.pal-list { display: grid; gap: 20px; }
+.pal-card {
+  border: 1px solid #e0e2e7; border-radius: 14px; background: #fff;
+  padding: 22px 24px 24px;
+}
+.pal-card.is-picked { border-color: #16181d; box-shadow: 0 0 0 1px #16181d; }
+.pal-card-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; }
+.pal-card-head h3 { font-size: 17px; }
+.pal-card-head .hex {
+  font: 500 12px ui-monospace, Menlo, monospace; color: #8a8f99;
+}
+.pal-card-head .tag {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 8px; border-radius: 5px; background: #eef0f3; color: #6b7079;
+}
+.pal-card > p.why { margin-top: 9px; color: #52575f; font-size: 14px; max-width: 76ch; }
+
+.ramp { display: flex; margin-top: 18px; border-radius: 8px; overflow: hidden; }
+.ramp div {
+  flex: 1; height: 46px; position: relative;
+  display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px;
+  font: 600 9px ui-monospace, Menlo, monospace;
+}
+.ramp-name {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #8a8f99; margin: 16px 0 0;
+}
+
+.contrast-grid {
+  margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+}
+@media (max-width: 880px) { .contrast-grid { grid-template-columns: 1fr; } }
+table.ct { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+table.ct caption {
+  text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #8a8f99; padding-bottom: 8px;
+}
+table.ct th, table.ct td {
+  text-align: left; padding: 6px 8px; border-bottom: 1px solid #edeef1;
+}
+table.ct th { font-weight: 500; color: #52575f; }
+table.ct td.r { font: 600 12.5px ui-monospace, Menlo, monospace; text-align: right; }
+table.ct td.v { text-align: right; width: 62px; }
+.pass, .fail, .aaa {
+  font-size: 10px; font-weight: 700; letter-spacing: .04em;
+  padding: 2px 6px; border-radius: 4px;
+}
+.aaa  { background: #dcf5e4; color: #1c6b36; }
+.pass { background: #e6f2dc; color: #3f6b1c; }
+.fail { background: #fde4e4; color: #a11b1b; }
+
+.swatch-demo {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px;
+}
+.swatch-demo span {
+  font-size: 12px; padding: 7px 11px; border-radius: 6px;
+}
+
+/* ============================================================
+   FONT CATALOGUE
+   ============================================================ */
+.font-list { display: grid; gap: 18px; }
+.font-card {
+  border: 1px solid #e0e2e7; border-radius: 14px; background: #fff;
+  padding: 26px 28px 28px;
+}
+.font-card.is-picked { border-color: #16181d; box-shadow: 0 0 0 1px #16181d; }
+.font-card-head {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px;
+  padding-bottom: 18px; margin-bottom: 20px; border-bottom: 1px solid #edeef1;
+}
+.font-card-head h3 { font-size: 17px; }
+.font-card-head .stack { font: 500 12px ui-monospace, Menlo, monospace; color: #8a8f99; }
+.font-card-head .tag {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 8px; border-radius: 5px; background: #eef0f3; color: #6b7079;
+}
+.font-card > p.why { margin: -8px 0 20px; color: #52575f; font-size: 14px; max-width: 76ch; }
+.spec {
+  font-family: var(--fc-display); font-weight: var(--fc-display-wt);
+  font-size: clamp(30px, 5vw, 52px); line-height: var(--fc-display-lh);
+  letter-spacing: var(--fc-display-ls);
+  color: #16181d; text-wrap: balance; margin: 0;
+}
+.spec em { font-style: var(--fc-display-em, italic); color: #8a8f99; }
+.spec-body {
+  font-family: var(--fc-body); margin-top: 18px; max-width: 58ch;
+  font-size: 15.5px; line-height: 1.68; color: #3d424a;
+}
+.spec-meta {
+  font-family: var(--fc-body); margin-top: 16px;
+  display: flex; flex-wrap: wrap; gap: 26px;
+}
+.spec-meta .m .k {
+  font-family: var(--fc-display); font-weight: var(--fc-display-wt);
+  font-size: 26px; line-height: 1; letter-spacing: var(--fc-display-ls);
+}
+.spec-meta .m .u {
+  margin-top: 6px; font-size: 10.5px; font-weight: 500;
+  letter-spacing: .1em; text-transform: uppercase; color: #8a8f99;
+}
+.spec-ui {
+  font-family: var(--fc-body); margin-top: 22px; padding-top: 18px;
+  border-top: 1px solid #edeef1;
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+}
+.spec-ui .nav-sample { display: flex; gap: 18px; font-size: 13px; color: #6b7079; }
+.spec-ui .btn-sample {
+  font-family: var(--fc-body); font-size: 13.5px; font-weight: 500;
+  padding: 10px 16px; border-radius: 7px; background: #0A1628; color: #fff;
+  border: none;
+}
+
+footer.foot { padding: 48px 0 72px; color: #8a8f99; font-size: 13px; }
+footer.foot p + p { margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Interact District 3220 · Design directions</p>
+    <h1>Pick a palette and a type pairing.</h1>
+    <p class="lede">
+      Every option below is built on the deep navy you chose (<code>#0A1628</code>) and is designed to
+      read clean rather than loud. Use the controls to combine any palette with any pairing and see the
+      result on a real home-page mock, in light and dark. Contrast ratios are computed live in this
+      page against the WCAG 2.1 formula — nothing here is estimated.
+    </p>
+  </div>
+</header>
+
+<div class="picker">
+  <div class="wrap picker-row">
+    <div class="picker-group">
+      <span class="picker-label">Palette</span>
+      <div class="chips" id="palChips"></div>
+    </div>
+    <div class="picker-group">
+      <span class="picker-label">Type</span>
+      <div class="chips" id="fontChips"></div>
+    </div>
+    <div class="picker-group">
+      <span class="picker-label">View</span>
+      <div class="chips" id="modeChips">
+        <button class="chip" data-mode="both" aria-pressed="true">Both</button>
+        <button class="chip" data-mode="light" aria-pressed="false">Light</button>
+        <button class="chip" data-mode="dark" aria-pressed="false">Dark</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <h2>Live combination</h2>
+      <p>
+        The mock uses real content — the 2026-27 theme, the district's actual statistics, and the five
+        avenues. The accordion is interactive: click or tab through the panels.
+      </p>
+      <div class="note">
+        <strong>Placeholder imagery.</strong> The accordion panels show colour blocks because
+        <code>images/avenues/</code> contains icons only. Five real photographs — one per avenue, ideally
+        from district projects — are needed before this section is finished.
+      </div>
+    </div>
+    <div class="preview-frames side-by-side" id="frames"></div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <h2>The five palettes</h2>
+      <p>
+        Shared navy ramp, five different accents. Ratios are measured on the pairs that actually carry
+        meaning: body text, secondary text, links, and button fills. <strong>AA</strong> needs 4.5:1 for
+        body text and 3:1 for large text and UI borders; <strong>AAA</strong> needs 7:1.
+      </p>
+    </div>
+    <div class="pal-list" id="palList"></div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <h2>The six type pairings</h2>
+      <p>
+        Each set with identical content so you're comparing the typefaces, not the words. Ordered from
+        most expressive to most minimal — the lower ones are the safer answer to "clean, not over the top".
+      </p>
+    </div>
+    <div class="font-list" id="fontList"></div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Tell me which palette number and which pairing number to build with, and I'll lock them into tokens and start the scaffold.</p>
+    <p>Palette and type are independent — any combination works. If you want to mix (e.g. one palette's accent with another's neutrals), say so.</p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   COLOUR MATH — WCAG 2.1 relative luminance + contrast ratio
+   Computed here so every number on the page is verifiable.
+   ============================================================ */
+const hexToRgb = h => {
+  const n = parseInt(h.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+const luminance = hex => {
+  const [r, g, b] = hexToRgb(hex).map(v => {
+    const s = v / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const contrast = (a, b) => {
+  const [l1, l2] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (l1 + 0.05) / (l2 + 0.05);
+};
+/* Pick whichever of black/white is more legible on a given fill. */
+const bestOn = bg => contrast(bg, '#ffffff') >= contrast(bg, '#0A1628') ? '#ffffff' : '#0A1628';
+
+/* --- token solvers ------------------------------------------------
+   Rather than hardcoding ramp steps and hoping they pass, walk the ramp in
+   preference order and take the first step that actually clears the threshold.
+   Every palette then satisfies contrast by construction, not by luck. */
+const firstMeeting = (ramp, keys, against, min) => {
+  for (const k of keys) if (contrast(ramp[k], against) >= min) return ramp[k];
+  return ramp[keys[keys.length - 1]];
+};
+/* A fill needs a legible label sitting on top of it. */
+const accessibleFill = (ramp, keys) => {
+  for (const k of keys) if (contrast(bestOn(ramp[k]), ramp[k]) >= 4.5) return ramp[k];
+  return ramp[keys[keys.length - 1]];
+};
+
+const badge = (ratio, large = false) => {
+  const min = large ? 3 : 4.5;
+  const r = ratio.toFixed(2);
+  if (ratio >= 7)   return `<td class="v"><span class="aaa">AAA</span></td><td class="r">${r}</td>`;
+  if (ratio >= min) return `<td class="v"><span class="pass">AA</span></td><td class="r">${r}</td>`;
+  return `<td class="v"><span class="fail">FAIL</span></td><td class="r">${r}</td>`;
+};
+
+/* ============================================================
+   NAVY — shared across all five directions
+   ============================================================ */
+const NAVY = {
+  50:'#F4F7FA', 100:'#E5EBF2', 200:'#C8D5E4', 300:'#9FB3CC', 400:'#6E88AB',
+  500:'#4A6489', 600:'#33496B', 700:'#223451', 800:'#16243B', 900:'#0A1628', 950:'#050C17'
+};
+
+/* ============================================================
+   PALETTES
+   ============================================================ */
+const PALETTES = [
+  {
+    id: 'ember', name: 'Ember', tag: 'Warm · energetic', hue: '14°',
+    why: 'The orange-red you were heading toward, pushed 8° warmer so its tints land on peach instead of pink. Reads young and active without shouting, and sits far enough from error-red that a primary button never looks like a warning.',
+    accent: { 50:'#FFF4F0',100:'#FFE4DA',200:'#FFC7B3',300:'#FFA184',400:'#FF855F',500:'#FF6B35',600:'#E04E1C',700:'#B93D14',800:'#8F3113',900:'#682611' }
+  },
+  {
+    id: 'brass', name: 'Brass', tag: 'Warm · classic', hue: '38°',
+    why: 'A muted gold — adjacent to Rotary\'s own without copying it. The calmest of the warm options and the most naturally "institutional but modern". Its deep end doubles as a usable text colour, which the brighter accents can\'t manage.',
+    accent: { 50:'#FFF9EF',100:'#FCEED2',200:'#F7DAA2',300:'#EFBE6A',400:'#E5A742',500:'#D18B22',600:'#AE6E19',700:'#8B5617',800:'#6C4316',900:'#4F3113' }
+  },
+  {
+    id: 'terracotta', name: 'Terracotta', tag: 'Warm · restrained', hue: '13°',
+    why: 'Ember with the saturation pulled back. Quieter and more grown-up; the accent recedes so photography and typography lead. The most "clean aesthetic" of the warm three, and the least likely to date.',
+    accent: { 50:'#FBF4F2',100:'#F5E4DF',200:'#E9C6BB',300:'#D9A08F',400:'#CC8069',500:'#BC5B41',600:'#A04833',700:'#82392A',800:'#652D22',900:'#4A231B' }
+  },
+  {
+    id: 'kingfisher', name: 'Kingfisher', tag: 'Cool · crisp', hue: '174°',
+    why: 'A clear teal against the navy. Cool-on-cool, so the page stays composed, but the hue gap is wide enough that actions are unmistakable. Freshest and cleanest option here — and the accent survives on both white and near-black without retuning.',
+    accent: { 50:'#EFFBF8',100:'#D0F5EC',200:'#A0E8DB',300:'#66D5C3',400:'#2FBBA6',500:'#12A08F',600:'#0B8175',700:'#0B675F',800:'#0C524D',900:'#0B3E3A' }
+  },
+  {
+    id: 'signal', name: 'Signal', tag: 'Cool · quietest', hue: '213°',
+    why: 'Near-monochrome: one bright blue lifted out of the same family as the navy. The most restrained direction on the page — almost no colour decisions competing for attention, so layout and type carry everything. Risk: it reads more corporate than youthful.',
+    accent: { 50:'#EFF5FF',100:'#DBE7FE',200:'#BAD1FD',300:'#8DB2FB',400:'#5B90F8',500:'#2E7DF6',600:'#155FD9',700:'#124AAD',800:'#133E8A',900:'#14356D' }
+  }
+];
+
+/* Semantic mapping. Light mode uses a faint navy-tinted page rather than pure
+   white — softer on the eye and it makes white cards read as elevated.
+   Dark mode uses near-neutral navy-cast surfaces, NOT saturated navy, which is
+   what keeps text contrast from collapsing. */
+const modeTokens = (p, mode) => {
+  if (mode === 'light') {
+    const bg = NAVY[50];
+    /* --p-border is a decorative hairline (exempt from 1.4.11); --p-border-strong
+       is a control boundary (ghost button) and must clear 3:1. */
+    const strong = firstMeeting(NAVY, [400, 500, 600, 700], bg, 3);
+    const fill = accessibleFill(p.accent, [500, 600, 700, 800]);
+    return {
+      '--p-bg': bg, '--p-surface': '#FFFFFF',
+      '--p-text': NAVY[900], '--p-muted': NAVY[600],
+      '--p-border': NAVY[200], '--p-border-strong': strong,
+      '--p-accent': fill, '--p-accent-on': bestOn(fill),
+      '--p-accent-text': firstMeeting(p.accent, [600, 700, 800, 900], bg, 4.5),
+      '--p-scrim': 'rgba(10,22,40,.82)'
+    };
+  }
+  const bg = NAVY[950];
+  const strong = firstMeeting(NAVY, [500, 400, 300], bg, 3);
+  const fill = accessibleFill(p.accent, [400, 300, 200]);
+  return {
+    '--p-bg': bg, '--p-surface': '#0C1A2E',
+    '--p-text': NAVY[100], '--p-muted': NAVY[300],
+    '--p-border': '#1C2E47', '--p-border-strong': strong,
+    '--p-accent': fill, '--p-accent-on': bestOn(fill),
+    '--p-accent-text': firstMeeting(p.accent, [300, 200, 100], bg, 4.5),
+    '--p-scrim': 'rgba(3,8,16,.86)'
+  };
+};
+
+/* ============================================================
+   TYPE PAIRINGS — expressive → minimal
+   ============================================================ */
+const FONTS = [
+  {
+    id:'editorial', name:'Instrument Serif + Inter', tag:'Editorial · high contrast',
+    stack:"'Instrument Serif' / 'Inter'",
+    why:'The sharpest hierarchy here. Instrument Serif is genuinely characterful at large sizes and disappears politely at small ones, so it only ever does headline work. Inter handles everything else invisibly. Most "designed" of the six.',
+    display:"'Instrument Serif', Georgia, serif", body:"'Inter', system-ui, sans-serif",
+    wt:400, lh:1.04, ls:'-0.015em', em:'italic'
+  },
+  {
+    id:'warm', name:'Fraunces + Instrument Sans', tag:'Expressive · warm',
+    stack:"'Fraunces' / 'Instrument Sans'",
+    why:'Fraunces has a soft, slightly wonky warmth that suits a youth organisation better than a formal serif does. Variable, so weight and optical size are tunable. The boldest pick — verges on "over the top" if used at heavy weights.',
+    display:"'Fraunces', Georgia, serif", body:"'Instrument Sans', system-ui, sans-serif",
+    wt:600, lh:1.06, ls:'-0.02em', em:'italic'
+  },
+  {
+    id:'quiet', name:'Newsreader + Inter Tight', tag:'Editorial · restrained',
+    stack:"'Newsreader' / 'Inter Tight'",
+    why:'Newsreader is a reading serif rather than a display one, so headlines feel composed instead of decorative. Inter Tight adds a little density without looking cramped. My pick for "modern but not over the top" — clean, confident, quiet.',
+    display:"'Newsreader', Georgia, serif", body:"'Inter Tight', system-ui, sans-serif",
+    wt:500, lh:1.1, ls:'-0.018em', em:'italic'
+  },
+  {
+    id:'harmonious', name:'DM Serif Display + DM Sans', tag:'Cohesive · safe',
+    stack:"'DM Serif Display' / 'DM Sans'",
+    why:'Designed as a family, so the pairing needs no negotiation — it simply works. The most conventional option: nothing here will surprise anyone, which is either reassuring or forgettable depending on your ambition.',
+    display:"'DM Serif Display', Georgia, serif", body:"'DM Sans', system-ui, sans-serif",
+    wt:400, lh:1.1, ls:'-0.01em', em:'italic'
+  },
+  {
+    id:'technical', name:'Space Grotesk + Inter', tag:'All-sans · technical',
+    stack:"'Space Grotesk' / 'Inter'",
+    why:'No serif at all. Space Grotesk\'s odd details give headlines personality while staying firmly modern. Reads more tech-product than service-organisation — good if you want to feel current, less good if you want to feel established.',
+    display:"'Space Grotesk', system-ui, sans-serif", body:"'Inter', system-ui, sans-serif",
+    wt:600, lh:1.08, ls:'-0.03em', em:'normal'
+  },
+  {
+    id:'minimal', name:'Outfit — single family', tag:'Geometric · minimal',
+    stack:"'Outfit' 300–800",
+    why:'One geometric sans doing everything, with hierarchy from weight and scale alone. Cleanest and fastest — one font file. Youthful and tidy, but there is no typographic contrast to fall back on, so layout and colour must carry all the interest.',
+    display:"'Outfit', system-ui, sans-serif", body:"'Outfit', system-ui, sans-serif",
+    wt:600, lh:1.06, ls:'-0.032em', em:'normal'
+  }
+];
+
+/* ============================================================
+   CONTENT — real, from CONTENT.md
+   ============================================================ */
+const AVENUES = [
+  { n:'Community Service',            d:'The heart and soul of the movement.' },
+  { n:'International Understanding',  d:'Building good-will across communities.' },
+  { n:'Club Service',                 d:'Strengthening the foundation of every club.' },
+  { n:'Green Life',                   d:'Service that answers to the planet.' },
+  { n:'Finance',                      d:'Fundraising that powers every other avenue.' }
+];
+
+let sel = { pal: PALETTES[0], font: FONTS[2], mode: 'both' };
+
+/* ---- mock markup ------------------------------------------------- */
+const mockHTML = p => `
+  <div class="mock-nav">
+    <div class="mock-logo">Interact 3220</div>
+    <div class="mock-nav-links">
+      <span data-active>Home</span><span>About</span><span>Calendar</span>
+      <span>News</span><span>Archives</span><span>Contact</span>
+    </div>
+  </div>
+  <div class="mock-inner">
+    <p class="eyebrow-line">Rotary year 2026–27</p>
+    <h3 class="display">Create <em>lasting</em> impact.</h3>
+    <p class="lede-body">
+      Interact District 3220 brings together young people across Sri Lanka and the Maldives
+      to serve their communities — and to build something that outlasts the year.
+    </p>
+    <div class="mock-cta">
+      <button class="btn btn-primary">Find your club</button>
+      <button class="btn btn-ghost">About the district</button>
+    </div>
+    <div class="mock-stats">
+      <div class="stat"><div class="n">3,500</div><div class="l">Members</div></div>
+      <div class="stat"><div class="n">100+</div><div class="l">Clubs</div></div>
+      <div class="stat"><div class="n">9</div><div class="l">Zones</div></div>
+      <div class="stat"><div class="n">1962</div><div class="l">Since</div></div>
+    </div>
+  </div>
+  <div class="acc-section">
+    <div class="acc-head">
+      <h4>Five avenues of service</h4>
+      <span class="hint">Click a panel</span>
+    </div>
+    <div class="acc">
+      ${AVENUES.map((a, i) => `
+        <div class="acc-panel" role="button" tabindex="0"
+             aria-expanded="${i === 0}"
+             style="--panel-bg:linear-gradient(155deg, ${p.accent[900]} 0%, ${NAVY[800]} 46%, ${NAVY[950]} 100%)">
+          <span class="acc-num">0${i + 1}</span>
+          <div class="acc-label">
+            <div class="t">${a.n}</div>
+            <div class="d">${a.d}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+
+const frameHTML = (p, f, mode) => {
+  const vars = { ...modeTokens(p, mode),
+    '--f-display': f.display, '--f-body': f.body,
+    '--f-display-wt': f.wt, '--f-display-lh': f.lh,
+    '--f-display-ls': f.ls, '--f-display-em': f.em };
+  const style = Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';');
+  return `<div class="frame">
+    <div class="frame-bar"><span>${mode}</span><span>${p.name} · ${f.name}</span></div>
+    <div class="mock" style="${style}">${mockHTML(p)}</div>
+  </div>`;
+};
+
+/* ---- accordion behaviour ---------------------------------------- */
+const wireAccordions = root => {
+  root.querySelectorAll('.acc').forEach(acc => {
+    const panels = [...acc.querySelectorAll('.acc-panel')];
+    const open = i => panels.forEach((el, j) =>
+      el.setAttribute('aria-expanded', String(i === j)));
+    panels.forEach((el, i) => {
+      el.addEventListener('click', () => open(i));
+      el.addEventListener('mouseenter', () => open(i));
+      el.addEventListener('focus', () => open(i));
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(i); }
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); panels[(i + 1) % panels.length].focus(); }
+        if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); panels[(i - 1 + panels.length) % panels.length].focus(); }
+      });
+    });
+  });
+};
+
+/* ---- render preview --------------------------------------------- */
+const renderFrames = () => {
+  const el = document.getElementById('frames');
+  const modes = sel.mode === 'both' ? ['light', 'dark'] : [sel.mode];
+  el.innerHTML = modes.map(m => frameHTML(sel.pal, sel.font, m)).join('');
+  wireAccordions(el);
+};
+
+/* ---- palette catalogue ------------------------------------------ */
+const rampHTML = ramp => `<div class="ramp">${
+  Object.entries(ramp).map(([k, v]) =>
+    `<div style="background:${v};color:${bestOn(v)}">${k}</div>`).join('')}</div>`;
+
+const contrastTable = (p, mode) => {
+  const t = modeTokens(p, mode);
+  const bg = t['--p-bg'], surf = t['--p-surface'];
+  const rows = [
+    ['Body text on page',      t['--p-text'],   bg,   false],
+    ['Body text on surface',   t['--p-text'],   surf, false],
+    ['Secondary text',         t['--p-muted'],  bg,   false],
+    ['Accent link',            t['--p-accent-text'], bg, false],
+    ['Eyebrow / label (large)',t['--p-accent-text'], bg, true],
+    ['Button label on accent', t['--p-accent-on'], t['--p-accent'], false],
+    ['Border on page (UI)',    t['--p-border-strong'], bg, true]
+  ];
+  return `<table class="ct">
+    <caption>${mode}</caption>
+    <tbody>${rows.map(([label, fg, b, large]) => `
+      <tr>
+        <th>${label}${large ? ' <span style="color:#b6bbc3">·3:1</span>' : ''}</th>
+        ${badge(contrast(fg, b), large)}
+      </tr>`).join('')}</tbody>
+  </table>`;
+};
+
+const renderPalettes = () => {
+  document.getElementById('palList').innerHTML = PALETTES.map((p, i) => {
+    const lt = modeTokens(p, 'light'), dk = modeTokens(p, 'dark');
+    return `<article class="pal-card ${p.id === sel.pal.id ? 'is-picked' : ''}">
+      <div class="pal-card-head">
+        <h3>${i + 1}. ${p.name}</h3>
+        <span class="tag">${p.tag}</span>
+        <span class="hex">accent ${p.accent[500]} · hue ${p.hue}</span>
+      </div>
+      <p class="why">${p.why}</p>
+      <p class="ramp-name">Navy — structure, text, surfaces</p>
+      ${rampHTML(NAVY)}
+      <p class="ramp-name">${p.name} — actions and highlights only</p>
+      ${rampHTML(p.accent)}
+      <p class="ramp-name">In context</p>
+      <div class="swatch-demo">
+        <span style="background:${lt['--p-accent']};color:${lt['--p-accent-on']}">Primary button · light</span>
+        <span style="background:${lt['--p-bg']};color:${lt['--p-accent-text']};box-shadow:inset 0 0 0 1px ${lt['--p-border']}">Accent link · light</span>
+        <span style="background:${dk['--p-accent']};color:${dk['--p-accent-on']}">Primary button · dark</span>
+        <span style="background:${dk['--p-bg']};color:${dk['--p-accent-text']}">Accent link · dark</span>
+        <span style="background:#DC2626;color:#fff">Error red — check separation</span>
+      </div>
+      <div class="contrast-grid">
+        ${contrastTable(p, 'light')}
+        ${contrastTable(p, 'dark')}
+      </div>
+    </article>`;
+  }).join('');
+};
+
+/* ---- font catalogue --------------------------------------------- */
+const renderFonts = () => {
+  document.getElementById('fontList').innerHTML = FONTS.map((f, i) => `
+    <article class="font-card ${f.id === sel.font.id ? 'is-picked' : ''}"
+      style="--fc-display:${f.display};--fc-body:${f.body};--fc-display-wt:${f.wt};--fc-display-lh:${f.lh};--fc-display-ls:${f.ls};--fc-display-em:${f.em}">
+      <div class="font-card-head">
+        <h3>${i + 1}. ${f.name}</h3>
+        <span class="tag">${f.tag}</span>
+        <span class="stack">${f.stack}</span>
+      </div>
+      <p class="why">${f.why}</p>
+      <p class="spec">Create <em>lasting</em> impact.</p>
+      <p class="spec-body">
+        Interact District 3220 brings together young people across Sri Lanka and the Maldives to serve
+        their communities. Founded in 1962, Interact is Rotary International's service club for people
+        aged 12 to 19 — and this district is one of its largest.
+      </p>
+      <div class="spec-meta">
+        <div class="m"><div class="k">3,500</div><div class="u">Members</div></div>
+        <div class="m"><div class="k">100+</div><div class="u">Clubs</div></div>
+        <div class="m"><div class="k">9</div><div class="u">Zones</div></div>
+      </div>
+      <div class="spec-ui">
+        <div class="nav-sample"><span>Home</span><span>About</span><span>Calendar</span><span>Archives</span></div>
+        <button class="btn-sample">Find your club</button>
+      </div>
+    </article>`).join('');
+};
+
+/* ---- chips ------------------------------------------------------- */
+const buildChips = () => {
+  document.getElementById('palChips').innerHTML = PALETTES.map((p, i) =>
+    `<button class="chip" data-pal="${p.id}" aria-pressed="${p.id === sel.pal.id}">
+       <span class="dot" style="background:${p.accent[500]}"></span>${i + 1}. ${p.name}
+     </button>`).join('');
+  document.getElementById('fontChips').innerHTML = FONTS.map((f, i) =>
+    `<button class="chip" data-font="${f.id}" aria-pressed="${f.id === sel.font.id}">${i + 1}. ${f.name.split(' + ')[0].replace(' — single family','')}</button>`).join('');
+};
+
+const syncPressed = (containerId, attr, value) => {
+  document.querySelectorAll(`#${containerId} .chip`).forEach(c =>
+    c.setAttribute('aria-pressed', String(c.dataset[attr] === value)));
+};
+
+document.addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  if (chip.dataset.pal) {
+    sel.pal = PALETTES.find(p => p.id === chip.dataset.pal);
+    syncPressed('palChips', 'pal', sel.pal.id);
+    renderFrames(); renderPalettes();
+  } else if (chip.dataset.font) {
+    sel.font = FONTS.find(f => f.id === chip.dataset.font);
+    syncPressed('fontChips', 'font', sel.font.id);
+    renderFrames(); renderFonts();
+  } else if (chip.dataset.mode) {
+    sel.mode = chip.dataset.mode;
+    syncPressed('modeChips', 'mode', sel.mode);
+    renderFrames();
+  }
+});
+
+buildChips();
+renderFrames();
+renderPalettes();
+renderFonts();
+</script>
+</body>
+</html>

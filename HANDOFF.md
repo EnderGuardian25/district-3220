@@ -8,7 +8,126 @@
 
 ---
 
-## Current Status — 2026-06-15
+## Current Status — 2026-07-30
+
+**Phase:** Site build. Home page substantially built; design direction locked.
+
+> **START HERE NEXT SESSION:** the avenues image carousel is still visually broken.
+> See [Known broken](#known-broken--fix-first) below. Do not trust my last diagnosis —
+> it was made from source, not from the browser, and the fix did not resolve it.
+
+### Tech stack (decided)
+| | |
+|---|---|
+| Framework | Next.js 16 (App Router, TypeScript) |
+| Styling | Tailwind CSS v4 (CSS-first `@theme`) |
+| Motion | Framer Motion 12 + Lenis |
+| Media | sharp, ffmpeg-static, ffprobe-static |
+| Hosting | **Not decided** — build is host-agnostic |
+
+Versions deliberately match `EnderGuardian25/personal-portfolio` (the effects lab at
+lab.damiandc.com) so its effects lift across directly.
+
+### Design decisions
+**All locked decisions live in [`design/DECISIONS.md`](design/DECISIONS.md)** — palette with
+verified contrast ratios, typography, motion plan, nav URL mapping. Read that before
+changing anything visual. Revision 2 at the top supersedes the tables below it.
+
+Headlines: deep navy + official Interact cyan `#01B4E6`, warm neutrals (ivory `#F7F6F3` /
+ink `#0A0E14`), Outfit throughout, radii 14/24/28px, editorial rows rather than cards.
+
+### Built
+- **Scaffold** — Next.js + Tailwind v4 + Framer Motion + Lenis; theme resolved before
+  first paint (no flash); `prefers-reduced-motion` respected throughout.
+- **Nav + footer** — labels and order identical to the old Wix site; clean URLs with 301s
+  from every old path in `next.config.ts`; accessible dropdowns; theme toggle; social
+  links as inline SVG.
+- **Home page** — full-viewport split hero (copy left, assembly photo bleeding right),
+  pinned aperture reveal, stats, avenues accordion, events as editorial rows, closing CTA.
+- **Background video** — Higgsfield renders encoded to 1280x720 AV1 + H.264 with AVIF
+  posters via `scripts/encode-bg-video.mjs`. Not loaded on touch / reduced-motion /
+  Save-Data / 2g-3g; paused when the tab is hidden.
+- **Favicon** — the real Rotary wheel, cropped from the supplied logo.
+- `images/` moved to `public/images/` (all 150 tracked as git renames).
+
+### Known broken — FIX FIRST
+1. **Avenues image carousel is visually broken.** Reported twice. I rewrote
+   `components/home/avenues-accordion.tsx` addressing four real source-level defects
+   (clipped logo plate in the 84px collapsed rail, an invisible full-height paragraph
+   still being laid out, a crushed index number, absolute+rotate label swapped for
+   `writing-mode`). The rewrite is on disk and hot-reloaded, **but the problem persists.**
+   Strongest untested hypothesis: the panels are too translucent to see —
+   `bg-surface/55` collapsed is ~55% white over pale silk in light mode, so the rail may
+   read as logos floating with no panel behind them. **Open the page and look before
+   changing anything.**
+
+### Unverified — a tool outage blocked all checking
+The sandbox safety classifier went down partway through the session, blocking every
+command and browser tool (read-only tools still worked). Everything below is written but
+**never typechecked, built, or seen**:
+- The carousel rewrite.
+- Closing CTA made theme-aware (was hardcoded navy on a light page).
+- `--hero-runway` 100svh; aperture centred at 50%/50% instead of drifting.
+- `--hero-lid` navy for dark mode — a **reasoned pick from the ramp, not a measured
+  match** to the video. Measure the veiled video mean and refine.
+- Navbar snap fix (backdrop-filter cross-faded by opacity instead of class swap).
+- Odometer digit-grouping fix (a year was rendering as "1,964" mid-count).
+- `scripts/encode-bg-video.mjs` rewritten to remove the cross-fade and instead SEARCH the
+  interpolated timeline for the quietest hard cut. **The videos in `public/videos/` are
+  from the OLD cross-fade version — re-run the script.**
+- Light video grade lowered so the folds stay visible (was blowing out to 205/226/234).
+
+**First commands to run next session:**
+```powershell
+npx tsc --noEmit
+npx next dev --port 3000
+node scripts/encode-bg-video.mjs "<dark.mp4>" "<light.mp4>"   # sources in ~/Downloads
+```
+
+### Facts corrected this session — do not regress
+- **Rotary theme 2026-27 is "Create Lasting Impact"** (RI President Olayinka "Yinka" H.
+  Babalola, International Assembly 12 Jan 2026). `CONTENT.md` still carries the 2025/26
+  theme throughout and needs a pass. Do **not** use material tied to Sangkoo Yun — he was
+  originally selected for 2026-27, then resigned and died.
+- **Two different founding dates.** The Interact movement was founded globally 5 Nov 1962;
+  **Interact began in District 3220 in 1964.** `lib/site.ts` keeps both as
+  `movementFounded` / `districtFounded`. District-facing copy uses 1964.
+- Official Interact cyan is `#01B4E6`, sampled from the supplied logo. It **cannot carry
+  text on a light background** (2.25:1) — light-mode text uses `cyan-700 #026B87`.
+
+### Higgsfield
+CLI and MCP installed and authenticated; 7 skills installed (project-scoped, in
+`.agents/skills/`, gitignored). **Generation is currently blocked** by the API:
+`free_trial_model_requires_plan` on a "plus" plan — this is an account/plan issue, not a
+CLI one. Credits were consumed per generation despite an expected unlimited trial.
+Prompts and settings for regenerating the background videos manually are in
+[`design/higgsfield/VIDEO-BRIEF.md`](design/higgsfield/VIDEO-BRIEF.md).
+
+### Remaining tasks
+1. **Fix the avenues carousel** (see above) — first job.
+2. Verify everything in the "Unverified" list; run typecheck and a production build.
+3. Re-encode the background videos with the new no-cross-fade script.
+4. Measure and refine `--hero-lid` against the veiled video.
+5. Page transitions + apply the shared `Reveal` primitive consistently.
+6. Image pipeline over the remaining ~150 council/archive/DIMUN assets (currently only the
+   hero photo and avenue logos are optimised).
+7. Accessibility sweep in **both** themes: computed contrast, focus visibility, keyboard
+   paths through nav/accordion/rows, reduced-motion.
+8. Verify on throttled mobile (mid-range Android is the real audience) + Lighthouse.
+9. Build the remaining ~19 pages: About, Meet The Council 2026/27, College of DIRs,
+   Calendar, Admin Documents, News, Newsletter, Archives (14 year pages), Media Crew,
+   Contact.
+10. Form back-ends: Contact, Request a Date, Media Crew request.
+
+### Content still needed from the district
+- **2026/27 council roster** — `CONTENT.md §5` is the 2025/26 council.
+- **Current 2026/27 events** — every event in `CONTENT.md §3` has now passed.
+- **Avenue photography** — five images would replace the logo watermarks standing in now.
+- `dirs/dir-2016-17-chathula-fernando.jpg` still 403 on the Wix CDN.
+
+---
+
+## Earlier Status — 2026-06-15
 
 **Phase:** Content discovery & asset capture (started).
 
@@ -53,7 +172,12 @@
 | `images-manifest.js` | Shared list of all original images (id, friendly name, category, page, alt). |
 | `download-images.js` | Node bulk downloader → `./images/<category>/`. |
 | `download-images.html` | Browser-based image downloader (interactive gallery). |
-| `images/` | (Created on first download run) Original full-resolution assets. |
+| `public/images/` | Original full-resolution assets (moved from `images/` when the site was scaffolded). |
+| `design/DECISIONS.md` | **Locked design decisions** — palette with verified contrast, type, motion, URL map. Read before changing anything visual. |
+| `design/directions.html` | The interactive palette/type comparison the direction was chosen from. |
+| `design/higgsfield/VIDEO-BRIEF.md` | Prompts + settings for regenerating the background videos. |
+| `scripts/encode-bg-video.mjs` | Encodes background renders to web loops; finds the seamless cut by measurement. |
+| `app/`, `components/`, `lib/` | The Next.js site. |
 
 ## How to download the images
 **Option A — Node (recommended, saves straight into `images/`):**
