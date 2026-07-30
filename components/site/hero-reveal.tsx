@@ -83,6 +83,13 @@ export function HeroReveal({ children }: { children: ReactNode }) {
       // artefact can survive at the edges.
       lid.style.opacity = p >= 0.999 ? '0' : '1';
 
+      // CRITICAL: opacity 0 hides the hero but it still hit-tests, and the
+      // sticky z-20 stage keeps overlapping the viewport well past the wipe —
+      // which made everything beneath (avenues accordion, event links)
+      // unclickable. Once the aperture is fully open the stage must be inert;
+      // scrolling back up restores it.
+      stage.style.pointerEvents = p >= 0.999 ? 'none' : '';
+
       if (r <= 0.5) {
         // A zero-size radial-gradient is invalid — stay fully solid.
         lid.style.maskImage = 'none';

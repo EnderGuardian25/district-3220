@@ -1,5 +1,18 @@
 # Design Decisions — Interact District 3220 rebuild
 
+> **Revision 3 — 2026-07-30.** Cleanliness pass, user-approved direction: silk background
+> stays visible but toned down; glassy surfaces stay glassy but must be *present*.
+>
+> - Background veil `bg-bg/62` → **`/80` light, `/70` dark**. At 62% the light theme read
+>   as milky haze — ivory never appeared and sections didn't separate from the moving
+>   ground.
+> - Collapsed avenue panels: `bg-surface/85` + `border-hairline` (were /55, borderless —
+>   invisible over light silk). Event-row hover `/40` → `/60`.
+> - Background videos re-encoded with the measured **hard-cut loop** (no cross-fade),
+>   found by a (start, end) pair search. Dark seam 0.75x its own motion (invisible);
+>   light 2.11x — but 0.75% absolute and ~0.15% under the 80% veil, preferred over a
+>   pingpong loop's visible flow reversal.
+
 > **Revision 2 — 2026-07-29.** Superseding changes after first review, newest first.
 > The palette/type tables further down are still the base; these override them.
 >

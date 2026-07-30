@@ -12,9 +12,12 @@
  * briefly double-exposed. Instead the script SEARCHES for the cut:
  *
  *   1. Render the full clip through scale → grade → slow → interpolate.
- *   2. Compare every candidate end frame against frame 0 (mean absolute
- *      difference on greyscale thumbnails).
- *   3. Cut at the frame with the quietest join, and report it against that
+ *   2. Compare every candidate (start, end) frame PAIR (mean absolute
+ *      difference on greyscale thumbnails). Trimming the head as well as the
+ *      tail matters: a fixed frame 0 gives ~140 candidate joins, a pair search
+ *      gives thousands — the low-motion light clip needed that to get its seam
+ *      under its own average motion.
+ *   3. Cut at the pair with the quietest join, and report it against that
  *      clip's own average frame-to-frame motion. Below 1.0x means the seam is
  *      smaller than normal movement, i.e. invisible.
  *
@@ -51,6 +54,12 @@ const SPEED = 0.6;
 
 /** Only consider cuts in this portion of the clip, so loops stay a usable length. */
 const SEARCH_FROM = 0.55;
+
+/** How much of the head the pair search may trim away looking for a match. */
+const HEAD_MAX = 0.2;
+
+/** Never ship a loop shorter than this fraction of the processed clip. */
+const MIN_LEN = 0.5;
 
 const VARIANTS = {
   dark: { grade: null },
@@ -96,7 +105,7 @@ function renderIntermediate(src, grade, dest) {
     '-pix_fmt', 'yuv420p', '-y', dest]);
 }
 
-/** Find the end frame whose join back to frame 0 is quietest. */
+/** Find the (start, end) frame pair whose join is quietest. */
 async function findLoopCut(mid, workDir) {
   rmSync(workDir, { recursive: true, force: true });
   mkdirSync(workDir, { recursive: true });
@@ -119,16 +128,21 @@ async function findLoopCut(mid, workDir) {
   for (let i = 1; i < bufs.length; i++) motion += mae(bufs[i - 1], bufs[i]);
   motion /= bufs.length - 1;
 
-  let best = { frames: bufs.length, seam: Infinity };
-  for (let i = Math.floor(bufs.length * SEARCH_FROM); i < bufs.length; i++) {
-    const seam = mae(bufs[0], bufs[i]);
-    // i is a 0-based index; keeping i frames ends on frame i-1, so the join is
-    // frame i-1 → frame 0. Compare against frame i for that reason.
-    if (seam < best.seam) best = { frames: i, seam };
+  // Pair search: the loop keeps frames [start, end) and joins frame end-1 back
+  // to frame `start`, so the seam is mae(bufs[start], bufs[end]) — the frame
+  // that WOULD have come next vs the one that actually does.
+  const n = bufs.length;
+  let best = { start: 0, end: n, seam: Infinity };
+  const minLen = Math.floor(n * MIN_LEN);
+  for (let s = 0; s <= Math.floor(n * HEAD_MAX); s++) {
+    for (let e = Math.max(Math.floor(n * SEARCH_FROM), s + minLen); e < n; e++) {
+      const seam = mae(bufs[s], bufs[e]);
+      if (seam < best.seam) best = { start: s, end: e, seam };
+    }
   }
 
   rmSync(workDir, { recursive: true, force: true });
-  return { ...best, motion, total: bufs.length };
+  return { ...best, motion, total: n };
 }
 
 async function encode(name, src, cfg) {
@@ -140,7 +154,10 @@ async function encode(name, src, cfg) {
   const mp4 = `${OUT_DIR}/bg-${name}.mp4`;
   const webm = `${OUT_DIR}/bg-${name}.webm`;
   const poster = `${OUT_DIR}/bg-${name}-poster.avif`;
-  const trim = ['-vf', `trim=end_frame=${cut.frames},setpts=PTS-STARTPTS`];
+  const trim = [
+    '-vf',
+    `trim=start_frame=${cut.start}:end_frame=${cut.end},setpts=PTS-STARTPTS`,
+  ];
 
   // H.264 — universal fallback. Smooth gradients band easily, so we lean on a
   // moderate CRF rather than a hard bitrate cap.
@@ -151,14 +168,16 @@ async function encode(name, src, cfg) {
   run(['-i', mid, ...trim, '-an', '-c:v', 'libaom-av1', '-crf', '42', '-b:v', '0',
     '-cpu-used', '5', '-row-mt', '1', '-tiles', '2x1', '-pix_fmt', 'yuv420p', '-y', webm]);
 
-  // Poster: frame 1 of the processed video, so playback starts without a flash.
-  run(['-i', mid, '-frames:v', '1',
+  // Poster: the LOOP's first frame (not the clip's), so playback starts
+  // without a flash.
+  run(['-i', mid, ...trim, '-frames:v', '1',
     '-c:v', 'libaom-av1', '-crf', '32', '-still-picture', '1', '-y', poster]);
 
   const kb = (p) => (statSync(p).size / 1024).toFixed(0) + ' KB';
   const ratio = cut.seam / cut.motion;
+  const len = cut.end - cut.start;
   console.log(
-    `${name.padEnd(6)} ${(cut.frames / FPS).toFixed(2)}s hard cut at frame ${cut.frames}/${cut.total}` +
+    `${name.padEnd(6)} ${(len / FPS).toFixed(2)}s hard cut, frames [${cut.start}, ${cut.end}) of ${cut.total}` +
       `  ·  seam ${cut.seam.toFixed(2)} vs motion ${cut.motion.toFixed(2)} = ${ratio.toFixed(2)}x` +
       ` ${ratio <= 1 ? '(invisible)' : '(check)'}` +
       `  ·  mp4 ${kb(mp4)}  ·  webm ${kb(webm)}  ·  poster ${kb(poster)}`,

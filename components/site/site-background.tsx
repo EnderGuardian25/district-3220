@@ -61,8 +61,11 @@ export function SiteBackground() {
 
       {useVideo && <BackgroundVideo theme={theme} poster={poster} />}
 
-      {/* Veil — this is what guarantees text contrast over the moving footage. */}
-      <div className="absolute inset-0 bg-bg/62" />
+      {/* Veil — this is what guarantees text contrast over the moving footage.
+          Heavier in light mode: at 62% the ivory theme read as a milky haze and
+          sections never separated from the moving ground. The silk stays
+          clearly visible, just calmer. */}
+      <div className="absolute inset-0 bg-bg/80 dark:bg-bg/70" />
     </div>
   );
 }

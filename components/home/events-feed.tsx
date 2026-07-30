@@ -83,7 +83,7 @@ function EventRow({ event, index }: { event: DistrictEvent; index: number }) {
           href={link}
           target="_blank"
           rel="noreferrer noopener"
-          className="block transition-colors hover:bg-surface/40"
+          className="block transition-colors hover:bg-surface/60"
         >
           {body}
           <span className="sr-only">

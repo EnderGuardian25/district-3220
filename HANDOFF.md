@@ -12,9 +12,13 @@
 
 **Phase:** Site build. Home page substantially built; design direction locked.
 
-> **START HERE NEXT SESSION:** the avenues image carousel is still visually broken.
-> See [Known broken](#known-broken--fix-first) below. Do not trust my last diagnosis —
-> it was made from source, not from the browser, and the fix did not resolve it.
+> **2026-07-30 (later session): the avenues carousel is FIXED.** The root cause was never
+> in the accordion — the pinned hero (`components/site/hero-reveal.tsx`, sticky `z-20`
+> stage) stayed **hit-testable at `opacity: 0`** after the aperture wipe and kept
+> overlapping the viewport for the whole runway, swallowing every pointer event meant for
+> the sections beneath (accordion, event links). Fix: `stage.style.pointerEvents = 'none'`
+> once `p >= 0.999`, restored on scroll-back. Verified in the browser: click, hover and
+> arrow-key navigation all work; hero CTAs still work at the top.
 
 ### Tech stack (decided)
 | | |
@@ -50,39 +54,43 @@ ink `#0A0E14`), Outfit throughout, radii 14/24/28px, editorial rows rather than 
 - **Favicon** — the real Rotary wheel, cropped from the supplied logo.
 - `images/` moved to `public/images/` (all 150 tracked as git renames).
 
-### Known broken — FIX FIRST
-1. **Avenues image carousel is visually broken.** Reported twice. I rewrote
-   `components/home/avenues-accordion.tsx` addressing four real source-level defects
-   (clipped logo plate in the 84px collapsed rail, an invisible full-height paragraph
-   still being laid out, a crushed index number, absolute+rotate label swapped for
-   `writing-mode`). The rewrite is on disk and hot-reloaded, **but the problem persists.**
-   Strongest untested hypothesis: the panels are too translucent to see —
-   `bg-surface/55` collapsed is ~55% white over pale silk in light mode, so the rail may
-   read as logos floating with no panel behind them. **Open the page and look before
-   changing anything.**
+### Fixed & verified — 2026-07-30 (later session)
+All checked in a real browser (Chrome DevTools MCP) on `next dev` at 1440×900 and
+390×844, both themes:
+- **Avenues carousel interactivity** — root cause and fix in the note at the top of this
+  section. The accordion rewrite from the earlier session was fine; it was never
+  receiving events.
+- `npx tsc --noEmit` passes for the whole previously-unverified batch.
+- Closing CTA is theme-aware (white panel on light, navy on dark). ✓
+- Odometer renders `1964` un-grouped at rest (no "1,964"). ✓
+- Hero CTAs clickable at p=0; aperture centred; reveal ring rides the edge. ✓
+- Mobile: accordion stacks correctly, tap targets fine, poster-only background. ✓
+- Only console note: Next.js flags the first avenue logo as LCP (suggests
+  `loading="eager"`) — harmless, revisit during the perf pass.
 
-### Unverified — a tool outage blocked all checking
-The sandbox safety classifier went down partway through the session, blocking every
-command and browser tool (read-only tools still worked). Everything below is written but
-**never typechecked, built, or seen**:
-- The carousel rewrite.
-- Closing CTA made theme-aware (was hardcoded navy on a light page).
-- `--hero-runway` 100svh; aperture centred at 50%/50% instead of drifting.
-- `--hero-lid` navy for dark mode — a **reasoned pick from the ramp, not a measured
-  match** to the video. Measure the veiled video mean and refine.
-- Navbar snap fix (backdrop-filter cross-faded by opacity instead of class swap).
-- Odometer digit-grouping fix (a year was rendering as "1,964" mid-count).
-- `scripts/encode-bg-video.mjs` rewritten to remove the cross-fade and instead SEARCH the
-  interpolated timeline for the quietest hard cut. **The videos in `public/videos/` are
-  from the OLD cross-fade version — re-run the script.**
-- Light video grade lowered so the folds stay visible (was blowing out to 205/226/234).
+### Design cleanliness pass — 2026-07-30 (user-approved direction)
+User verdict: light mode read as milky haze. Chosen direction (via explicit options):
+**keep the silk visible but toned down; keep glassy surfaces but make them present.**
+- Site background veil raised `bg-bg/62` → **`bg-bg/80` light / `bg-bg/70` dark**
+  (`components/site/site-background.tsx`). Sections now separate from the moving ground.
+- Collapsed avenue panels `border-transparent bg-surface/55` →
+  **`border-hairline bg-surface/85 hover:bg-surface`** — glassy but visible in light mode.
+- Event row hover `bg-surface/40` → `bg-surface/60`.
 
-**First commands to run next session:**
-```powershell
-npx tsc --noEmit
-npx next dev --port 3000
-node scripts/encode-bg-video.mjs "<dark.mp4>" "<light.mp4>"   # sources in ~/Downloads
-```
+### Background videos — re-encoded 2026-07-30 with the hard-cut loop (no fade)
+`scripts/encode-bg-video.mjs` upgraded from "best end frame vs frame 0" to a
+**(start, end) pair search** (head trim up to 20%, loop ≥ 50% of the clip; poster now
+taken from the loop's first frame). Shipped from `~/Downloads/dark-mode.mp4` +
+`light_mode.mp4`:
+- **dark** 13.04s, frames [4, 317) — seam **0.75x** its own motion → invisible.
+- **light** 12.88s, frames [9, 318) — seam **2.11x** (down from 2.96x). The graded light
+  clip barely moves, so the ratio is strict: in absolute terms the seam is 0.75% raw and
+  ~0.15% on screen under the 80% ivory veil, one frame every 12.9s — chosen over a
+  pingpong loop, whose multi-second flow reversal would be far more visible than this.
+Both verified playing on the page (webm picked, readyState 4). Production build passes.
+
+**Dev server note:** port 3000 was occupied by something else on this machine — use
+`npx next dev --port 3100`.
 
 ### Facts corrected this session — do not regress
 - **Rotary theme 2026-27 is "Create Lasting Impact"** (RI President Olayinka "Yinka" H.
@@ -104,9 +112,9 @@ Prompts and settings for regenerating the background videos manually are in
 [`design/higgsfield/VIDEO-BRIEF.md`](design/higgsfield/VIDEO-BRIEF.md).
 
 ### Remaining tasks
-1. **Fix the avenues carousel** (see above) — first job.
-2. Verify everything in the "Unverified" list; run typecheck and a production build.
-3. Re-encode the background videos with the new no-cross-fade script.
+1. ~~Fix the avenues carousel~~ ✅ 2026-07-30 (root cause was the hero reveal).
+2. ~~Verify the "Unverified" list; typecheck and production build~~ ✅ 2026-07-30.
+3. ~~Re-encode the background videos~~ ✅ 2026-07-30 (pair-search hard cut).
 4. Measure and refine `--hero-lid` against the veiled video.
 5. Page transitions + apply the shared `Reveal` primitive consistently.
 6. Image pipeline over the remaining ~150 council/archive/DIMUN assets (currently only the
@@ -198,6 +206,10 @@ Open `download-images.html` in any browser. Click **Download All** (saves to you
 - CMS need: will council/DIR/events/newsletter data be edited by non-developers (suggests a CMS or structured data files)?
 
 ## Change log
+- **2026-07-30 (later)** — Carousel interactivity fixed (hero reveal was swallowing pointer
+  events at opacity 0); full unverified batch checked in-browser both themes; design
+  cleanliness pass (veil /80 light /70 dark, panels /85 + hairline) per user decision;
+  videos re-encoded with pair-search hard-cut loop; production build green.
 - **2026-06-15** — Initial content crawl, image manifest, downloaders, CONTENT.md and HANDOFF.md created.
 - **2026-06-15** — Second pass: crawled all Archives sub-pages → ARCHIVES.md; captured full blog bodies; added 12 archive-logo images (93/94 downloaded); flagged 2 broken archive links + missing 1991/92.
 - **2026-06-16** — Captured past-year council pages (2024/25 + 2022/23) with 43 member portraits → ARCHIVES.md Past Councils; manifest now 137 images (136 downloaded). Flagged 2023/24 & 2021/22 council pages as 404.

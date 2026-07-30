@@ -91,7 +91,9 @@ export function AvenuesAccordion() {
               className={`group relative flex shrink-0 overflow-hidden rounded-card border text-left transition-colors duration-300 md:basis-[84px] ${
                 isActive
                   ? 'border-hairline bg-surface'
-                  : 'border-transparent bg-surface/55 hover:bg-surface/80'
+                  : // Glassy but PRESENT: at /55 with no border the collapsed
+                    // rail vanished into the light-mode silk entirely.
+                    'border-hairline bg-surface/85 hover:bg-surface'
               }`}
               style={{ minHeight: isActive ? undefined : '84px' }}
             >
