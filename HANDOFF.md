@@ -218,6 +218,10 @@ Open `download-images.html` in any browser. Click **Download All** (saves to you
 - CMS need: will council/DIR/events/newsletter data be edited by non-developers (suggests a CMS or structured data files)?
 
 ## Change log
+- **2026-08-03 (animation review + background retune)** — /review-animations pass:
+  underline butt caps (stretched round caps read as end dots), press/hover timings
+  brought into budget (150/200ms). Background rebalanced by live iteration:
+  light media filter contrast(1.2) saturate(1.15), light veil 80 → 75.
 - **2026-08-03 (later)** — Refinement pass on the locked pieces (DECISIONS.md Revision
   4.1): light-mode background media contrast boost (veil untouched), silkier aperture
   feather + richer ring, themed scrollbar + accent-color, title tracking/leading micro

@@ -3,11 +3,15 @@
 > **Revision 4.1 — 2026-08-03 (later).** Refinement pass on the locked pieces themselves
 > (user-approved; identities unchanged).
 >
-> - **Light-mode wave visibility:** `contrast(1.35) saturate(1.25)` on the background
->   MEDIA layer (`.site-bg-poster` + `#site-bg-video`), light mode only. The 80% veil
->   from Revision 3 is untouched — sharpening the media instead of thinning the veil is
->   what makes the waves read without reopening the milky-haze problem. Chosen over a
->   74% veil variant in a live A/B.
+> - **Light-mode wave visibility:** `contrast(1.2) saturate(1.15)` on the background
+>   MEDIA layer (`.site-bg-poster` + `#site-bg-video`), light mode only, paired with the
+>   light veil eased **80% → 75%**. Settled by live iteration: 1.35/80 read too punchy,
+>   pure veil-thinning risks the Revision 3 milky-haze problem — this splits the
+>   difference. Dark mode carries no filter and keeps its 70% veil.
+> - **Animation review fixes** (via /review-animations): headline underline uses butt
+>   caps — `preserveAspectRatio="none"` stretches round caps into elliptical "dots";
+>   CTA press feedback 300 → 150ms (press budget is 100–160ms); arrow-chip hover
+>   500 → 200ms; event-date hover tint 300 → 200ms.
 > - **Aperture:** feather 4.5% → 6.5% of radius (min 2px) — silkier edge; ring
 >   `cyan-400/80` with an added inner glow. Mechanic, geometry and pin unchanged.
 > - **Palette reach:** `scrollbar-color` (navy-300 light / navy-600 dark thumb) and

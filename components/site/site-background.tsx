@@ -63,9 +63,10 @@ export function SiteBackground() {
 
       {/* Veil — this is what guarantees text contrast over the moving footage.
           Heavier in light mode: at 62% the ivory theme read as a milky haze and
-          sections never separated from the moving ground. The silk stays
-          clearly visible, just calmer. */}
-      <div className="absolute inset-0 bg-bg/80 dark:bg-bg/70" />
+          sections never separated from the moving ground. Eased 80 → 75 in the
+          visual-style pass, paired with a gentler contrast boost on the media
+          layer (globals.css) so the waves read without the haze coming back. */}
+      <div className="absolute inset-0 bg-bg/75 dark:bg-bg/70" />
     </div>
   );
 }

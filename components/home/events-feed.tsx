@@ -32,7 +32,7 @@ function EventRow({ event, index }: { event: DistrictEvent; index: number }) {
       <div className="text-content-muted">
         {d ? (
           <time dateTime={event.date!} className="block">
-            <span className="block text-[30px] leading-none font-semibold tracking-tight text-content tabular-nums transition-colors duration-300 group-hover:text-accent-text">
+            <span className="block text-[30px] leading-none font-semibold tracking-tight text-content tabular-nums transition-colors duration-200 group-hover:text-accent-text">
               {d.day}
             </span>
             <span className="mt-1.5 block text-[11px] font-medium tracking-[0.12em]">

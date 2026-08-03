@@ -106,7 +106,7 @@
    only the static poster exists anyway, so it costs one paint. */
 .site-bg-poster,
 #site-bg-video {
-  filter: contrast(1.35) saturate(1.25);
+  filter: contrast(1.2) saturate(1.15);
 }
 
 [data-theme='dark'] .site-bg-poster,

@@ -82,11 +82,16 @@ export function Hero() {
                       preserveAspectRatio="none"
                       className="absolute -bottom-[0.06em] left-0 h-[0.13em] w-full"
                     >
+                      {/* Butt caps, not round: preserveAspectRatio="none"
+                          stretches this ~1.4x horizontally and round caps
+                          become elliptical blobs at each end. Butt caps are
+                          immune, and a zero-length dash renders nothing at
+                          pathLength 0, so there's no start-dot flash either. */}
                       <motion.path
-                        d="M3 9C43 4 121 2 197 5"
+                        d="M1.5 9C43 4 121 2 198.5 5.5"
                         stroke="var(--color-cyan-500)"
-                        strokeWidth={7}
-                        strokeLinecap="round"
+                        strokeWidth={6.5}
+                        strokeLinecap="butt"
                         initial={reduced ? undefined : { pathLength: 0 }}
                         animate={{ pathLength: 1 }}
                         transition={{ duration: 0.7, delay: reduced ? 0 : 1.15, ease }}
@@ -118,12 +123,12 @@ export function Hero() {
             <Magnetic className="inline-block">
               <Link
                 href="/about"
-                className="group inline-flex items-center gap-3 rounded-control bg-accent py-2 pr-2 pl-6 text-sm font-medium text-accent-on transition-[filter,transform] duration-300 hover:brightness-[0.94] active:scale-[0.98]"
+                className="group inline-flex items-center gap-3 rounded-control bg-accent py-2 pr-2 pl-6 text-sm font-medium text-accent-on transition-[filter,transform] duration-150 hover:brightness-[0.94] active:scale-[0.98]"
               >
                 About the district
                 <span
                   aria-hidden="true"
-                  className="inline-flex size-8 items-center justify-center rounded-[calc(var(--radius-control)-0.375rem)] bg-accent-on/15 transition-transform duration-500 ease-out-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  className="inline-flex size-8 items-center justify-center rounded-[calc(var(--radius-control)-0.375rem)] bg-accent-on/15 transition-transform duration-200 ease-out-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 >
                   <svg viewBox="0 0 12 12" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                     <path d="M2 6h8M6.5 2.5L10 6l-3.5 3.5" />
