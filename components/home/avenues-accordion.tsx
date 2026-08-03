@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useCallback, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { MaskWipe } from '@/components/motion/mask-wipe';
 import { AVENUES } from '@/lib/site';
 
 /**
@@ -48,27 +49,29 @@ export function AvenuesAccordion() {
 
   return (
     <section aria-labelledby="avenues-heading" className="container-page py-20 md:py-24">
+      {/* No eyebrow — the headline says it, and four eyebrows in five sections
+          was a templated rhythm (visual-style pass). */}
       <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-[11px] font-semibold tracking-[0.13em] text-accent-text uppercase">
-            What we do
-          </p>
-          <h2 id="avenues-heading" className="mt-4 text-title font-semibold">
+        <MaskWipe>
+          <h2 id="avenues-heading" className="text-title font-semibold">
             Five avenues of service
           </h2>
-        </div>
+        </MaskWipe>
         <p className="max-w-[36ch] text-sm text-content-muted">
           Every project a club runs sits in one of five avenues. Together they cover the whole of
           Interact&rsquo;s work.
         </p>
       </div>
 
+      {/* Double-bezel tray: the accordion sits in a machined outer shell
+          (hairline ring + glassy fill) with the panels as the inner cores.
+          Radii are concentric — 24px cards + 8px padding = 32px shell. */}
       {/* Tablist rather than a disclosure list, because exactly one is always open. */}
       <div
         role="tablist"
         aria-label="Avenues of Interact"
         aria-orientation="horizontal"
-        className="mt-12 flex flex-col gap-2 md:h-[400px] md:flex-row"
+        className="mt-12 flex flex-col gap-2 rounded-[2rem] border border-hairline bg-surface/45 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] md:h-[416px] md:flex-row dark:bg-surface/30 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
       >
         {AVENUES.map((avenue, i) => {
           const isActive = i === active;
@@ -87,7 +90,8 @@ export function AvenuesAccordion() {
               onMouseEnter={() => setActive(i)}
               onKeyDown={(e) => onKeyDown(e, i)}
               animate={{ flexGrow: isActive ? 1 : 0 }}
-              transition={reduced ? { duration: 0 } : { duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              // Spring rather than tween — the settle has real mass to it.
+              transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 170, damping: 26 }}
               className={`group relative flex shrink-0 overflow-hidden rounded-card border text-left transition-colors duration-300 md:basis-[84px] ${
                 isActive
                   ? 'border-hairline bg-surface'
@@ -105,6 +109,16 @@ export function AvenuesAccordion() {
                 style={{
                   background: `radial-gradient(125% 115% at 14% 6%, ${avenue.logoColor}40 0%, transparent 64%)`,
                 }}
+              />
+
+              {/* Identity strip in the avenue's own colour along the left edge —
+                  gives the collapsed rails a fingerprint. Decorative. */}
+              <span
+                aria-hidden="true"
+                className={`pointer-events-none absolute top-0 left-0 h-full w-[3px] transition-opacity duration-300 ${
+                  isActive ? 'opacity-90' : 'opacity-45 group-hover:opacity-75'
+                }`}
+                style={{ background: avenue.logoColor }}
               />
 
               {/* Oversized logo watermark, filling the expanded panel until real

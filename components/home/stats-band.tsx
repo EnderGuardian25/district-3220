@@ -52,9 +52,10 @@ export function StatsBand() {
   return (
     <section aria-label="District at a glance" className="container-page pt-2 pb-2">
       <div className="grid grid-cols-2 gap-x-6 gap-y-10 border-t border-hairline pt-10 md:grid-cols-4">
-        {STATS.map((stat) => (
-          <div key={stat.label}>
-            <p className="text-[clamp(1.9rem,4vw,2.75rem)] leading-none font-semibold tracking-[-0.03em]">
+        {STATS.map((stat, i) => (
+          <div key={stat.label} className={i > 0 ? 'md:border-l md:border-hairline md:pl-8' : ''}>
+            {/* Big enough to be a moment — these four figures ARE the section. */}
+            <p className="text-[clamp(2.4rem,5vw,3.5rem)] leading-none font-semibold tracking-[-0.035em]">
               <Odometer value={stat.value} display={stat.display} />
             </p>
             <p className="mt-3 text-[11px] font-medium tracking-[0.1em] text-content-muted uppercase">

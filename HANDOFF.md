@@ -8,9 +8,21 @@
 
 ---
 
-## Current Status — 2026-07-30
+## Current Status — 2026-08-03
 
 **Phase:** Site build. Home page substantially built; design direction locked.
+
+> **2026-08-03: home-page visual-style pass shipped** (user-approved at both design and
+> ship gates). Same aesthetic, deeper execution: hero underline stroke + bloom +
+> button-in-button magnetic CTA + glass caption chip, double-bezel avenues tray and
+> closing CTA, avenue identity strips, spring accordion settle, 3.5rem stats with
+> dividers, Mask Wipe heading reveals, static film grain, eyebrows 4 → 2, one CTA label
+> per destination. Full detail in `design/DECISIONS.md` **Revision 4**. New primitives:
+> `components/motion/magnetic.tsx`, `components/motion/mask-wipe.tsx`.
+> Verified: typecheck + production build green; both themes at 1440×900 and 390×844
+> (no horizontal overflow); aperture wipe and its `pointer-events` fix confirmed intact
+> in-browser; all new motion honours `prefers-reduced-motion`; no new console messages
+> (the avenue-logo LCP note below remains the only one).
 
 > **2026-07-30 (later session): the avenues carousel is FIXED.** The root cause was never
 > in the accordion — the pinned hero (`components/site/hero-reveal.tsx`, sticky `z-20`
@@ -206,6 +218,10 @@ Open `download-images.html` in any browser. Click **Download All** (saves to you
 - CMS need: will council/DIR/events/newsletter data be edited by non-developers (suggests a CMS or structured data files)?
 
 ## Change log
+- **2026-08-03** — Home-page visual-style pass (DECISIONS.md Revision 4): hero underline
+  stroke, magnetic button-in-button CTA, double-bezel tray/panel, avenue identity strips,
+  Mask Wipe headings, film grain, stats scale-up, eyebrow + CTA-label cleanup. Both
+  themes + mobile verified in-browser; production build green.
 - **2026-07-30 (later)** — Carousel interactivity fixed (hero reveal was swallowing pointer
   events at opacity 0); full unverified batch checked in-browser both themes; design
   cleanliness pass (veil /80 light /70 dark, panels /85 + hairline) per user decision;

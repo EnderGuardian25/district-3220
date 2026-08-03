@@ -12,7 +12,11 @@ import { SITE } from '@/lib/site';
 export function ClosingCta() {
   return (
     <section className="container-page pb-4">
-      <Reveal className="relative overflow-hidden rounded-panel border border-hairline bg-surface/75 px-7 py-14 backdrop-blur-xl md:px-14 md:py-20">
+      {/* Double-bezel: hairline outer shell, glassy inner core with an inset
+          top highlight — the one panel on the page should feel machined, not
+          painted on. Radii concentric: 28px inner + 6px padding = 34px shell. */}
+      <Reveal className="rounded-[2.125rem] border border-hairline bg-surface/40 p-1.5 dark:bg-surface/25">
+        <div className="relative overflow-hidden rounded-panel bg-surface/80 px-7 py-14 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl md:px-14 md:py-20 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         {/* Faint cyan bloom. Kept subtle enough to work over a light surface as
             well as a dark one. */}
         <span
@@ -41,13 +45,15 @@ export function ClosingCta() {
             >
               Get in touch
             </Link>
+            {/* Same label as the hero's /about CTA — one label per destination. */}
             <Link
               href="/about"
               className="rounded-control border border-control-border px-5 py-3 text-sm font-medium text-content transition-colors hover:bg-surface"
             >
-              About Interact
+              About the district
             </Link>
           </div>
+        </div>
         </div>
       </Reveal>
     </section>

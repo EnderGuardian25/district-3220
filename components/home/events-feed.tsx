@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { pastEvents, upcomingEvents, type DistrictEvent } from '@/lib/events';
 import { Reveal } from '@/components/motion/reveal';
+import { MaskWipe } from '@/components/motion/mask-wipe';
 
 /**
  * Events as editorial rows, not cards.
@@ -31,7 +32,7 @@ function EventRow({ event, index }: { event: DistrictEvent; index: number }) {
       <div className="text-content-muted">
         {d ? (
           <time dateTime={event.date!} className="block">
-            <span className="block text-[26px] leading-none font-semibold tracking-tight text-content tabular-nums">
+            <span className="block text-[30px] leading-none font-semibold tracking-tight text-content tabular-nums transition-colors duration-300 group-hover:text-accent-text">
               {d.day}
             </span>
             <span className="mt-1.5 block text-[11px] font-medium tracking-[0.1em]">
@@ -107,20 +108,20 @@ export function EventsFeed() {
 
   return (
     <section aria-labelledby="events-heading" className="container-page py-20 md:py-24">
+      {/* No eyebrow — the headline already carries the upcoming/recent state
+          (visual-style pass, eyebrow rationing). */}
       <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-[11px] font-semibold tracking-[0.13em] text-accent-text uppercase">
-            {showingUpcoming ? 'What’s coming up' : 'Recently'}
-          </p>
-          <h2 id="events-heading" className="mt-4 max-w-[24ch] text-title font-semibold">
+        <MaskWipe>
+          <h2 id="events-heading" className="max-w-[24ch] text-title font-semibold">
             {showingUpcoming ? 'Upcoming across the district' : 'What the district has been doing'}
           </h2>
-        </div>
+        </MaskWipe>
+        {/* Same label as the hero's calendar link — one label per destination. */}
         <Link
           href="/calendar"
           className="group inline-flex shrink-0 items-center gap-2 text-sm font-medium text-accent-text"
         >
-          Full calendar
+          See what&rsquo;s on
           <svg viewBox="0 0 12 12" aria-hidden="true" className="size-3 transition-transform group-hover:translate-x-1">
             <path d="M2 6h8M6.5 2.5L10 6l-3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>

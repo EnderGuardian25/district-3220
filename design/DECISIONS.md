@@ -1,5 +1,31 @@
 # Design Decisions — Interact District 3220 rebuild
 
+> **Revision 4 — 2026-08-03.** Visual-style pass (user-approved direction: "keep the
+> aesthetic, make it more expensive"). Palette, type family, aperture reveal and the silk
+> background all untouched; everything below is execution depth on top of them.
+>
+> - **Display max 5.25 → 5.75rem** — the headline is three words, which earns the scale.
+> - **Hero:** animated cyan underline stroke under the last headline word (full-strength
+>   brand cyan — decorative graphics are exempt from the light-mode contrast rule); radial
+>   cyan bloom behind the copy (pure gradient, deliberately no blur filter — the aperture
+>   re-rasterises the lid per frame); primary CTA is button-in-button (arrow in a nested
+>   chip) with `active:scale-[0.98]` and **magnetic hover** (`components/motion/magnetic.tsx`,
+>   fine pointers only, motion-values so tracking never re-renders); split edge is a cyan
+>   gradient hairline; photo caption in a glass chip.
+> - **Double-bezel surfaces** — the avenues accordion sits in a machined tray
+>   (24px cards + 8px padding = 32px shell, concentric radii) and the closing CTA panel is
+>   nested the same way (28px + 6px = 34px). Collapsed avenue rails carry a 3px identity
+>   strip in the avenue's own colour; the expand animation is a near-critically-damped
+>   spring (170/26 — no overshoot into negative flexGrow).
+> - **Mask Wipe** heading reveal (§5's planned item) built as
+>   `components/motion/mask-wipe.tsx` — wrapper div animates the clip so heading ids keep
+>   serving `aria-labelledby`. Applied to avenues + events headings.
+> - **Stats numerals 2.75 → 3.5rem max** with hairline column dividers.
+> - **Film grain** — static SVG noise tile, fixed layer, 4.5% light / 6% dark. No
+>   animation, no blend mode: composites once, free on mid-range Android.
+> - **Copy discipline:** eyebrows rationed 4 → 2 (hero + Get involved); one CTA label per
+>   destination ("About the district", "See what's on"); em-dash removed from hero copy.
+
 > **Revision 3 — 2026-07-30.** Cleanliness pass, user-approved direction: silk background
 > stays visible but toned down; glassy surfaces stay glassy but must be *present*.
 >

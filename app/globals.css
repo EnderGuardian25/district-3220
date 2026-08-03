@@ -70,8 +70,10 @@
 
   --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
 
-  /* Display sizes. Tight tracking is what stops Outfit reading generic at scale. */
-  --text-display: clamp(2.75rem, 7vw, 5.25rem);
+  /* Display sizes. Tight tracking is what stops Outfit reading generic at scale.
+     Max raised 5.25 → 5.75rem in the visual-style pass: the headline is three
+     words, which earns the scale without risking a third line. */
+  --text-display: clamp(2.75rem, 7.4vw, 5.75rem);
   --text-display--line-height: 1.06;
   --text-display--letter-spacing: -0.032em;
 
@@ -143,6 +145,24 @@
   to {
     opacity: 1;
   }
+}
+
+/* Film grain — one fixed composited layer tiling a static SVG noise square.
+   Cheap even on mid-range Android: no animation, no blend mode, no scroll
+   repaints, pointer-events: none. What it buys is physical texture over the
+   silk video, which otherwise reads slightly too digital. */
+.site-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  opacity: 0.045;
+}
+
+[data-theme='dark'] .site-grain {
+  opacity: 0.06;
 }
 
 /* ==========================================================================

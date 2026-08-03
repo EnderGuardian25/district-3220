@@ -55,6 +55,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeProvider>
           <SiteBackground />
+          {/* Static film grain over everything (see .site-grain in globals.css). */}
+          <div aria-hidden="true" className="site-grain" />
           <SmoothScroll />
           <a
             href="#main"
