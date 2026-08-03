@@ -28,7 +28,7 @@ export function ClosingCta() {
           }}
         />
         <div className="relative max-w-[52ch]">
-          <p className="text-[11px] font-semibold tracking-[0.13em] text-accent-text uppercase">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-accent-text uppercase">
             Get involved
           </p>
           <h2 className="mt-5 text-title font-semibold text-content">

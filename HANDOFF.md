@@ -218,6 +218,10 @@ Open `download-images.html` in any browser. Click **Download All** (saves to you
 - CMS need: will council/DIR/events/newsletter data be edited by non-developers (suggests a CMS or structured data files)?
 
 ## Change log
+- **2026-08-03 (later)** — Refinement pass on the locked pieces (DECISIONS.md Revision
+  4.1): light-mode background media contrast boost (veil untouched), silkier aperture
+  feather + richer ring, themed scrollbar + accent-color, title tracking/leading micro
+  tighten, uppercase labels unified to 0.12em. Verified both themes; build green.
 - **2026-08-03** — Home-page visual-style pass (DECISIONS.md Revision 4): hero underline
   stroke, magnetic button-in-button CTA, double-bezel tray/panel, avenue identity strips,
   Mask Wipe headings, film grain, stats scale-up, eyebrow + CTA-label cleanup. Both

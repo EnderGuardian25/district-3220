@@ -1,5 +1,20 @@
 # Design Decisions — Interact District 3220 rebuild
 
+> **Revision 4.1 — 2026-08-03 (later).** Refinement pass on the locked pieces themselves
+> (user-approved; identities unchanged).
+>
+> - **Light-mode wave visibility:** `contrast(1.35) saturate(1.25)` on the background
+>   MEDIA layer (`.site-bg-poster` + `#site-bg-video`), light mode only. The 80% veil
+>   from Revision 3 is untouched — sharpening the media instead of thinning the veil is
+>   what makes the waves read without reopening the milky-haze problem. Chosen over a
+>   74% veil variant in a live A/B.
+> - **Aperture:** feather 4.5% → 6.5% of radius (min 2px) — silkier edge; ring
+>   `cyan-400/80` with an added inner glow. Mechanic, geometry and pin unchanged.
+> - **Palette reach:** `scrollbar-color` (navy-300 light / navy-600 dark thumb) and
+>   `accent-color: var(--accent)` for native form controls. No token values changed.
+> - **Type:** `--text-title` line-height 1.12 → 1.1, tracking −0.024 → −0.026em; all
+>   uppercase micro-labels unified to `tracking-[0.12em]` (were a mix of 0.10/0.12/0.13).
+
 > **Revision 4 — 2026-08-03.** Visual-style pass (user-approved direction: "keep the
 > aesthetic, make it more expensive"). Palette, type family, aperture reveal and the silk
 > background all untouched; everything below is execution depth on top of them.

@@ -95,7 +95,9 @@ export function HeroReveal({ children }: { children: ReactNode }) {
         lid.style.maskImage = 'none';
         lid.style.webkitMaskImage = 'none';
       } else {
-        const feather = Math.max(1.5, r * 0.045);
+        // 6.5% feather (was 4.5%) — the edge reads as light rather than cut
+        // paper. The mechanic (smoothstep, geometry, pin) is untouched.
+        const feather = Math.max(2, r * 0.065);
         const mask =
           `radial-gradient(${r.toFixed(1)}px ${r.toFixed(1)}px at ${cx.toFixed(2)}% ${cy.toFixed(2)}%,` +
           ` transparent 0, transparent ${(r - feather).toFixed(1)}px, #000 ${r.toFixed(1)}px)`;
@@ -160,7 +162,7 @@ export function HeroReveal({ children }: { children: ReactNode }) {
         <span
           aria-hidden="true"
           ref={ringRef}
-          className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-500/70 opacity-0 shadow-[0_0_28px_rgba(1,180,230,0.3)]"
+          className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-400/80 opacity-0 shadow-[0_0_32px_rgba(1,180,230,0.35),inset_0_0_18px_rgba(1,180,230,0.2)]"
         />
       </div>
     </div>

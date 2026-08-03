@@ -58,7 +58,7 @@ export function StatsBand() {
             <p className="text-[clamp(2.4rem,5vw,3.5rem)] leading-none font-semibold tracking-[-0.035em]">
               <Odometer value={stat.value} display={stat.display} />
             </p>
-            <p className="mt-3 text-[11px] font-medium tracking-[0.1em] text-content-muted uppercase">
+            <p className="mt-3 text-[11px] font-medium tracking-[0.12em] text-content-muted uppercase">
               {stat.label}
             </p>
           </div>

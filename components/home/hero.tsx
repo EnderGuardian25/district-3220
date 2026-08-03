@@ -42,7 +42,7 @@ export function Hero() {
           initial={reduced ? undefined : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease }}
-          className="flex items-center gap-3 text-[11px] font-semibold tracking-[0.13em] text-accent-text uppercase"
+          className="flex items-center gap-3 text-[11px] font-semibold tracking-[0.12em] text-accent-text uppercase"
         >
           <span aria-hidden="true" className="h-px w-7 bg-accent-text" />
           Rotary year {SITE.rotaryYear}

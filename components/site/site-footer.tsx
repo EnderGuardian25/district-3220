@@ -28,14 +28,14 @@ export function SiteFooter() {
               Rotary International&rsquo;s service club for young people aged 12&ndash;19.
               Serving {SITE.region} since {SITE.districtFounded}.
             </p>
-            <p className="mt-5 text-[11px] font-semibold tracking-[0.13em] text-accent-text uppercase">
+            <p className="mt-5 text-[11px] font-semibold tracking-[0.12em] text-accent-text uppercase">
               {SITE.rotaryYear} &middot; {SITE.rotaryTheme}
             </p>
           </div>
 
           {/* --- nav mirror --- */}
           <nav aria-label="Footer">
-            <h2 className="text-[11px] font-semibold tracking-[0.13em] text-content-muted uppercase">
+            <h2 className="text-[11px] font-semibold tracking-[0.12em] text-content-muted uppercase">
               Explore
             </h2>
             <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5">
@@ -54,7 +54,7 @@ export function SiteFooter() {
 
           {/* --- contact + social --- */}
           <div>
-            <h2 className="text-[11px] font-semibold tracking-[0.13em] text-content-muted uppercase">
+            <h2 className="text-[11px] font-semibold tracking-[0.12em] text-content-muted uppercase">
               Get in touch
             </h2>
             <ul className="mt-4 flex flex-col gap-2.5 text-sm">
@@ -76,7 +76,7 @@ export function SiteFooter() {
               </li>
             </ul>
 
-            <h2 className="mt-7 text-[11px] font-semibold tracking-[0.13em] text-content-muted uppercase">
+            <h2 className="mt-7 text-[11px] font-semibold tracking-[0.12em] text-content-muted uppercase">
               Social media
             </h2>
             <ul className="mt-4 flex flex-wrap gap-2.5">

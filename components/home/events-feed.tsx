@@ -35,12 +35,12 @@ function EventRow({ event, index }: { event: DistrictEvent; index: number }) {
             <span className="block text-[30px] leading-none font-semibold tracking-tight text-content tabular-nums transition-colors duration-300 group-hover:text-accent-text">
               {d.day}
             </span>
-            <span className="mt-1.5 block text-[11px] font-medium tracking-[0.1em]">
+            <span className="mt-1.5 block text-[11px] font-medium tracking-[0.12em]">
               {d.month} {d.year}
             </span>
           </time>
         ) : (
-          <span className="text-[11px] font-medium tracking-[0.1em] uppercase">Ongoing</span>
+          <span className="text-[11px] font-medium tracking-[0.12em] uppercase">Ongoing</span>
         )}
       </div>
 

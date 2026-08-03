@@ -78,8 +78,8 @@
   --text-display--letter-spacing: -0.032em;
 
   --text-title: clamp(1.75rem, 3.4vw, 2.75rem);
-  --text-title--line-height: 1.12;
-  --text-title--letter-spacing: -0.024em;
+  --text-title--line-height: 1.1;
+  --text-title--letter-spacing: -0.026em;
 
   --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -97,6 +97,21 @@
 
 [data-theme='dark'] .site-bg-poster {
   background-image: url('/videos/bg-dark-poster.avif');
+}
+
+/* Light mode only: the graded light clip barely moves and its waves sink under
+   the 80% ivory veil. Sharpening the MEDIA layer (not the veil) makes the
+   waves read without reopening the Revision-3 haze problem — the veil that
+   fixed it stays at 80%. A colour-matrix filter is GPU-cheap; on touch devices
+   only the static poster exists anyway, so it costs one paint. */
+.site-bg-poster,
+#site-bg-video {
+  filter: contrast(1.35) saturate(1.25);
+}
+
+[data-theme='dark'] .site-bg-poster,
+[data-theme='dark'] #site-bg-video {
+  filter: none;
 }
 
 /* ==========================================================================
@@ -187,6 +202,11 @@
 
 :root {
   color-scheme: light;
+  /* Palette reaching parts CSS colour utilities don't: the scroll thumb and
+     native form controls (checkboxes, radios, date pickers) pick up the ramp
+     instead of browser blue. Values come from the existing navy scale. */
+  scrollbar-color: var(--color-navy-300) transparent;
+  accent-color: var(--accent);
   --bg: var(--color-sand-100); /* warm ivory, not cool grey */
   --surface: #ffffff;
   --content: var(--color-navy-900); /* 16.78 on bg */
@@ -212,6 +232,7 @@
 
 [data-theme='dark'] {
   color-scheme: dark;
+  scrollbar-color: var(--color-navy-600) transparent;
   /* Near-neutral surfaces with a faint navy cast, warmed slightly. Saturated
      navy surfaces collapse text contrast and read as a dated intranet. */
   --bg: var(--color-ink-900); /* #0A0E14 */
