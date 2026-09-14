@@ -193,6 +193,18 @@ export type WallItem = {
   alt: string;
   /** Shown above the image, the way the reference strip labels each plate. */
   caption: string;
+  /**
+   * Rendered after the caption. Only set where the date is actually sourced;
+   * see the note on WALL_ITEMS. An unsourced year is a fabricated fact about
+   * the district's own record, so absent is correct where it is unknown.
+   */
+  year?: string;
+  /**
+   * 'district' is a real photograph of this district. 'stock' is a generic
+   * image inherited from the old Wix site. The distinction drives what may
+   * legitimately be captioned as an event.
+   */
+  provenance: 'district' | 'stock';
   /** Plate size in the horizontal collage. */
   size: 'sm' | 'md' | 'lg';
   /** Vertical placement, which is what stops the strip reading as a row. */
@@ -204,25 +216,38 @@ export type WallItem = {
  * every plate is the same size at the same height reads as a filmstrip, not as
  * an edit.
  *
- * Captions carry no year. The repo does not record when most of these were
- * taken, and inventing dates on a district's own record is worse than omitting
- * them. Add years here once the district confirms them.
+ * TWO THINGS TO FIX BEFORE THIS SECTION IS HONEST:
+ *
+ * 1. Provenance. Only two of these are photographs of District 3220. The six
+ *    `media-*.jpg` are the Media Crew SERVICE CATEGORY images from the old Wix
+ *    site (CONTENT.md §12) and the two `decor-*.jpg` are listed there as
+ *    "decorative imagery" (§3). They are generic stock. A section headed "A
+ *    year of the district, in photographs" that is 80% stock misrepresents the
+ *    district, so their captions name the service rather than claiming an
+ *    event, and they carry no year. Replace them with real photography.
+ *
+ * 2. Years. Only the 35th District Assembly is dated anywhere in the repo:
+ *    CONTENT.md §9 records it as 29 June 2025 at Wave & Lake, the collaring of
+ *    Int. PP. Jezon Fernando. Everything else is undated, and inventing a year
+ *    on a district's own record is worse than leaving it off.
  *
  * `blog-shawn-shiek-tribute.jpg` is deliberately absent. It is a memorial card,
  * and a tribute used as decorative filler reads badly however good the image
  * is. If the district wants it on the site it belongs in News with its context.
  */
 export const WALL_ITEMS: WallItem[] = [
-  { src: '/images/hero/assembly.webp', alt: 'Interactors filling the district assembly hall', caption: 'District Assembly, Colombo', size: 'lg', drop: 'mid' },
-  { src: '/images/media-crew/media-photography.jpg', alt: 'Student photographer on assignment', caption: 'Media Crew, photography', size: 'sm', drop: 'top' },
-  { src: '/images/blog/blog-35th-district-assembly.jpg', alt: 'Delegates at the 35th District Assembly', caption: '35th District Assembly', size: 'md', drop: 'low' },
-  { src: '/images/media-crew/media-compering.jpg', alt: 'Student compères running the floor', caption: 'Compères on the floor', size: 'lg', drop: 'top' },
-  { src: '/images/media-crew/media-livestreaming.jpg', alt: 'Students operating a livestream desk', caption: 'Media Crew, livestream desk', size: 'sm', drop: 'mid' },
-  { src: '/images/media-crew/media-videography.jpg', alt: 'Student videographer filming', caption: 'Media Crew, videography', size: 'md', drop: 'low' },
-  { src: '/images/decor/decor-sphere-stairs.jpg', alt: 'Event venue detail', caption: 'Venue detail', size: 'sm', drop: 'top' },
-  { src: '/images/media-crew/media-designing.jpg', alt: 'Student designer at work', caption: 'Media Crew, design', size: 'md', drop: 'mid' },
-  { src: '/images/media-crew/media-photo-booths.jpg', alt: 'Event photo booth', caption: 'Photo booth', size: 'sm', drop: 'low' },
-  { src: '/images/decor/decor-white-structure.jpg', alt: 'Venue architecture', caption: 'Venue architecture', size: 'md', drop: 'top' },
+  // TODO(district): confirm the year. Almost certainly the same 2025 assembly
+  // as the plate below, but the repo does not say so and it is a different shot.
+  { src: '/images/hero/assembly.webp', alt: 'Interactors from clubs across the district filling the assembly hall', caption: 'District Assembly', provenance: 'district', size: 'lg', drop: 'mid' },
+  { src: '/images/media-crew/media-photography.jpg', alt: 'A photographer holding a camera at sunset', caption: 'Media Crew, photography', provenance: 'stock', size: 'sm', drop: 'top' },
+  { src: '/images/blog/blog-35th-district-assembly.jpg', alt: 'The incoming District Interact Representative being collared at the 35th District Assembly', caption: '35th District Assembly', year: '2025', provenance: 'district', size: 'md', drop: 'low' },
+  { src: '/images/media-crew/media-compering.jpg', alt: 'A compère addressing an audience from a podium', caption: 'Media Crew, compering', provenance: 'stock', size: 'lg', drop: 'top' },
+  { src: '/images/media-crew/media-livestreaming.jpg', alt: 'A live streaming camera at an event', caption: 'Media Crew, live streaming', provenance: 'stock', size: 'sm', drop: 'mid' },
+  { src: '/images/media-crew/media-videography.jpg', alt: 'A video camera with a shotgun microphone', caption: 'Media Crew, videography', provenance: 'stock', size: 'md', drop: 'low' },
+  { src: '/images/decor/decor-sphere-stairs.jpg', alt: 'A sphere resting on a green spiral form', caption: 'Decorative', provenance: 'stock', size: 'sm', drop: 'top' },
+  { src: '/images/media-crew/media-designing.jpg', alt: 'A designer working at a laptop', caption: 'Media Crew, design', provenance: 'stock', size: 'md', drop: 'mid' },
+  { src: '/images/media-crew/media-photo-booths.jpg', alt: 'A hand holding printed photo booth strips', caption: 'Media Crew, photo booths', provenance: 'stock', size: 'sm', drop: 'low' },
+  { src: '/images/decor/decor-white-structure.jpg', alt: 'A white fanned architectural form', caption: 'Decorative', provenance: 'stock', size: 'md', drop: 'top' },
 ];
 
 /** The member-facing utility band. Mirrors the nav, minus the public pages. */

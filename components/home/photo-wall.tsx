@@ -161,7 +161,10 @@ export function PhotoWall() {
                     <span className="label-micro text-white/55">
                       {String(i + 1).padStart(2, '0')}
                     </span>
-                    <span className="label-micro text-white/80">{p.caption}</span>
+                    <span className="label-micro text-white/80">
+                      {p.caption}
+                      {p.year ? `, ${p.year}` : ''}
+                    </span>
                   </figcaption>
                   <div
                     className="relative overflow-hidden rounded-media bg-navy-800"

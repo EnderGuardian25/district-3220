@@ -8,7 +8,107 @@
 
 ---
 
-## Current Status — 2026-08-03
+## Current Status — 2026-09-14
+
+**Phase:** Home page rebuilt on a new design direction. Branch `redesign/blueprint`.
+
+The silk-video / aperture-reveal home page is gone. Everything below supersedes
+the 2026-08-03 status; that entry is kept for the decisions still in force
+(nav labels, URL mapping, 301s, the two founding dates, the 2026-27 theme).
+
+### Design direction (locked 2026-09-14)
+Chosen by comparing prototypes in `design/concepts.html` (three directions) and
+`design/concept-blueprint.html` (the merged direction, with live palette / type
+/ shape / accent pickers in the style of `design/directions.html`).
+
+| | |
+|---|---|
+| Palette | **Signal** accent (from `directions.html`) on **warm chalk** neutrals |
+| Type | **Fraunces 600** display + **Instrument Sans** body (pairing 2) |
+| Shape | Pill controls, rounded panels. Nothing square. |
+| Theme | **Light only.** No dark mode, no toggle. The theme provider is deleted. |
+
+Tokens live in `app/globals.css`. Every contrast ratio in that file is computed,
+not estimated. Three are deliberately non-obvious and should not be "tidied":
+- `signal-500` as a button fill gives white text only **3.90** and fails AA, so
+  the fill is `signal-600` (**5.78**). `signal-500` survives as a graphic mark.
+- Micro-labels use `chalk-700` (**5.02**); `chalk-600` measures 2.92 and fails.
+- Community Service avenue: white on `#D8951C` measures about **2.6** and
+  **fails AA**. It is white by explicit request. The one-line fix if it must
+  pass is to darken only that band to `#A86F12` (white reaches 4.6) while the
+  logo plate keeps the true brand amber.
+
+### Home page sections
+1. **Hero** — Clip Reveal carousel, four district photographs, exactly `100svh`
+   (not `dvh`: `dvh` re-resolves as mobile chrome collapses and shifts the copy
+   mid-scroll). Header bar is transparent over it at rest and goes solid on the
+   first scroll.
+2. **Stats** — Odometer Roll.
+3. **Projects** — Expand Grid. Five numbered tiles, tap for a shared-element
+   handoff (Framer `layoutId`) into a detail panel.
+4. **Avenues** — Accordion Gallery. All five start collapsed and equal; hover
+   opens, click locks. Becomes a list below `md`.
+5. **Photographs** — pinned horizontal collage threaded by a Line Draw.
+6. **Officers band** — inverted near-black panel, tiles fill Signal on hover.
+7. **Closing CTA.**
+
+Effects are all from `lab.damiandc.com`: Clip Reveal, Odometer Roll, Expand
+Grid, Accordion Gallery, Line Draw, Morph Cursor.
+
+### Morph cursor
+Sitewide, fine pointers only, off entirely on touch and under reduced motion
+(it hides the native pointer). It parks only on control-sized elements: without
+the size cap it inflated to cover a 140x520 accordion panel and fought that
+panel's own hover. Centring must be a `transform` — Tailwind v4's
+`-translate-1/2` writes the `translate` property, which the rAF loop also
+writes, so the two fight and the blob hangs off the pointer.
+
+### Scroll-driven animation
+The pinned horizontal scroll uses a CSS scroll-driven animation on a **named
+view timeline declared on the tall section, not on the sticky rail** (a
+timeline scoped to the rail never leaves the viewport, so it never advances).
+`--pan` is measured in JS; a percentage translate is a percentage of the rail's
+own width and overshoots. Falls back to a snap-scroll rail where unsupported,
+and to a vertical stack below `md`.
+
+### BLOCKING content gaps
+1. **Interflash and Race4Change have no photography.** Both flagged
+   `needsPhoto` in `lib/home.ts`.
+2. **IBTS and Intercede have no content at all.** Not in CONTENT.md, ARCHIVES.md
+   or lib/. Each needs a figure, headline, blurb and photo. Flagged
+   `needsContent`.
+3. **The photo collage is 80% stock.** Only `hero/assembly.webp` and
+   `blog/blog-35th-district-assembly.jpg` are photographs of this district. The
+   six `media-*.jpg` are Media Crew *service category* images (CONTENT.md §12)
+   and the two `decor-*.jpg` are listed as "decorative imagery" (§3). Their
+   captions name the service rather than claiming an event, and they carry no
+   year, but a section headed "A year of the district, in photographs" needs
+   real photography before launch. Each item carries `provenance` in
+   `lib/home.ts`.
+4. **Years.** Only the 35th District Assembly is dated in the repo (29 June
+   2025, Wave & Lake, the collaring of Int. PP. Jezon Fernando — CONTENT.md §9).
+   Every other image is undated. Years are omitted rather than guessed.
+5. Still outstanding from before: the 2026/27 council roster, current events,
+   and avenue photography.
+
+### Removed in the cleanup
+`components/home/*` (old), `site-background`, `hero-reveal`, `theme-toggle`,
+`components/theme/*`, `magnetic`, `mask-wipe`, `public/videos/*`,
+`scripts/encode-bg-video.mjs`, `design/higgsfield/`. **`public/images/` is
+untouched** — all 156 files, 293MB.
+
+### Verified
+`tsc --noEmit` and `next build` clean. No console messages. No horizontal
+overflow at 390x844 across the full scroll. Morph cursor off on touch.
+**Not yet verified: `prefers-reduced-motion` rendering.** The guards are
+written throughout but have not been exercised in a browser.
+
+### Dev server
+`npx next dev --port 3100` (port 3000 is occupied on this machine).
+
+---
+
+## Earlier Status — 2026-08-03
 
 **Phase:** Site build. Home page substantially built; design direction locked.
 
