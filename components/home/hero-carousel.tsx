@@ -89,9 +89,14 @@ export function HeroCarousel() {
         dragStart.current = null;
         if (Math.abs(dx) > 48) go(index + (dx < 0 ? 1 : -1));
       }}
-      // Pulled up under the sticky header so the photography is genuinely
-      // full-bleed. The header carries its own scrim for exactly this.
-      className="relative isolate -mt-16 h-[min(92svh,880px)] min-h-[520px] overflow-hidden bg-chalk-950 md:-mt-18"
+      // Pulled up under the sticky header by exactly the header's height, so
+      // the hero starts at y=0 and one svh fills the screen precisely.
+      //
+      // svh, not dvh: dvh re-resolves as mobile browser chrome collapses, which
+      // resizes the hero mid-scroll and shifts the copy under the reader's
+      // thumb. svh is stable and guarantees the CTAs are reachable on first
+      // paint. min-h keeps it usable in a short landscape window.
+      className="relative isolate -mt-16 h-[100svh] min-h-[520px] overflow-hidden bg-chalk-950 md:-mt-18"
     >
       {HERO_SLIDES.map((s, i) => {
         if (i > maxSeen) return null;
@@ -196,10 +201,12 @@ export function HeroCarousel() {
       {/* SiteHeader watches this to decide whether the bar is transparent (the
           photograph showing through) or solid.
 
-          It sits near the TOP of the hero, not the bottom. Anchored at the
-          bottom, the bar stayed transparent for the hero's whole height, and
-          the white CTA pills scrolled up through it as visible ghosts. */}
-      <div data-hero-top aria-hidden="true" className="absolute inset-x-0 top-32 h-px" />
+          Deliberately 16px from the hero's top, so the solid block returns on
+          the first real scroll. The transparent treatment only reads well when
+          the hero is genuinely at rest: the moment it starts moving, white nav
+          text is crossing unpredictable parts of the photograph and stops being
+          legible. 16px rather than 0 so a rubber-band bounce cannot flicker it. */}
+      <div data-hero-top aria-hidden="true" className="absolute inset-x-0 top-4 h-px" />
     </section>
   );
 }

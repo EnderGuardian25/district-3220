@@ -40,9 +40,9 @@ export function SiteHeader() {
         // Solid once the marker has passed up behind the bar.
         setScrolled(!entry.isIntersecting && entry.boundingClientRect.top < 0);
       },
-      // Shrink the root by the bar's own height so the swap happens exactly as
-      // the marker slides under it, not a bar-height later.
-      { threshold: 0, rootMargin: '-72px 0px 0px 0px' },
+      // No rootMargin: the marker sits 16px into the hero, so this flips on the
+      // first real scroll rather than a bar-height later.
+      { threshold: 0 },
     );
     io.observe(sentinel);
     return () => io.disconnect();
