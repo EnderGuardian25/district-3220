@@ -1,57 +1,79 @@
 'use client';
 
-import { motion, useReducedMotion, type Variants } from 'framer-motion';
-import type { ElementType, ReactNode } from 'react';
+import { useEffect, useRef, useState, type ElementType, type ReactNode } from 'react';
 
 /**
- * The one scroll-reveal used everywhere.
+ * Enter-once reveal, driven by IntersectionObserver rather than a scroll
+ * listener so nothing runs per frame.
  *
- * Deliberately a single shared primitive rather than per-section animations —
- * consistency is what makes motion read as designed instead of as a demo reel
- * (design/DECISIONS.md §5).
+ * Deliberately not Framer Motion: these are one-shot opacity and transform
+ * transitions on static content, and a CSS transition costs no JS at all on
+ * the sections that only need to fade up. Framer stays for the pieces that
+ * genuinely need interruptible or gesture-driven motion.
  */
+export function useEnterOnce<T extends Element>(rootMargin = '0px 0px -8% 0px') {
+  const ref = useRef<T | null>(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setShown(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([entry], obs) => {
+        if (!entry.isIntersecting) return;
+        setShown(true);
+        obs.disconnect();
+      },
+      { threshold: 0.14, rootMargin },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [rootMargin]);
+
+  return { ref, shown };
+}
+
 type RevealProps = {
   children: ReactNode;
+  /** Stagger position, in steps of 70ms. */
+  step?: number;
   as?: ElementType;
   className?: string;
-  /** Stagger index — multiplied by 60ms. Keep under ~6 or the tail drags. */
-  index?: number;
-  delay?: number;
 };
 
-export function Reveal({ children, as = 'div', className, index = 0, delay = 0 }: RevealProps) {
-  const reduced = useReducedMotion();
-  const MotionTag = motion[as as keyof typeof motion] as typeof motion.div;
-
-  if (reduced) {
-    const Tag = as as ElementType;
-    return <Tag className={className}>{children}</Tag>;
-  }
-
+export function Reveal({ children, step = 0, as: Tag = 'div', className = '' }: RevealProps) {
+  const { ref, shown } = useEnterOnce<HTMLElement>();
   return (
-    <MotionTag
-      className={className}
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-12% 0px -12% 0px' }}
-      transition={{
-        duration: 0.6,
-        delay: delay + index * 0.06,
-        ease: [0.22, 1, 0.36, 1],
-      }}
+    <Tag
+      ref={ref}
+      style={{ transitionDelay: shown ? `${step * 70}ms` : '0ms' }}
+      className={`transition-[opacity,translate] duration-[550ms] ease-out-expo ${
+        shown ? 'translate-y-0 opacity-100' : 'translate-y-[18px] opacity-0'
+      } ${className}`}
     >
       {children}
-    </MotionTag>
+    </Tag>
   );
 }
 
-/** Container + child variants for staggering a list without one Reveal per item. */
-export const staggerParent: Variants = {
-  hidden: {},
-  shown: { transition: { staggerChildren: 0.06 } },
-};
-
-export const staggerChild: Variants = {
-  hidden: { opacity: 0, y: 18 },
-  shown: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
-};
+/**
+ * The blueprint hairline that draws itself in as a section arrives. Separated
+ * from Reveal because it scales rather than translates, and because it is used
+ * as a section rule everywhere.
+ */
+export function DrawLine({ className = '' }: { className?: string }) {
+  const { ref, shown } = useEnterOnce<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      aria-hidden="true"
+      className={`h-px origin-left bg-navy-800/30 transition-transform duration-[900ms] ease-out-expo ${
+        shown ? 'scale-x-100' : 'scale-x-0'
+      } ${className}`}
+    />
+  );
+}

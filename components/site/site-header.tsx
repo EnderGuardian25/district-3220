@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { NAV, SITE } from '@/lib/site';
-import { ThemeToggle } from './theme-toggle';
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -22,12 +21,30 @@ export function SiteHeader() {
     setOpenMenu(null);
   }, [pathname]);
 
+  /**
+   * The header is hidden while a full-screen hero owns the viewport, and
+   * appears once that hero has scrolled past. Pages without a hero mark
+   * (everything except home) get the solid bar immediately.
+   *
+   * Driven by an IntersectionObserver on a sentinel at the hero's bottom edge
+   * rather than a scroll listener, so nothing runs per frame.
+   */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    const sentinel = document.querySelector('[data-hero-end]');
+    if (!sentinel) {
+      setScrolled(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        // Past the hero once the sentinel has left through the top.
+        setScrolled(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      },
+      { threshold: 0 },
+    );
+    io.observe(sentinel);
+    return () => io.disconnect();
+  }, [pathname]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -62,7 +79,13 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50">
+    <header
+      // Invisible and inert while the hero fills the screen; fades in with the
+      // solid bar once the hero is behind you.
+      className={`sticky top-0 z-50 transition-[opacity,translate] duration-300 ease-out-expo ${
+        scrolled ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'
+      }`}
+    >
       {/* The solid bar is its own layer, cross-faded by OPACITY rather than by
           swapping classes on the header. `transition-colors` does not
           interpolate `backdrop-filter`, so adding the blur on scroll made it pop
@@ -72,16 +95,6 @@ export function SiteHeader() {
         aria-hidden="true"
         className={`pointer-events-none absolute inset-0 -z-10 border-b border-hairline bg-bg/80 backdrop-blur-xl backdrop-saturate-150 transition-opacity duration-300 ${
           scrolled ? 'opacity-100' : 'opacity-0'
-        }`}
-      />
-
-      {/* Legibility scrim for the transparent state. The hero photo bleeds up
-          behind the nav, and light nav text over a bright LED wall is
-          unreadable without this. Fades out as the solid bar fades in. */}
-      <div
-        aria-hidden="true"
-        className={`pointer-events-none absolute inset-x-0 top-0 -z-10 h-28 bg-gradient-to-b from-bg via-bg/70 to-transparent transition-opacity duration-300 ${
-          scrolled ? 'opacity-0' : 'opacity-100'
         }`}
       />
 
@@ -139,7 +152,8 @@ export function SiteHeader() {
                     href={item.href}
                     aria-current={active ? 'page' : undefined}
                     aria-expanded={hasChildren ? openMenu === item.href : undefined}
-                    className={`relative flex items-center gap-1 rounded-md px-2.5 py-2 text-[13.5px] font-medium transition-colors ${
+                    data-morph
+                    className={`relative flex items-center gap-1 rounded-full px-3.5 py-2 text-[13.5px] font-medium transition-colors ${
                       active ? 'text-content' : 'text-content-muted hover:text-content'
                     }`}
                   >
@@ -164,7 +178,7 @@ export function SiteHeader() {
                     {active && (
                       <motion.span
                         layoutId="nav-active"
-                        className="absolute inset-x-2.5 -bottom-px h-0.5 rounded-full bg-accent"
+                        className="absolute inset-x-3.5 -bottom-px h-0.5 rounded-full bg-accent"
                         transition={
                           reduced ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 34 }
                         }
@@ -204,7 +218,6 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <button
             type="button"
             onClick={() => setDrawerOpen((v) => !v)}

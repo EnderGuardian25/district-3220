@@ -1,0 +1,1353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>District 3220 · three concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&family=Archivo:wght@400;500;600;700;800;900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   PROTOTYPE ONLY. Three concept directions for the District 3220 home page.
+   Not production code: no build step, fonts via link tag, Picsum stand-ins
+   where the district has no photography yet (every one marked TODO).
+
+   Headline is now: "3,500 students. 100+ clubs. One district."
+   Motion ceiling is open: lab effects used properly, including pinned and
+   scroll-driven sequences. Everything still collapses under reduced motion.
+
+   Effects lifted from lab.damiandc.com, one signature hero plus two
+   supporting effects per concept:
+     A FRONTLINE   Clip Reveal carousel · Counter Columns · Mosaic Ripple wall
+     B STATEMENT   Kinetic Slab hero    · Horizontal Journey · Hover Index
+     C BLUEPRINT   Blueprint hero       · Expand Grid · Sticky Stack
+
+   Architecture of A borrows from rid3220.org (full-bleed carousel, then what
+   the district does, then a wall of real project photographs, then utility).
+   None of its styling is borrowed.
+   ========================================================================== */
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{max-width:100%;display:block}
+a{color:inherit}
+button{font:inherit;color:inherit}
+h1,h2,h3,p,figure,ul,ol,blockquote{margin:0}
+ul{list-style:none;padding:0}
+.c[hidden]{display:none}
+
+/* ---------- shared mobile corrections ------------------------------------ */
+.c-a .nav .join,.c-b .nav .join,.c-c .nav .join{white-space:nowrap}
+@media (max-width:720px){
+  .c-a .mark i,.c-b .mark i{display:none}
+  .c-a .mark,.c-b .mark,.c-c .mark{font-size:14px}
+  .c-a .nav .join,.c-b .nav .join,.c-c .nav .join{padding:9px 13px;font-size:12.5px}
+}
+@media (pointer:coarse){.c-b .slabhint{display:none}}
+
+/* ---------- switcher: prototype chrome, not part of any direction --------- */
+.switcher{position:fixed;z-index:100;left:50%;bottom:18px;transform:translateX(-50%);
+  display:flex;gap:2px;padding:4px;border-radius:999px;background:#17191C;
+  box-shadow:0 10px 34px rgba(10,12,14,.38);font-family:"Geist Mono",ui-monospace,monospace}
+.switcher button{border:0;background:transparent;color:#9BA1A8;padding:9px 17px;border-radius:999px;
+  font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
+  transition:color .15s,background .15s;white-space:nowrap}
+.switcher button:hover{color:#fff}
+.switcher button[aria-pressed="true"]{background:#fff;color:#17191C}
+.switcher button:focus-visible{outline:2px solid #01B4E6;outline-offset:3px}
+@media (max-width:560px){.switcher button{padding:9px 10px;font-size:10px;letter-spacing:.04em}}
+
+/* ---------- shared reveal ------------------------------------------------- */
+[data-reveal]{opacity:0;transform:translateY(18px);
+  transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)}
+[data-reveal].in{opacity:1;transform:none}
+[data-rule]{transform:scaleX(0);transform-origin:left;transition:transform .8s cubic-bezier(.16,1,.3,1)}
+[data-rule].in{transform:scaleX(1)}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  [data-reveal],[data-rule]{opacity:1!important;transform:none!important;transition:none!important}
+  .car-slide{transition:none!important;clip-path:none!important}
+  .slab span{transform:none!important;transition:none!important}
+  .bp line,.bp rect,.bp path{stroke-dashoffset:0!important;animation:none!important}
+  .journey-rail{animation:none!important}
+  .tile{transition:none!important}
+}
+
+/* ==========================================================================
+   A · FRONTLINE
+   Photography leads. Architecture borrowed from rid3220: a full-bleed
+   carousel, then the district in one line, then a wall of real work.
+   Signature: CLIP REVEAL carousel. Support: COUNTER COLUMNS, MOSAIC RIPPLE.
+   ========================================================================== */
+.c-a{
+  --paper:#FAFAF8; --ink:#0F1113; --grey:#6B7075; --faint:#9A9EA3;
+  --rule:#E4E4E0; --rule-strong:#C9C9C4; --sunk:#F1F1ED;
+  --cyan:#01B4E6; --cyan-text:#026B87;
+  --pad:clamp(18px,4.5vw,64px);
+  background:var(--paper);color:var(--ink);
+  font-family:"Geist",ui-sans-serif,system-ui,sans-serif;font-size:16px;line-height:1.55}
+.c-a .wrap{max-width:1400px;margin:0 auto;padding-inline:var(--pad)}
+.c-a ::selection{background:var(--cyan);color:#fff}
+.c-a a:focus-visible,.c-a button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+
+/* nav overlays the carousel, so it carries its own scrim */
+.c-a .nav{position:absolute;top:0;left:0;right:0;z-index:12;color:#fff}
+.c-a .nav::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(10,12,14,.62),transparent)}
+.c-a .nav-in{position:relative;display:flex;align-items:center;justify-content:space-between;gap:24px;height:76px}
+.c-a .mark{display:flex;align-items:baseline;gap:9px;font-weight:700;letter-spacing:-.02em;
+  font-size:15.5px;text-decoration:none}
+.c-a .mark i{font-style:normal;color:rgba(255,255,255,.66);font-weight:400;font-size:11.5px;letter-spacing:.05em}
+.c-a .nav ul{display:flex;align-items:center;gap:25px;font-size:13.5px;color:rgba(255,255,255,.82)}
+.c-a .nav ul a{text-decoration:none;transition:color .15s}
+.c-a .nav ul a:hover{color:#fff}
+.c-a .nav .join{text-decoration:none;font-size:13.5px;font-weight:600;color:#0F1113;background:#fff;
+  padding:9px 17px;border-radius:2px;transition:background .15s,transform .15s}
+.c-a .nav .join:hover{background:var(--cyan);color:#062430}
+.c-a .nav .join:active{transform:translateY(1px)}
+@media (max-width:1080px){.c-a .nav ul{display:none}}
+
+/* --- CLIP REVEAL carousel ------------------------------------------------ */
+.c-a .car{position:relative;height:min(92vh,880px);min-height:520px;overflow:hidden;background:#0F1113;isolation:isolate}
+.c-a .car-slide{position:absolute;inset:0;clip-path:inset(0 0 0 100%);
+  transition:clip-path .95s cubic-bezier(.72,0,.18,1);will-change:clip-path}
+.c-a .car-slide.is-past{clip-path:inset(0 0 0 0)}
+.c-a .car-slide.is-live{clip-path:inset(0 0 0 0);z-index:2}
+.c-a .car-slide img{width:100%;height:100%;object-fit:cover;transform:scale(1.06);
+  transition:transform 7s linear}
+.c-a .car-slide.is-live img{transform:scale(1)}
+.c-a .car-slide::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(10,12,14,.88),rgba(10,12,14,.24) 52%,rgba(10,12,14,.30))}
+
+.c-a .car-ui{position:absolute;inset:0;z-index:5;pointer-events:none;
+  display:flex;flex-direction:column;justify-content:flex-end;color:#fff}
+.c-a .car-count{position:absolute;top:96px;left:var(--pad);font-family:"Geist Mono",monospace;
+  font-size:13px;letter-spacing:.08em}
+.c-a .car-count b{font-size:20px;font-weight:500}
+.c-a .car-count span{color:rgba(255,255,255,.55);font-size:12px}
+.c-a .car-arrows{position:absolute;top:92px;right:var(--pad);display:flex;gap:8px;pointer-events:auto}
+.c-a .car-arrows button{width:44px;height:38px;border:1px solid rgba(255,255,255,.42);background:transparent;
+  color:#fff;border-radius:2px;cursor:pointer;transition:background .15s,border-color .15s,transform .15s}
+.c-a .car-arrows button:hover{background:rgba(255,255,255,.16);border-color:#fff}
+.c-a .car-arrows button:active{transform:translateY(1px)}
+
+.c-a .car-copy{padding:0 var(--pad) 0;max-width:1400px;margin:0 auto;width:100%}
+.c-a .car-eyebrow{font-family:"Geist Mono",monospace;font-size:11.5px;letter-spacing:.15em;
+  text-transform:uppercase;color:rgba(255,255,255,.72)}
+.c-a .h1{margin-top:18px;font-size:clamp(2.1rem,4.9vw,4.4rem);line-height:1.04;letter-spacing:-.038em;
+  font-weight:600;max-width:19ch}
+.c-a .h1 u{text-decoration:none;color:var(--cyan)}
+.c-a .lede{margin-top:20px;max-width:46ch;color:rgba(255,255,255,.84);font-size:1.04rem}
+.c-a .acts{margin-top:30px;display:flex;flex-wrap:wrap;gap:12px;pointer-events:auto}
+.c-a .btn{display:inline-flex;align-items:center;text-decoration:none;font-size:14.5px;font-weight:600;
+  padding:14px 25px;border-radius:2px;border:1px solid #fff;background:#fff;color:#0F1113;
+  white-space:nowrap;transition:transform .15s,background .15s,color .15s,border-color .15s}
+.c-a .btn:hover{background:var(--cyan);border-color:var(--cyan);color:#062430}
+.c-a .btn:active{transform:translateY(1px)}
+.c-a .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+.c-a .btn.ghost:hover{background:rgba(255,255,255,.14);color:#fff;border-color:#fff}
+
+.c-a .car-foot{margin-top:38px;padding:0 var(--pad) 26px;max-width:1400px;width:100%;
+  margin-inline:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:24px}
+.c-a .car-cap{font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:.13em;
+  text-transform:uppercase;color:rgba(255,255,255,.78);transition:opacity .3s}
+.c-a .car-bars{display:flex;gap:6px;width:min(42%,360px);pointer-events:auto}
+.c-a .car-bars button{flex:1;height:3px;padding:0;border:0;background:rgba(255,255,255,.28);
+  cursor:pointer;position:relative;overflow:hidden;border-radius:2px}
+.c-a .car-bars button i{position:absolute;inset:0;background:#fff;transform:scaleX(0);transform-origin:left}
+.c-a .car-bars button[aria-current="true"] i{animation:carfill 6s linear forwards}
+@keyframes carfill{to{transform:scaleX(1)}}
+.c-a .car.is-paused .car-bars button[aria-current="true"] i{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){
+  .c-a .car-bars button[aria-current="true"] i{animation:none;transform:scaleX(1)}
+  .c-a .car-slide img{transition:none;transform:none}}
+@media (max-width:760px){
+  .c-a .car-count{top:86px}.c-a .car-arrows{display:none}
+  .c-a .car-foot{flex-direction:column;align-items:flex-start}
+  .c-a .car-bars{width:100%}}
+
+/* --- COUNTER COLUMNS ----------------------------------------------------- */
+.c-a .cols{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ink)}
+.c-a .cols div{padding:34px 26px 40px 0;border-right:1px solid var(--rule);overflow:hidden}
+.c-a .cols div:last-child{border-right:0}
+.c-a .cols b{display:block;font-size:clamp(2.2rem,4.6vw,3.6rem);font-weight:500;letter-spacing:-.045em;
+  line-height:1;font-variant-numeric:tabular-nums}
+.c-a .cols .roll{display:inline-block;transform:translateY(105%);opacity:0;
+  transition:transform .75s cubic-bezier(.16,1,.3,1),opacity .5s}
+.c-a .cols.in .roll{transform:none;opacity:1}
+.c-a .cols.in div:nth-child(2) .roll{transition-delay:.09s}
+.c-a .cols.in div:nth-child(3) .roll{transition-delay:.18s}
+.c-a .cols.in div:nth-child(4) .roll{transition-delay:.27s}
+.c-a .cols span{display:block;margin-top:13px;font-family:"Geist Mono",monospace;font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+@media (max-width:760px){
+  .c-a .cols{grid-template-columns:1fr 1fr}
+  .c-a .cols div{padding-right:20px}
+  .c-a .cols div:nth-child(2){border-right:0}
+  .c-a .cols div:nth-child(-n+2){border-bottom:1px solid var(--rule)}}
+
+.c-a .sec{padding-block:clamp(64px,9vw,118px)}
+.c-a .h2{font-size:clamp(1.6rem,3.2vw,2.5rem);letter-spacing:-.032em;font-weight:600;line-height:1.12;max-width:20ch}
+.c-a .sub{margin-top:16px;max-width:56ch;color:var(--grey);font-size:1.02rem}
+
+.c-a .proj{display:grid;grid-template-columns:1fr 1fr;gap:clamp(26px,4.5vw,68px);align-items:center;
+  padding-block:clamp(38px,5.5vw,66px);border-top:1px solid var(--rule)}
+.c-a .proj.flip .pic{order:-1}
+.c-a .fig{font-size:clamp(2.8rem,6.2vw,5rem);font-weight:500;letter-spacing:-.05em;line-height:.9;
+  font-variant-numeric:tabular-nums}
+.c-a .figlabel{margin-top:14px;font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--faint)}
+.c-a .proj h3{margin-top:32px;font-size:clamp(1.25rem,2vw,1.7rem);letter-spacing:-.025em;font-weight:600}
+.c-a .proj p{margin-top:12px;max-width:46ch;color:var(--grey)}
+.c-a .more{display:inline-block;margin-top:20px;font-size:14px;font-weight:600;color:var(--cyan-text);
+  text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px;transition:border-color .15s}
+.c-a .more:hover{border-color:currentColor}
+.c-a .proj img{width:100%;aspect-ratio:4/3;object-fit:cover}
+@media (max-width:860px){.c-a .proj{grid-template-columns:1fr}.c-a .proj.flip .pic{order:0}}
+
+/* --- MOSAIC RIPPLE photo wall (the rid3220 idea, done properly) ---------- */
+.c-a .wall{background:var(--ink)}
+.c-a .wall .h2,.c-a .wall .sub{color:#fff}
+.c-a .wall .sub{color:rgba(255,255,255,.62)}
+.c-a .mosaic{margin-top:clamp(30px,4vw,48px);display:grid;grid-template-columns:repeat(6,1fr);
+  gap:6px;grid-auto-rows:clamp(88px,10vw,150px)}
+.c-a .tile{position:relative;overflow:hidden;background:#1A1D21;
+  transition:transform .45s cubic-bezier(.16,1,.3,1),filter .3s}
+.c-a .tile img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.16,1,.3,1)}
+.c-a .tile:hover img{transform:scale(1.07)}
+.c-a .tile.w2{grid-column:span 2}
+.c-a .tile.h2x{grid-row:span 2}
+@media (max-width:860px){
+  .c-a .mosaic{grid-template-columns:repeat(4,1fr)}
+  .c-a .tile.w2{grid-column:span 2}}
+@media (max-width:520px){.c-a .mosaic{grid-template-columns:repeat(2,1fr)}}
+
+.c-a .aves{border-top:1px solid var(--ink);margin-top:clamp(34px,5vw,58px)}
+.c-a .ave{display:grid;grid-template-columns:44px 1fr 1.35fr;gap:clamp(14px,3vw,40px);align-items:center;
+  padding-block:25px;border-bottom:1px solid var(--rule);text-decoration:none;
+  transition:padding-left .15s,background .15s}
+.c-a .ave:hover{background:var(--sunk);padding-left:12px}
+.c-a .ave img{width:38px;height:38px;object-fit:contain}
+.c-a .ave b{font-size:clamp(1.02rem,1.7vw,1.28rem);font-weight:600;letter-spacing:-.02em}
+.c-a .ave span{color:var(--grey);font-size:.95rem}
+@media (max-width:720px){.c-a .ave{grid-template-columns:34px 1fr;row-gap:6px}.c-a .ave span{grid-column:2}}
+
+.c-a .util{background:var(--sunk);border-top:1px solid var(--rule)}
+.c-a .dir{margin-top:clamp(30px,4.5vw,50px);display:grid;grid-template-columns:repeat(3,1fr);gap:0 clamp(24px,4vw,56px)}
+.c-a .dir a{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:17px 0;
+  border-top:1px solid var(--rule-strong);text-decoration:none;transition:color .15s}
+.c-a .dir a:hover{color:var(--cyan-text)}
+.c-a .dir b{font-weight:500;font-size:1.02rem}
+.c-a .dir i{font-style:normal;font-family:"Geist Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);text-align:right}
+@media (max-width:900px){.c-a .dir{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.c-a .dir{grid-template-columns:1fr}}
+
+.c-a .close{padding-block:clamp(76px,11vw,136px)}
+.c-a .close .h2{font-size:clamp(1.9rem,4.4vw,3.5rem);max-width:17ch}
+.c-a .close .btn{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.c-a .close .btn:hover{background:var(--cyan);border-color:var(--cyan);color:#062430}
+.c-a .close .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule-strong)}
+.c-a .close .btn.ghost:hover{background:transparent;color:var(--ink);border-color:var(--ink)}
+.c-a .foot{border-top:1px solid var(--rule);padding-block:40px;font-size:13.5px;color:var(--grey)}
+.c-a .foot-in{display:flex;flex-wrap:wrap;gap:26px;justify-content:space-between}
+.c-a .foot a{text-decoration:none;transition:color .15s}
+.c-a .foot a:hover{color:var(--ink)}
+.c-a .foot ul{display:flex;flex-wrap:wrap;gap:18px}
+
+/* ==========================================================================
+   B · STATEMENT
+   No photograph above the fold. The headline is the design, set as three
+   stacked slabs with one filled in brand cyan.
+   Signature: KINETIC SLAB. Support: HORIZONTAL JOURNEY, HOVER INDEX.
+   ========================================================================== */
+.c-b{
+  --paper:#F4F3EF; --ink:#0A0B0D; --grey:#5E6266; --faint:#8E9298;
+  --rule:#DEDDD7; --cyan:#01B4E6; --cyan-text:#026B87;
+  --pad:clamp(18px,4.5vw,64px);
+  background:var(--paper);color:var(--ink);
+  font-family:"Archivo",ui-sans-serif,system-ui,sans-serif;font-size:16px;line-height:1.55}
+.c-b .wrap{max-width:1500px;margin:0 auto;padding-inline:var(--pad)}
+.c-b ::selection{background:var(--cyan);color:#fff}
+.c-b a:focus-visible,.c-b button:focus-visible{outline:2px solid var(--cyan-text);outline-offset:3px}
+
+.c-b .nav{position:sticky;top:0;z-index:20;background:rgba(244,243,239,.9);backdrop-filter:blur(10px)}
+.c-b .nav-in{display:flex;align-items:center;justify-content:space-between;gap:24px;height:74px}
+.c-b .mark{font-weight:900;letter-spacing:-.04em;font-size:17px;text-decoration:none}
+.c-b .mark i{font-style:normal;font-weight:400;color:var(--faint);font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;margin-left:10px}
+.c-b .nav ul{display:flex;align-items:center;gap:24px;font-size:13px;font-weight:600;
+  letter-spacing:.02em;text-transform:uppercase;color:var(--grey)}
+.c-b .nav ul a{text-decoration:none;transition:color .15s}
+.c-b .nav ul a:hover{color:var(--ink)}
+.c-b .nav .join{text-decoration:none;font-size:12.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--paper);background:var(--ink);padding:11px 18px;
+  transition:background .15s,transform .15s}
+.c-b .nav .join:hover{background:var(--cyan-text)}
+.c-b .nav .join:active{transform:translateY(1px)}
+@media (max-width:1120px){.c-b .nav ul{display:none}}
+
+/* --- KINETIC SLAB hero --------------------------------------------------- */
+.c-b .slabwrap{min-height:calc(100dvh - 74px);display:flex;flex-direction:column;justify-content:center;
+  padding-block:clamp(30px,5vw,60px)}
+.c-b .slabtag{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.c-b .slab{margin-top:clamp(20px,3vw,34px)}
+.c-b .slab h1{margin:0;font-size:0}
+.c-b .slab span{display:block;font-size:clamp(1.9rem,7.3vw,6.6rem);line-height:.92;font-weight:900;
+  white-space:nowrap;
+  letter-spacing:-.055em;text-transform:uppercase;transform-origin:left center;
+  transition:transform .5s cubic-bezier(.16,1,.3,1);will-change:transform}
+.c-b .slab span.fill{background:var(--cyan);color:var(--paper);display:inline-block;
+  padding:.04em .1em .07em;margin-left:-.02em}
+.c-b .slabnote{margin-top:clamp(24px,3.4vw,40px);max-width:44ch;color:var(--grey);font-size:1.06rem}
+.c-b .acts{margin-top:30px;display:flex;flex-wrap:wrap;gap:12px}
+.c-b .btn{display:inline-flex;align-items:center;text-decoration:none;font-size:13px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;padding:16px 27px;border:1px solid var(--ink);
+  background:var(--ink);color:var(--paper);white-space:nowrap;
+  transition:transform .15s,background .15s,color .15s,border-color .15s}
+.c-b .btn:hover{background:var(--cyan-text);border-color:var(--cyan-text)}
+.c-b .btn:active{transform:translateY(1px)}
+.c-b .btn.ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
+.c-b .btn.ghost:hover{background:var(--ink);color:var(--paper)}
+.c-b .slabhint{margin-top:auto;padding-top:clamp(28px,4vw,52px);font-size:10.5px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+
+.c-b .sec{padding-block:clamp(64px,9vw,116px)}
+.c-b .h2{font-size:clamp(1.7rem,3.6vw,2.9rem);letter-spacing:-.042em;font-weight:900;line-height:1.04;
+  text-transform:uppercase;max-width:18ch}
+.c-b .sub{margin-top:16px;max-width:54ch;color:var(--grey);font-size:1.02rem}
+
+/* --- HORIZONTAL JOURNEY: flagships pan sideways as you scroll ------------- */
+.c-b .journey{height:340vh;position:relative;view-timeline-name:--journey;view-timeline-axis:block}
+.c-b .journey-pin{position:sticky;top:0;height:100dvh;overflow:hidden;display:flex;align-items:center}
+.c-b .journey-rail{display:flex;gap:clamp(16px,2.4vw,32px);padding-inline:var(--pad);will-change:transform}
+.c-b .jcard{flex:0 0 min(76vw,780px);background:var(--ink);color:var(--paper);position:relative;
+  display:flex;flex-direction:column;justify-content:flex-end;height:min(74vh,620px);overflow:hidden}
+.c-b .jcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.52}
+.c-b .jcard::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(10,11,13,.92),rgba(10,11,13,.3) 62%,transparent)}
+.c-b .jcard .jin{position:relative;z-index:1;padding:clamp(22px,3vw,42px)}
+.c-b .jcard .jtag{font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--cyan)}
+.c-b .jcard .fig{margin-top:16px;font-size:clamp(2.6rem,7vw,6rem);font-weight:900;letter-spacing:-.055em;
+  line-height:.86;font-variant-numeric:tabular-nums}
+.c-b .jcard .figlabel{margin-top:10px;font-size:11px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:rgba(255,255,255,.62)}
+.c-b .jcard h3{margin-top:24px;font-size:clamp(1.15rem,1.9vw,1.6rem);font-weight:700;letter-spacing:-.028em}
+.c-b .jcard p{margin-top:10px;max-width:44ch;color:rgba(255,255,255,.78);font-size:.98rem}
+.c-b .jprog{position:absolute;left:var(--pad);right:var(--pad);bottom:34px;height:2px;
+  background:rgba(10,11,13,.14)}
+.c-b .jprog i{display:block;height:100%;background:var(--ink);transform-origin:left;transform:scaleX(0)}
+
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .c-b .journey-rail{animation:jpan linear both;animation-timeline:--journey;
+      animation-range:contain 0% contain 100%}
+    .c-b .jprog i{animation:jfill linear both;animation-timeline:--journey;
+      animation-range:contain 0% contain 100%}
+  }
+}
+/* --pan is measured in JS: rail width minus viewport, so the last card lands flush */
+@keyframes jpan{from{transform:translateX(0)}to{transform:translateX(calc(-1 * var(--pan,1000px)))}}
+@keyframes jfill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+/* Fallback where scroll-driven animation is unsupported: honest swipe rail */
+@supports not (animation-timeline:view()){
+  .c-b .journey{height:auto}
+  .c-b .journey-pin{position:static;height:auto;padding-block:20px}
+  .c-b .journey-rail{overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:16px}
+  .c-b .jcard{scroll-snap-align:center}
+  .c-b .jprog{display:none}
+}
+
+/* --- HOVER INDEX: avenues as a big type list, image on hover ------------- */
+.c-b .hidx{margin-top:clamp(28px,4vw,46px);position:relative;border-top:1px solid var(--ink)}
+.c-b .hrow{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+  padding-block:clamp(16px,2.4vw,26px);border-bottom:1px solid var(--rule);text-decoration:none;
+  position:relative;transition:padding-left .25s cubic-bezier(.16,1,.3,1),color .2s}
+.c-b .hrow:hover{padding-left:18px;color:var(--cyan-text)}
+.c-b .hrow b{font-size:clamp(1.3rem,3.4vw,2.6rem);font-weight:900;letter-spacing:-.045em;
+  text-transform:uppercase;line-height:1}
+.c-b .hrow span{font-size:.94rem;color:var(--grey);text-align:right;max-width:34ch}
+.c-b .hpeek{position:fixed;z-index:30;width:220px;height:160px;pointer-events:none;opacity:0;
+  transform:translate(-50%,-50%) scale(.94);transition:opacity .2s,transform .3s cubic-bezier(.16,1,.3,1);
+  background:#fff;padding:14px;box-shadow:0 20px 50px rgba(10,11,13,.22)}
+.c-b .hpeek.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.c-b .hpeek img{width:100%;height:100%;object-fit:contain}
+@media (max-width:860px){.c-b .hrow span{display:none}.c-b .hpeek{display:none}}
+
+.c-b .util{background:var(--ink);color:#EDEDEA}
+.c-b .util .h2{color:#fff}
+.c-b .util .sub{color:#9CA0A5}
+.c-b .dir{margin-top:clamp(30px,4.5vw,48px);display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:#25282C;border:1px solid #25282C}
+.c-b .dir a{display:block;padding:24px 22px;background:var(--ink);text-decoration:none;transition:background .15s}
+.c-b .dir a:hover{background:#191C20}
+.c-b .dir b{display:block;font-weight:700;font-size:.98rem;text-transform:uppercase;letter-spacing:.03em}
+.c-b .dir i{display:block;margin-top:7px;font-style:normal;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:#82868B}
+@media (max-width:900px){.c-b .dir{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.c-b .dir{grid-template-columns:1fr}}
+
+.c-b .close{padding-block:clamp(76px,11vw,136px)}
+.c-b .close .h2{font-size:clamp(2rem,5vw,4rem);max-width:15ch}
+.c-b .foot{border-top:1px solid var(--rule);padding-block:40px;font-size:13px;color:var(--grey)}
+.c-b .foot-in{display:flex;flex-wrap:wrap;gap:26px;justify-content:space-between}
+.c-b .foot a{text-decoration:none;transition:color .15s}
+.c-b .foot a:hover{color:var(--ink)}
+.c-b .foot ul{display:flex;flex-wrap:wrap;gap:18px}
+
+/* ==========================================================================
+   C · BLUEPRINT
+   The district drawn as a technical document: the hero drafts itself, the
+   nine zones expand on demand, the flagships stack under a pin.
+   Signature: BLUEPRINT hero. Support: EXPAND GRID, STICKY STACK.
+   ========================================================================== */
+.c-c{
+  --paper:#F2F4F3; --card:#FFFFFF; --ink:#14171A; --grey:#5B6066; --faint:#8C9198;
+  --rule:#DFE3E1; --draft:#1B244A; --draft-soft:rgba(27,36,74,.22);
+  --cyan:#01B4E6; --cyan-text:#026B87; --cyan-soft:#E2F6FD;
+  --amber:#D8951C; --teal:#187777; --plum:#97114B; --rust:#A85619;
+  --r:14px; --pad:clamp(18px,4vw,56px);
+  background:var(--paper);color:var(--ink);
+  font-family:"Instrument Sans",ui-sans-serif,system-ui,sans-serif;font-size:16px;line-height:1.55}
+.c-c .wrap{max-width:1440px;margin:0 auto;padding-inline:var(--pad)}
+.c-c ::selection{background:var(--cyan);color:#fff}
+.c-c a:focus-visible,.c-c button:focus-visible{outline:2px solid var(--cyan-text);outline-offset:3px}
+.c-c .mono{font-family:"Geist Mono",ui-monospace,monospace}
+
+.c-c .nav{position:sticky;top:0;z-index:20;background:rgba(242,244,243,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--rule)}
+.c-c .nav-in{display:flex;align-items:center;justify-content:space-between;gap:24px;height:70px}
+.c-c .mark{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.02em;
+  font-size:15.5px;text-decoration:none}
+.c-c .mark s{text-decoration:none;width:11px;height:11px;background:var(--cyan)}
+.c-c .nav ul{display:flex;align-items:center;gap:24px;font-size:13.5px;color:var(--grey)}
+.c-c .nav ul a{text-decoration:none;transition:color .15s}
+.c-c .nav ul a:hover{color:var(--ink)}
+.c-c .nav .join{text-decoration:none;font-size:13.5px;font-weight:600;color:#fff;background:var(--draft);
+  padding:10px 18px;border-radius:8px;transition:background .15s,transform .15s}
+.c-c .nav .join:hover{background:var(--cyan-text)}
+.c-c .nav .join:active{transform:translateY(1px)}
+@media (max-width:1080px){.c-c .nav ul{display:none}}
+
+/* --- BLUEPRINT hero: the page drafts itself ----------------------------- */
+.c-c .bp{position:relative;min-height:calc(100dvh - 70px);display:flex;align-items:center;overflow:hidden}
+.c-c .bp-grid{position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--draft-soft) 1px,transparent 1px),
+    linear-gradient(90deg,var(--draft-soft) 1px,transparent 1px);
+  background-size:64px 64px;opacity:0;transition:opacity 1s ease .1s;
+  mask-image:radial-gradient(120% 90% at 30% 45%,#000 35%,transparent 78%)}
+.c-c .bp.drafted .bp-grid{opacity:.5}
+.c-c .bp svg.leaders{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.c-c .bp svg.leaders line{stroke:var(--draft);stroke-width:1;opacity:.42;
+  stroke-dasharray:var(--len,600);stroke-dashoffset:var(--len,600);
+  transition:stroke-dashoffset 1.1s cubic-bezier(.16,1,.3,1)}
+.c-c .bp.drafted svg.leaders line{stroke-dashoffset:0}
+.c-c .bp.drafted svg.leaders line:nth-child(2){transition-delay:.12s}
+.c-c .bp.drafted svg.leaders line:nth-child(3){transition-delay:.24s}
+.c-c .bp.drafted svg.leaders line:nth-child(4){transition-delay:.36s}
+
+.c-c .bp-in{position:relative;z-index:2;width:100%;padding-block:clamp(40px,6vw,80px)}
+.c-c .bp-ann{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--draft);
+  opacity:0;transform:translateY(6px);transition:opacity .5s ease .55s,transform .5s ease .55s}
+.c-c .bp.drafted .bp-ann{opacity:.72;transform:none}
+.c-c .h1{margin-top:16px;font-size:clamp(2.1rem,5.4vw,4.6rem);line-height:1.02;letter-spacing:-.04em;
+  font-weight:700;max-width:15ch}
+.c-c .h1 em{font-style:normal;display:inline-block;overflow:hidden;vertical-align:bottom}
+.c-c .h1 em i{font-style:normal;display:inline-block;transform:translateY(102%);
+  transition:transform .85s cubic-bezier(.16,1,.3,1)}
+.c-c .bp.drafted .h1 em i{transform:none}
+.c-c .bp.drafted .h1 em:nth-child(2) i{transition-delay:.1s}
+.c-c .bp.drafted .h1 em:nth-child(3) i{transition-delay:.2s}
+.c-c .lede{margin-top:22px;max-width:46ch;color:var(--grey);font-size:1.05rem;
+  opacity:0;transition:opacity .6s ease .8s}
+.c-c .bp.drafted .lede{opacity:1}
+.c-c .acts{margin-top:30px;display:flex;flex-wrap:wrap;gap:10px;
+  opacity:0;transition:opacity .6s ease .95s}
+.c-c .bp.drafted .acts{opacity:1}
+.c-c .btn{display:inline-flex;align-items:center;text-decoration:none;font-size:14.5px;font-weight:600;
+  padding:14px 24px;border-radius:9px;border:1px solid var(--draft);background:var(--draft);color:#fff;
+  white-space:nowrap;transition:transform .15s,background .15s,border-color .15s}
+.c-c .btn:hover{background:var(--cyan-text);border-color:var(--cyan-text)}
+.c-c .btn:active{transform:translateY(1px)}
+.c-c .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+.c-c .btn.ghost:hover{background:transparent;color:var(--ink);border-color:var(--draft)}
+
+/* the live index drawn as dimensioned figures */
+.c-c .bp-figs{margin-top:clamp(40px,5.5vw,74px);display:grid;grid-template-columns:repeat(4,1fr);
+  gap:clamp(10px,1.4vw,16px);max-width:780px}
+.c-c .bp-fig{border:1px solid var(--draft);border-radius:4px;padding:16px 14px 14px;background:rgba(255,255,255,.6);
+  opacity:0;transform:translateY(10px);transition:opacity .5s cubic-bezier(.16,1,.3,1),transform .5s cubic-bezier(.16,1,.3,1)}
+.c-c .bp.drafted .bp-fig{opacity:1;transform:none}
+.c-c .bp.drafted .bp-fig:nth-child(1){transition-delay:1.05s}
+.c-c .bp.drafted .bp-fig:nth-child(2){transition-delay:1.15s}
+.c-c .bp.drafted .bp-fig:nth-child(3){transition-delay:1.25s}
+.c-c .bp.drafted .bp-fig:nth-child(4){transition-delay:1.35s}
+.c-c .bp-fig b{display:block;font-size:clamp(1.5rem,2.6vw,2.2rem);font-weight:700;letter-spacing:-.04em;
+  line-height:1;font-variant-numeric:tabular-nums}
+.c-c .bp-fig span{display:block;margin-top:8px;font-size:9.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--faint)}
+@media (max-width:720px){.c-c .bp-figs{grid-template-columns:1fr 1fr;max-width:none}}
+
+.c-c .sec{padding-block:clamp(54px,7.5vw,100px)}
+.c-c .h2{font-size:clamp(1.55rem,3vw,2.4rem);letter-spacing:-.034em;font-weight:700;line-height:1.1;max-width:20ch}
+.c-c .sub{margin-top:14px;max-width:56ch;color:var(--grey);font-size:1.02rem}
+
+/* --- STICKY STACK: flagships stack under the pin ------------------------- */
+.c-c .stack{margin-top:clamp(24px,3.4vw,40px)}
+.c-c .scard{position:sticky;top:96px;border-radius:var(--r);overflow:hidden;background:var(--card);
+  border:1px solid var(--rule);display:grid;grid-template-columns:1.05fr 1fr;min-height:400px;
+  margin-bottom:20px;box-shadow:0 18px 44px rgba(20,23,26,.07)}
+.c-c .scard:nth-child(1){top:96px}
+.c-c .scard:nth-child(2){top:118px}
+.c-c .scard:nth-child(3){top:140px}
+.c-c .scard .sbody{padding:clamp(22px,3vw,42px);display:flex;flex-direction:column;justify-content:center}
+.c-c .scard .spic{position:relative;min-height:240px}
+.c-c .scard .spic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.c-c .scard .stag{display:inline-block;align-self:flex-start;font-size:10.5px;font-weight:700;
+  letter-spacing:.13em;text-transform:uppercase;padding:6px 11px;border-radius:6px}
+.c-c .scard .fig{margin-top:18px;font-size:clamp(2.2rem,4.4vw,3.6rem);font-weight:700;letter-spacing:-.05em;
+  line-height:1;font-variant-numeric:tabular-nums}
+.c-c .scard .figlabel{margin-top:9px;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+.c-c .scard h3{margin-top:22px;font-size:1.24rem;font-weight:700;letter-spacing:-.022em}
+.c-c .scard p{margin-top:10px;max-width:42ch;color:var(--grey);font-size:.97rem}
+.c-c .scard .more{margin-top:18px;font-size:13.5px;font-weight:600;color:var(--cyan-text)}
+@media (max-width:860px){
+  .c-c .scard{grid-template-columns:1fr;position:static;min-height:0}
+  .c-c .scard .spic{min-height:200px;order:-1}}
+
+/* --- EXPAND GRID: nine zones, one opens at a time ------------------------ */
+.c-c .zones{margin-top:clamp(24px,3.4vw,40px);display:flex;gap:8px;height:clamp(220px,26vw,300px)}
+.c-c .zone{flex:1;min-width:0;border:0;border-radius:12px;background:var(--card);cursor:pointer;
+  padding:18px 14px;text-align:left;overflow:hidden;position:relative;
+  transition:flex-grow .55s cubic-bezier(.16,1,.3,1),background .3s;
+  display:flex;flex-direction:column;justify-content:space-between}
+.c-c .zone[aria-expanded="true"]{flex-grow:5;background:var(--draft);color:#fff}
+.c-c .zone b{display:block;font-size:1.3rem;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.c-c .zone .zlabel{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.c-c .zone[aria-expanded="true"] .zlabel{color:rgba(255,255,255,.62)}
+.c-c .zone .zbody{opacity:0;max-width:32ch;font-size:.93rem;color:rgba(255,255,255,.82);
+  transition:opacity .3s ease .2s}
+.c-c .zone[aria-expanded="true"] .zbody{opacity:1}
+@media (max-width:860px){
+  .c-c .zones{flex-wrap:wrap;height:auto}
+  .c-c .zone{flex:0 0 calc(33.333% - 6px);min-height:96px}
+  .c-c .zone[aria-expanded="true"]{flex-basis:100%}}
+
+/* avenues as coloured plates, unequal spans */
+.c-c .aves{margin-top:clamp(24px,3.4vw,40px);display:grid;grid-template-columns:repeat(6,1fr);
+  gap:clamp(10px,1.4vw,16px)}
+.c-c .ave{border-radius:var(--r);padding:clamp(16px,2vw,24px);min-height:190px;display:flex;
+  flex-direction:column;justify-content:space-between;gap:26px;text-decoration:none;color:#fff;
+  transition:transform .18s cubic-bezier(.16,1,.3,1)}
+.c-c .ave:hover{transform:translateY(-4px)}
+.c-c .ave:nth-child(1){grid-column:span 2;background:var(--amber)}
+.c-c .ave:nth-child(2){grid-column:span 2;background:var(--plum)}
+.c-c .ave:nth-child(3){grid-column:span 2;background:var(--rust)}
+.c-c .ave:nth-child(4){grid-column:span 3;background:var(--teal)}
+.c-c .ave:nth-child(5){grid-column:span 3;background:var(--draft)}
+.c-c .ave img{width:38px;height:38px;object-fit:contain;background:#fff;border-radius:8px;padding:5px}
+.c-c .ave b{display:block;font-size:1.06rem;font-weight:700;letter-spacing:-.02em}
+.c-c .ave span{display:block;margin-top:7px;font-size:.92rem;color:rgba(255,255,255,.85)}
+@media (max-width:860px){
+  .c-c .aves{grid-template-columns:1fr 1fr}
+  .c-c .ave:nth-child(n){grid-column:span 1}
+  .c-c .ave:nth-child(5){grid-column:span 2}}
+@media (max-width:520px){.c-c .aves{grid-template-columns:1fr}.c-c .ave:nth-child(5){grid-column:span 1}}
+
+.c-c .dir{margin-top:clamp(24px,3.4vw,40px);display:grid;grid-template-columns:repeat(4,1fr);
+  gap:clamp(10px,1.4vw,16px)}
+.c-c .dir a{background:var(--card);border:1px solid var(--rule);border-radius:11px;padding:20px 18px;
+  text-decoration:none;transition:background .15s,transform .15s,border-color .15s}
+.c-c .dir a:hover{background:var(--cyan-soft);border-color:var(--cyan);transform:translateY(-2px)}
+.c-c .dir b{display:block;font-weight:600;font-size:.99rem}
+.c-c .dir i{display:block;margin-top:7px;font-style:normal;font-size:10px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--faint)}
+@media (max-width:900px){.c-c .dir{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.c-c .dir{grid-template-columns:1fr}}
+
+.c-c .close .panel{background:var(--draft);color:#fff;border-radius:var(--r);padding:clamp(34px,5.5vw,74px)}
+.c-c .close .h2{font-size:clamp(1.85rem,4.2vw,3.2rem);color:#fff;max-width:16ch}
+.c-c .close .sub{color:rgba(255,255,255,.74)}
+.c-c .close .btn{background:#fff;color:var(--draft);border-color:#fff}
+.c-c .close .btn:hover{background:var(--cyan);border-color:var(--cyan);color:#06232C}
+.c-c .close .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.42)}
+.c-c .close .btn.ghost:hover{background:transparent;color:#fff;border-color:#fff}
+.c-c .foot{padding-block:38px;font-size:13.5px;color:var(--grey);border-top:1px solid var(--rule)}
+.c-c .foot-in{display:flex;flex-wrap:wrap;gap:26px;justify-content:space-between}
+.c-c .foot a{text-decoration:none;transition:color .15s}
+.c-c .foot a:hover{color:var(--ink)}
+.c-c .foot ul{display:flex;flex-wrap:wrap;gap:18px}
+</style>
+</head>
+<body>
+
+<nav class="switcher" aria-label="Concept direction">
+  <button type="button" data-go="a" aria-pressed="true">A Frontline</button>
+  <button type="button" data-go="b" aria-pressed="false">B Statement</button>
+  <button type="button" data-go="c" aria-pressed="false">C Blueprint</button>
+</nav>
+
+<main id="stage">
+
+<!-- ======================================================================
+     A · FRONTLINE
+     ====================================================================== -->
+<article class="c c-a" id="concept-a">
+
+  <div style="position:relative">
+    <header class="nav">
+      <div class="wrap nav-in">
+        <a class="mark" href="#concept-a">Interact District 3220 <i>Sri Lanka and Maldives</i></a>
+        <ul>
+          <li><a href="#a-projects">Projects</a></li>
+          <li><a href="#a-wall">Our work</a></li>
+          <li><a href="#a-avenues">Avenues</a></li>
+          <li><a href="#a-members">Calendar</a></li>
+          <li><a href="#a-members">Archives</a></li>
+          <li><a href="#a-members">Contact</a></li>
+        </ul>
+        <a class="join" href="#a-close">Join a club</a>
+      </div>
+    </header>
+
+    <!-- CLIP REVEAL carousel (lab.damiandc.com/clip-reveal-carousel) -->
+    <section class="car" data-carousel aria-roledescription="carousel" aria-label="District 3220 in action">
+      <div class="car-slide is-live" data-cap="District Assembly, Colombo">
+        <img src="../public/images/hero/assembly.webp" alt="Interactors filling a district assembly hall">
+      </div>
+      <div class="car-slide" data-cap="36th District Assembly">
+        <img src="../public/images/blog/blog-35th-district-assembly.jpg" alt="Delegates at the district assembly">
+      </div>
+      <div class="car-slide" data-cap="Media Crew on assignment">
+        <img src="../public/images/media-crew/media-photography.jpg" alt="Student photographer covering an event">
+      </div>
+      <div class="car-slide" data-cap="Livestreaming a district event">
+        <img src="../public/images/media-crew/media-livestreaming.jpg" alt="Students running a livestream desk">
+      </div>
+
+      <div class="car-ui">
+        <p class="car-count"><b data-car-now>01</b> <span>/ <span data-car-total>04</span></span></p>
+        <div class="car-arrows">
+          <button type="button" data-car-prev aria-label="Previous slide">&#8592;</button>
+          <button type="button" data-car-next aria-label="Next slide">&#8594;</button>
+        </div>
+
+        <div class="car-copy">
+          <p class="car-eyebrow">Interact District 3220 · Sri Lanka and Maldives</p>
+          <h1 class="h1">3,500 students. <u>100+ clubs.</u> One district.</h1>
+          <p class="lede">Youth-led service across Sri Lanka and the Maldives.</p>
+          <div class="acts">
+            <a class="btn" href="#a-close">Join a club</a>
+            <a class="btn ghost" href="#a-projects">See the projects</a>
+          </div>
+        </div>
+
+        <div class="car-foot">
+          <p class="car-cap" data-car-cap>District Assembly, Colombo</p>
+          <div class="car-bars" data-car-bars></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- COUNTER COLUMNS (lab.damiandc.com/counter-columns) -->
+  <div class="wrap">
+    <div class="cols" data-cols>
+      <div><b><span class="roll" data-count="3500" data-group="1">0</span></b><span>Members</span></div>
+      <div><b><span class="roll" data-count="100" data-suffix="+">0</span></b><span>Clubs</span></div>
+      <div><b><span class="roll" data-count="9">0</span></b><span>Zones</span></div>
+      <div><b><span class="roll" data-count="1964" data-raw="1">0</span></b><span>In the district since</span></div>
+    </div>
+  </div>
+
+  <section class="wrap sec" id="a-projects">
+    <h2 class="h2" data-reveal>Three projects the district is known for.</h2>
+    <p class="sub" data-reveal>Each one is planned, funded and run by school students, with the council behind them and Rotary alongside.</p>
+
+    <div class="proj" data-reveal>
+      <div>
+        <div class="fig"><span data-count="10000" data-group="1" data-suffix="+">0</span></div>
+        <p class="figlabel">Guests at Interflash</p>
+        <h3>Interflash</h3>
+        <p>The district's largest public event. A concert on a ten thousand seat scale, staged and run end to end by Interactors.</p>
+        <a class="more" href="#a-projects">About Interflash</a>
+      </div>
+      <div class="pic">
+        <!-- TODO: real Interflash photography. Picsum stand-in. -->
+        <img src="https://picsum.photos/seed/interflash-concert-crowd/1100/825" alt="Crowd at a large outdoor concert">
+      </div>
+    </div>
+
+    <div class="proj flip" data-reveal>
+      <div>
+        <div class="fig"><span data-count="6">0</span></div>
+        <p class="figlabel">Committees at DIMUN</p>
+        <h3>DIMUN</h3>
+        <p>The District Interact Model United Nations. The first Interact MUN conference in Sri Lanka, with its own committees, topics and study guides.</p>
+        <a class="more" href="#a-projects">About DIMUN</a>
+      </div>
+      <div class="pic">
+        <img src="../public/images/media-crew/media-compering.jpg" alt="Students compering a district conference">
+      </div>
+    </div>
+
+    <div class="proj" data-reveal>
+      <div>
+        <div class="fig">5 km</div>
+        <p class="figlabel">Galle Face Green</p>
+        <h3>Race4Change</h3>
+        <p>A public charity run with corporate teams and on the day registration, raising funds for the Little Hearts Foundation.</p>
+        <a class="more" href="#a-projects">About Race4Change</a>
+      </div>
+      <div class="pic">
+        <!-- TODO: real Race4Change photography. Picsum stand-in. -->
+        <img src="https://picsum.photos/seed/race4change-runners-seafront/1100/825" alt="Runners at a charity road race">
+      </div>
+    </div>
+  </section>
+
+  <!-- MOSAIC RIPPLE photo wall (the rid3220 mosaic idea, done properly) -->
+  <section class="wall" id="a-wall">
+    <div class="wrap sec">
+      <h2 class="h2" data-reveal>A year of the district, in photographs.</h2>
+      <p class="sub" data-reveal>Assemblies, training, media crew and club projects across nine zones.</p>
+      <div class="mosaic" data-mosaic>
+        <a class="tile w2 h2x" href="#a-wall"><img src="../public/images/hero/assembly.webp" alt="District assembly hall"></a>
+        <a class="tile" href="#a-wall"><img src="../public/images/media-crew/media-photography.jpg" alt="Student photographer"></a>
+        <a class="tile" href="#a-wall"><img src="../public/images/media-crew/media-videography.jpg" alt="Student videographer"></a>
+        <a class="tile w2" href="#a-wall"><img src="../public/images/blog/blog-35th-district-assembly.jpg" alt="District assembly"></a>
+        <a class="tile" href="#a-wall"><img src="../public/images/media-crew/media-livestreaming.jpg" alt="Livestream desk"></a>
+        <a class="tile" href="#a-wall"><img src="../public/images/media-crew/media-designing.jpg" alt="Student designer at work"></a>
+        <a class="tile w2" href="#a-wall"><img src="../public/images/media-crew/media-compering.jpg" alt="Students compering"></a>
+        <a class="tile" href="#a-wall"><img src="../public/images/decor/decor-sphere-stairs.jpg" alt="Event venue detail"></a>
+        <a class="tile" href="#a-wall"><img src="../public/images/media-crew/media-photo-booths.jpg" alt="Event photo booth"></a>
+        <a class="tile w2" href="#a-wall"><img src="../public/images/blog/blog-shawn-shiek-tribute.jpg" alt="District gathering"></a>
+        <a class="tile" href="#a-wall"><img src="../public/images/decor/decor-white-structure.jpg" alt="Venue architecture"></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap sec" id="a-avenues">
+    <h2 class="h2" data-reveal>Five avenues of service.</h2>
+    <p class="sub" data-reveal>Every club project sits under one of these. They are the structure behind everything above.</p>
+    <div class="aves">
+      <a class="ave" href="#a-avenues" data-reveal><img src="../public/images/avenues/avenue-community-service.png" alt=""><b>Community Service</b><span>The heart and soul of the movement.</span></a>
+      <a class="ave" href="#a-avenues" data-reveal><img src="../public/images/avenues/avenue-international-understanding.png" alt=""><b>International Understanding</b><span>Good will across communities.</span></a>
+      <a class="ave" href="#a-avenues" data-reveal><img src="../public/images/avenues/avenue-club-service.png" alt=""><b>Club Service</b><span>Strengthening every club's foundation.</span></a>
+      <a class="ave" href="#a-avenues" data-reveal><img src="../public/images/avenues/avenue-green-life.png" alt=""><b>Green Life</b><span>Service that answers to the planet.</span></a>
+      <a class="ave" href="#a-avenues" data-reveal><img src="../public/images/avenues/avenue-finance.png" alt=""><b>Finance</b><span>Fundraising that powers the rest.</span></a>
+    </div>
+  </section>
+
+  <section class="util" id="a-members">
+    <div class="wrap sec">
+      <h2 class="h2" data-reveal>For Interactors and club officers.</h2>
+      <p class="sub" data-reveal>The working side of the district. Dates, documents, records and the people who run them.</p>
+      <div class="dir" data-reveal>
+        <a href="#a-members"><b>Calendar</b><i>Dates and deadlines</i></a>
+        <a href="#a-members"><b>Admin Documents</b><i>Forms and reporting</i></a>
+        <a href="#a-members"><b>News</b><i>District bulletin</i></a>
+        <a href="#a-members"><b>Newsletter</b><i>Every issue</i></a>
+        <a href="#a-members"><b>Archives</b><i>1988 to today</i></a>
+        <a href="#a-members"><b>Meet the Council</b><i>2026 / 27</i></a>
+        <a href="#a-members"><b>College of DIRs</b><i>Past district reps</i></a>
+        <a href="#a-members"><b>Media Crew</b><i>Request coverage</i></a>
+        <a href="#a-members"><b>Request a Date</b><i>Book the calendar</i></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap close" id="a-close">
+    <h2 class="h2" data-reveal>Your school can start a club this year.</h2>
+    <p class="sub" data-reveal>Tell the council where you are and who is interested. Chartering a new Interact club takes one conversation to begin.</p>
+    <div class="acts" data-reveal style="margin-top:32px">
+      <a class="btn" href="#a-close">Join a club</a>
+      <a class="btn ghost" href="#a-close">Contact the council</a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <p>Interact District 3220, Sri Lanka and Maldives. Sponsored by Rotary International.</p>
+      <ul>
+        <li><a href="#concept-a">Instagram</a></li>
+        <li><a href="#concept-a">Facebook</a></li>
+        <li><a href="#concept-a">LinkedIn</a></li>
+        <li><a href="#concept-a">YouTube</a></li>
+        <li><a href="#concept-a">interactdistrictcouncil3220@gmail.com</a></li>
+      </ul>
+    </div>
+  </footer>
+</article>
+
+<!-- ======================================================================
+     B · STATEMENT
+     ====================================================================== -->
+<article class="c c-b" id="concept-b" hidden>
+
+  <header class="nav">
+    <div class="wrap nav-in">
+      <a class="mark" href="#concept-b">INTERACT 3220 <i>Sri Lanka and Maldives</i></a>
+      <ul>
+        <li><a href="#b-projects">Projects</a></li>
+        <li><a href="#b-avenues">Avenues</a></li>
+        <li><a href="#b-members">Calendar</a></li>
+        <li><a href="#b-members">Archives</a></li>
+        <li><a href="#b-members">News</a></li>
+        <li><a href="#b-members">Contact</a></li>
+      </ul>
+      <a class="join" href="#b-close">Join a club</a>
+    </div>
+  </header>
+
+  <!-- KINETIC SLAB hero (lab.damiandc.com/kinetic-slab-hero) -->
+  <section class="wrap slabwrap" data-slab>
+    <p class="slabtag">Interact District 3220 · Established 1964</p>
+    <div class="slab">
+      <h1>3,500 students. 100+ clubs. One district.</h1>
+      <span aria-hidden="true">3,500 students</span>
+      <span aria-hidden="true" class="fill">100+ clubs</span>
+      <span aria-hidden="true">One district</span>
+    </div>
+    <p class="slabnote">Youth-led service across Sri Lanka and the Maldives.</p>
+    <div class="acts">
+      <a class="btn" href="#b-close">Join a club</a>
+      <a class="btn ghost" href="#b-projects">See the projects</a>
+    </div>
+    <p class="slabhint">Move the cursor across the type</p>
+  </section>
+
+  <section class="wrap sec" id="b-projects" style="padding-bottom:clamp(28px,3.5vw,44px)">
+    <h2 class="h2" data-reveal>Three projects the district is known for.</h2>
+    <p class="sub" data-reveal>Each one is planned, funded and run by school students, with the council behind them and Rotary alongside.</p>
+  </section>
+
+  <!-- HORIZONTAL JOURNEY (lab.damiandc.com/horizontal-journey) -->
+  <section class="journey">
+    <div class="journey-pin">
+      <div class="journey-rail">
+        <article class="jcard">
+          <!-- TODO: real Interflash photography. Picsum stand-in. -->
+          <img src="https://picsum.photos/seed/interflash-concert-crowd/1400/900" alt="Crowd at a large outdoor concert">
+          <div class="jin">
+            <p class="jtag">Interflash</p>
+            <div class="fig">10,000+</div>
+            <p class="figlabel">Guests</p>
+            <h3>A concert on a ten thousand seat scale.</h3>
+            <p>The district's largest public event, staged and run end to end by school students.</p>
+          </div>
+        </article>
+        <article class="jcard">
+          <img src="../public/images/media-crew/media-compering.jpg" alt="Students compering a district conference">
+          <div class="jin">
+            <p class="jtag">DIMUN</p>
+            <div class="fig">6</div>
+            <p class="figlabel">Committees</p>
+            <h3>The first Interact Model UN in Sri Lanka.</h3>
+            <p>District Interact Model United Nations, with its own committees, topics and study guides.</p>
+          </div>
+        </article>
+        <article class="jcard">
+          <!-- TODO: real Race4Change photography. Picsum stand-in. -->
+          <img src="https://picsum.photos/seed/race4change-runners-seafront/1400/900" alt="Runners at a charity road race">
+          <div class="jin">
+            <p class="jtag">Race4Change</p>
+            <div class="fig">5 km</div>
+            <p class="figlabel">Galle Face Green</p>
+            <h3>A public charity run for the Little Hearts Foundation.</h3>
+            <p>Open registration and corporate teams, raising funds for children's cardiac care.</p>
+          </div>
+        </article>
+      </div>
+      <div class="jprog" aria-hidden="true"><i></i></div>
+    </div>
+  </section>
+
+  <!-- HOVER INDEX (lab.damiandc.com/hover-index-list) -->
+  <section class="wrap sec" id="b-avenues">
+    <h2 class="h2" data-reveal>Five avenues of service.</h2>
+    <p class="sub" data-reveal>Every club project sits under one of these.</p>
+    <div class="hidx" data-hoveridx>
+      <a class="hrow" href="#b-avenues" data-peek="../public/images/avenues/avenue-community-service.png"><b>Community Service</b><span>The heart and soul of the movement.</span></a>
+      <a class="hrow" href="#b-avenues" data-peek="../public/images/avenues/avenue-international-understanding.png"><b>International Understanding</b><span>Good will across communities.</span></a>
+      <a class="hrow" href="#b-avenues" data-peek="../public/images/avenues/avenue-club-service.png"><b>Club Service</b><span>Strengthening every club's foundation.</span></a>
+      <a class="hrow" href="#b-avenues" data-peek="../public/images/avenues/avenue-green-life.png"><b>Green Life</b><span>Service that answers to the planet.</span></a>
+      <a class="hrow" href="#b-avenues" data-peek="../public/images/avenues/avenue-finance.png"><b>Finance</b><span>Fundraising that powers the rest.</span></a>
+    </div>
+  </section>
+
+  <section class="util" id="b-members">
+    <div class="wrap sec">
+      <h2 class="h2" data-reveal>For Interactors and club officers.</h2>
+      <p class="sub" data-reveal>The working side of the district. Dates, documents, records and the people who run them.</p>
+      <div class="dir" data-reveal>
+        <a href="#b-members"><b>Calendar</b><i>Dates and deadlines</i></a>
+        <a href="#b-members"><b>Admin Documents</b><i>Forms and reporting</i></a>
+        <a href="#b-members"><b>News</b><i>District bulletin</i></a>
+        <a href="#b-members"><b>Newsletter</b><i>Every issue</i></a>
+        <a href="#b-members"><b>Archives</b><i>1988 to today</i></a>
+        <a href="#b-members"><b>Meet the Council</b><i>2026 / 27</i></a>
+        <a href="#b-members"><b>College of DIRs</b><i>Past district reps</i></a>
+        <a href="#b-members"><b>Media Crew</b><i>Request coverage</i></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap close" id="b-close">
+    <h2 class="h2" data-reveal>Your school can start a club this year.</h2>
+    <p class="sub" data-reveal>Tell the council where you are and who is interested. Chartering a new Interact club takes one conversation to begin.</p>
+    <div class="acts" data-reveal style="margin-top:32px">
+      <a class="btn" href="#b-close">Join a club</a>
+      <a class="btn ghost" href="#b-close">Contact the council</a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <p>Interact District 3220, Sri Lanka and Maldives. Sponsored by Rotary International.</p>
+      <ul>
+        <li><a href="#concept-b">Instagram</a></li>
+        <li><a href="#concept-b">Facebook</a></li>
+        <li><a href="#concept-b">LinkedIn</a></li>
+        <li><a href="#concept-b">YouTube</a></li>
+        <li><a href="#concept-b">interactdistrictcouncil3220@gmail.com</a></li>
+      </ul>
+    </div>
+  </footer>
+</article>
+
+<!-- ======================================================================
+     C · BLUEPRINT
+     ====================================================================== -->
+<article class="c c-c" id="concept-c" hidden>
+
+  <header class="nav">
+    <div class="wrap nav-in">
+      <a class="mark" href="#concept-c"><s></s>Interact District 3220</a>
+      <ul>
+        <li><a href="#c-projects">Projects</a></li>
+        <li><a href="#c-zones">Zones</a></li>
+        <li><a href="#c-avenues">Avenues</a></li>
+        <li><a href="#c-members">Calendar</a></li>
+        <li><a href="#c-members">Archives</a></li>
+        <li><a href="#c-members">Contact</a></li>
+      </ul>
+      <a class="join" href="#c-close">Join a club</a>
+    </div>
+  </header>
+
+  <!-- BLUEPRINT hero (lab.damiandc.com/blueprint-hero) -->
+  <section class="bp" data-blueprint>
+    <div class="bp-grid" aria-hidden="true"></div>
+    <svg class="leaders" aria-hidden="true" preserveAspectRatio="none">
+      <line x1="0" y1="18%" x2="100%" y2="18%" style="--len:1600"></line>
+      <line x1="6%" y1="14%" x2="6%" y2="86%" style="--len:900"></line>
+      <line x1="0" y1="82%" x2="100%" y2="82%" style="--len:1600"></line>
+      <line x1="66%" y1="14%" x2="66%" y2="86%" style="--len:900"></line>
+    </svg>
+
+    <div class="wrap bp-in">
+      <p class="bp-ann mono">Fig. 01 · District 3220 · Sri Lanka and Maldives · Est. 1964</p>
+      <h1 class="h1"><em><i>3,500 students.</i></em> <em><i>100+ clubs.</i></em> <em><i>One district.</i></em></h1>
+      <p class="lede">Youth-led service across Sri Lanka and the Maldives.</p>
+      <div class="acts">
+        <a class="btn" href="#c-close">Join a club</a>
+        <a class="btn ghost" href="#c-projects">See the projects</a>
+      </div>
+
+      <div class="bp-figs">
+        <div class="bp-fig"><b data-count="3500" data-group="1">0</b><span class="mono">Members</span></div>
+        <div class="bp-fig"><b data-count="100" data-suffix="+">0</b><span class="mono">Clubs</span></div>
+        <div class="bp-fig"><b data-count="9">0</b><span class="mono">Zones</span></div>
+        <div class="bp-fig"><b data-count="1964" data-raw="1">0</b><span class="mono">Since</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STICKY STACK (lab.damiandc.com/sticky-stack) -->
+  <section class="wrap sec" id="c-projects">
+    <h2 class="h2" data-reveal>Three projects the district is known for.</h2>
+    <p class="sub" data-reveal>Each one is planned, funded and run by school students, with the council behind them and Rotary alongside.</p>
+    <div class="stack">
+      <article class="scard">
+        <div class="sbody">
+          <span class="stag" style="background:#F7E3EC;color:#97114B">Interflash</span>
+          <div class="fig"><span data-count="10000" data-group="1" data-suffix="+">0</span></div>
+          <p class="figlabel mono">Guests</p>
+          <h3>A concert on a ten thousand seat scale.</h3>
+          <p>The district's largest public event, staged and run end to end by school students.</p>
+          <span class="more">About Interflash</span>
+        </div>
+        <div class="spic">
+          <!-- TODO: real Interflash photography. Picsum stand-in. -->
+          <img src="https://picsum.photos/seed/interflash-concert-crowd/1000/900" alt="Crowd at a large outdoor concert">
+        </div>
+      </article>
+      <article class="scard">
+        <div class="sbody">
+          <span class="stag" style="background:#E4E8F2;color:#1B244A">DIMUN</span>
+          <div class="fig"><span data-count="6">0</span></div>
+          <p class="figlabel mono">Committees</p>
+          <h3>The first Interact Model UN in Sri Lanka.</h3>
+          <p>District Interact Model United Nations, with its own committees, topics and study guides.</p>
+          <span class="more">About DIMUN</span>
+        </div>
+        <div class="spic"><img src="../public/images/media-crew/media-compering.jpg" alt="Students compering a district conference"></div>
+      </article>
+      <article class="scard">
+        <div class="sbody">
+          <span class="stag" style="background:#E1F0EE;color:#187777">Race4Change</span>
+          <div class="fig">5 km</div>
+          <p class="figlabel mono">Galle Face Green</p>
+          <h3>A public charity run for the Little Hearts Foundation.</h3>
+          <p>Open registration and corporate teams, raising funds for children's cardiac care.</p>
+          <span class="more">About Race4Change</span>
+        </div>
+        <div class="spic">
+          <!-- TODO: real Race4Change photography. Picsum stand-in. -->
+          <img src="https://picsum.photos/seed/race4change-runners-seafront/1000/900" alt="Runners at a charity road race">
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- EXPAND GRID (lab.damiandc.com/expand-grid) -->
+  <section class="wrap sec" id="c-zones" style="padding-top:0">
+    <h2 class="h2" data-reveal>Nine zones, one district.</h2>
+    <p class="sub" data-reveal>Clubs are grouped into zones across Sri Lanka and the Maldives, each with its own zonal leadership. Open one to see it.</p>
+    <div class="zones" data-expandgrid>
+      <button class="zone" type="button" aria-expanded="true"><span class="zlabel mono">Zone</span><div><b>01</b><p class="zbody">Zonal Representative, club count and the projects running in this zone would sit here.</p></div></button>
+      <button class="zone" type="button" aria-expanded="false"><span class="zlabel mono">Zone</span><div><b>02</b><p class="zbody">Zonal Representative, club count and the projects running in this zone would sit here.</p></div></button>
+      <button class="zone" type="button" aria-expanded="false"><span class="zlabel mono">Zone</span><div><b>03</b><p class="zbody">Zonal Representative, club count and the projects running in this zone would sit here.</p></div></button>
+      <button class="zone" type="button" aria-expanded="false"><span class="zlabel mono">Zone</span><div><b>04</b><p class="zbody">Zonal Representative, club count and the projects running in this zone would sit here.</p></div></button>
+      <button class="zone" type="button" aria-expanded="false"><span class="zlabel mono">Zone</span><div><b>05</b><p class="zbody">Zonal Representative, club count and the projects running in this zone would sit here.</p></div></button>
+      <button class="zone" type="button" aria-expanded="false"><span class="zlabel mono">Zone</span><div><b>06</b><p class="zbody">Zonal Representative, club count and the projects running in this zone would sit here.</p></div></button>
+      <button class="zone" type="button" aria-expanded="false"><span class="zlabel mono">Zone</span><div><b>07</b><p class="zbody">Zonal Representative, club count and the projects running in this zone would sit here.</p></div></button>
+      <button class="zone" type="button" aria-expanded="false"><span class="zlabel mono">Zone</span><div><b>08</b><p class="zbody">Zonal Representative, club count and the projects running in this zone would sit here.</p></div></button>
+      <button class="zone" type="button" aria-expanded="false"><span class="zlabel mono">Zone</span><div><b>09</b><p class="zbody">Zonal Representative, club count and the projects running in this zone would sit here.</p></div></button>
+    </div>
+  </section>
+
+  <section class="wrap sec" id="c-avenues" style="padding-top:0">
+    <h2 class="h2" data-reveal>Five avenues of service.</h2>
+    <p class="sub" data-reveal>Every club project sits under one of these. They are the structure behind everything above.</p>
+    <div class="aves">
+      <a class="ave" href="#c-avenues" data-reveal><img src="../public/images/avenues/avenue-community-service.png" alt=""><div><b>Community Service</b><span>The heart and soul of the movement.</span></div></a>
+      <a class="ave" href="#c-avenues" data-reveal><img src="../public/images/avenues/avenue-international-understanding.png" alt=""><div><b>International Understanding</b><span>Good will across communities.</span></div></a>
+      <a class="ave" href="#c-avenues" data-reveal><img src="../public/images/avenues/avenue-club-service.png" alt=""><div><b>Club Service</b><span>Strengthening every club's foundation.</span></div></a>
+      <a class="ave" href="#c-avenues" data-reveal><img src="../public/images/avenues/avenue-green-life.png" alt=""><div><b>Green Life</b><span>Service that answers to the planet.</span></div></a>
+      <a class="ave" href="#c-avenues" data-reveal><img src="../public/images/avenues/avenue-finance.png" alt=""><div><b>Finance</b><span>Fundraising that powers the rest.</span></div></a>
+    </div>
+  </section>
+
+  <section class="wrap sec" id="c-members" style="padding-top:0">
+    <h2 class="h2" data-reveal>For Interactors and club officers.</h2>
+    <p class="sub" data-reveal>The working side of the district. Dates, documents, records and the people who run them.</p>
+    <div class="dir" data-reveal>
+      <a href="#c-members"><b>Calendar</b><i>Dates and deadlines</i></a>
+      <a href="#c-members"><b>Admin Documents</b><i>Forms and reporting</i></a>
+      <a href="#c-members"><b>News</b><i>District bulletin</i></a>
+      <a href="#c-members"><b>Newsletter</b><i>Every issue</i></a>
+      <a href="#c-members"><b>Archives</b><i>1988 to today</i></a>
+      <a href="#c-members"><b>Meet the Council</b><i>2026 / 27</i></a>
+      <a href="#c-members"><b>College of DIRs</b><i>Past district reps</i></a>
+      <a href="#c-members"><b>Media Crew</b><i>Request coverage</i></a>
+    </div>
+  </section>
+
+  <section class="wrap close" id="c-close" style="padding-bottom:clamp(46px,6vw,86px)">
+    <div class="panel" data-reveal>
+      <h2 class="h2">Your school can start a club this year.</h2>
+      <p class="sub">Tell the council where you are and who is interested. Chartering a new Interact club takes one conversation to begin.</p>
+      <div class="acts" style="margin-top:30px;display:flex;flex-wrap:wrap;gap:10px">
+        <a class="btn" href="#c-close">Join a club</a>
+        <a class="btn ghost" href="#c-close">Contact the council</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <p>Interact District 3220, Sri Lanka and Maldives. Sponsored by Rotary International.</p>
+      <ul>
+        <li><a href="#concept-c">Instagram</a></li>
+        <li><a href="#concept-c">Facebook</a></li>
+        <li><a href="#concept-c">LinkedIn</a></li>
+        <li><a href="#concept-c">YouTube</a></li>
+        <li><a href="#concept-c">interactdistrictcouncil3220@gmail.com</a></li>
+      </ul>
+    </div>
+  </footer>
+</article>
+
+</main>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine = window.matchMedia('(pointer: fine)').matches;
+  var observer = null;
+  var teardown = [];
+
+  function group(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+  function countUp(el) {
+    var target = parseFloat(el.getAttribute('data-count'));
+    var suffix = el.getAttribute('data-suffix') || '';
+    var grouped = el.getAttribute('data-group') === '1';
+    var raw = el.getAttribute('data-raw') === '1';
+    function render(v, done) {
+      el.textContent = (raw ? v : (grouped ? group(v) : v)) + (done ? suffix : '');
+    }
+    if (reduce) { render(target, true); return; }
+    var start = null, dur = 1200;
+    function frame(t) {
+      if (start === null) start = t;
+      var p = Math.min((t - start) / dur, 1);
+      render(Math.round(target * (1 - Math.pow(1 - p, 3))), p === 1);
+      if (p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---------- CLIP REVEAL carousel --------------------------------------- */
+  function initCarousel(root) {
+    var slides = [].slice.call(root.querySelectorAll('.car-slide'));
+    if (!slides.length) return;
+    var now = root.querySelector('[data-car-now]');
+    var total = root.querySelector('[data-car-total]');
+    var cap = root.querySelector('[data-car-cap]');
+    var barWrap = root.querySelector('[data-car-bars]');
+    var i = 0, timer = null, DUR = 6000;
+
+    total.textContent = String(slides.length).padStart(2, '0');
+    barWrap.innerHTML = '';
+    slides.forEach(function (s, n) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Go to slide ' + (n + 1));
+      b.innerHTML = '<i></i>';
+      b.addEventListener('click', function () { go(n); });
+      barWrap.appendChild(b);
+    });
+    var bars = [].slice.call(barWrap.children);
+
+    function paint() {
+      slides.forEach(function (s, n) {
+        s.classList.toggle('is-live', n === i);
+        s.classList.toggle('is-past', n < i);
+        s.style.zIndex = n === i ? 3 : (n < i ? 2 : 1);
+      });
+      bars.forEach(function (b, n) {
+        b.setAttribute('aria-current', String(n === i));
+        var fill = b.firstElementChild;
+        fill.style.animation = 'none';
+        void fill.offsetWidth;
+        fill.style.animation = '';
+      });
+      now.textContent = String(i + 1).padStart(2, '0');
+      if (cap) cap.textContent = slides[i].getAttribute('data-cap') || '';
+    }
+    function go(n) { i = (n + slides.length) % slides.length; paint(); restart(); }
+    function restart() {
+      clearInterval(timer);
+      if (reduce) return;
+      timer = setInterval(function () { go(i + 1); }, DUR);
+    }
+
+    root.querySelector('[data-car-next]').addEventListener('click', function () { go(i + 1); });
+    root.querySelector('[data-car-prev]').addEventListener('click', function () { go(i - 1); });
+    root.addEventListener('mouseenter', function () { root.classList.add('is-paused'); clearInterval(timer); });
+    root.addEventListener('mouseleave', function () { root.classList.remove('is-paused'); restart(); });
+    root.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') go(i + 1);
+      if (e.key === 'ArrowLeft') go(i - 1);
+    });
+    root.tabIndex = 0;
+
+    /* drag / swipe */
+    var x0 = null;
+    root.addEventListener('pointerdown', function (e) { x0 = e.clientX; });
+    root.addEventListener('pointerup', function (e) {
+      if (x0 === null) return;
+      var d = e.clientX - x0; x0 = null;
+      if (Math.abs(d) > 48) go(i + (d < 0 ? 1 : -1));
+    });
+
+    paint(); restart();
+    teardown.push(function () { clearInterval(timer); });
+  }
+
+  /* ---------- KINETIC SLAB: lines lean with pointer velocity ------------- */
+  function initSlab(root) {
+    if (reduce || !fine) return;
+    var lines = [].slice.call(root.querySelectorAll('.slab span'));
+    var vx = 0, lastX = null, raf = null, target = 0, cur = 0;
+
+    function onMove(e) {
+      if (lastX !== null) vx = e.clientX - lastX;
+      lastX = e.clientX;
+      target = Math.max(-14, Math.min(14, vx * 0.9));
+    }
+    function loop() {
+      cur += (target - cur) * 0.12;
+      target *= 0.86;
+      lines.forEach(function (l, n) {
+        l.style.transform = 'skewX(' + (cur * (1 - n * 0.22)).toFixed(2) + 'deg)';
+      });
+      raf = requestAnimationFrame(loop);
+    }
+    root.addEventListener('pointermove', onMove);
+    raf = requestAnimationFrame(loop);
+    teardown.push(function () {
+      cancelAnimationFrame(raf);
+      root.removeEventListener('pointermove', onMove);
+      lines.forEach(function (l) { l.style.transform = ''; });
+    });
+  }
+
+  /* ---------- HOVER INDEX: floating avenue mark -------------------------- */
+  function initHoverIndex(root) {
+    if (!fine) return;
+    var peek = document.createElement('div');
+    peek.className = 'hpeek';
+    peek.innerHTML = '<img alt="">';
+    root.appendChild(peek);
+    var img = peek.firstElementChild;
+
+    function move(e) { peek.style.left = e.clientX + 'px'; peek.style.top = e.clientY + 'px'; }
+    [].slice.call(root.querySelectorAll('.hrow')).forEach(function (row) {
+      row.addEventListener('mouseenter', function () {
+        img.src = row.getAttribute('data-peek');
+        peek.classList.add('on');
+      });
+      row.addEventListener('mouseleave', function () { peek.classList.remove('on'); });
+      row.addEventListener('mousemove', move);
+    });
+    teardown.push(function () { peek.remove(); });
+  }
+
+  /* ---------- HORIZONTAL JOURNEY: measure the pan distance --------------- */
+  function initJourney(root) {
+    var rail = root.querySelector('.journey-rail');
+    if (!rail) return;
+    function measure() {
+      var pad = parseFloat(getComputedStyle(rail).paddingLeft) || 0;
+      var d = Math.max(0, rail.scrollWidth - window.innerWidth + pad);
+      rail.style.setProperty('--pan', d + 'px');
+    }
+    measure();
+    window.addEventListener('resize', measure);
+    teardown.push(function () { window.removeEventListener('resize', measure); });
+  }
+
+  /* ---------- EXPAND GRID ------------------------------------------------ */
+  function initExpandGrid(root) {
+    var zones = [].slice.call(root.querySelectorAll('.zone'));
+    zones.forEach(function (z) {
+      z.addEventListener('click', function () {
+        zones.forEach(function (o) { o.setAttribute('aria-expanded', String(o === z)); });
+      });
+    });
+  }
+
+  /* ---------- MOSAIC RIPPLE: neighbours react to the hovered tile -------- */
+  function initMosaic(root) {
+    if (!fine || reduce) return;
+    var tiles = [].slice.call(root.querySelectorAll('.tile'));
+    tiles.forEach(function (t, i) {
+      t.addEventListener('mouseenter', function () {
+        tiles.forEach(function (o, j) {
+          var d = Math.abs(i - j);
+          if (d === 0) return;
+          if (d > 3) { o.style.transform = ''; return; }
+          o.style.transform = 'scale(' + (1 - (4 - d) * 0.012).toFixed(3) + ')';
+        });
+      });
+      t.addEventListener('mouseleave', function () {
+        tiles.forEach(function (o) { o.style.transform = ''; });
+      });
+    });
+  }
+
+  /* ---------- wire the active concept ------------------------------------ */
+  function build() {
+    teardown.forEach(function (fn) { fn(); });
+    teardown = [];
+    if (observer) observer.disconnect();
+
+    var active = document.querySelector('.c:not([hidden])');
+    if (!active) return;
+
+    observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('in');
+        [].slice.call(e.target.querySelectorAll('[data-count]')).forEach(function (n) {
+          if (n.dataset.done) return;
+          n.dataset.done = '1';
+          countUp(n);
+        });
+        observer.unobserve(e.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+
+    [].slice.call(active.querySelectorAll('[data-reveal],[data-rule],[data-cols]')).forEach(function (el) {
+      el.classList.remove('in');
+      [].slice.call(el.querySelectorAll('[data-count]')).forEach(function (n) {
+        delete n.dataset.done; n.textContent = '0';
+      });
+      observer.observe(el);
+    });
+
+    var car = active.querySelector('[data-carousel]'); if (car) initCarousel(car);
+    var slab = active.querySelector('[data-slab]'); if (slab) initSlab(slab);
+    var hidx = active.querySelector('[data-hoveridx]'); if (hidx) initHoverIndex(hidx);
+    var grid = active.querySelector('[data-expandgrid]'); if (grid) initExpandGrid(grid);
+    var jour = active.querySelector('.journey'); if (jour) initJourney(jour);
+    var mos = active.querySelector('[data-mosaic]'); if (mos) initMosaic(mos);
+
+    var bp = active.querySelector('[data-blueprint]');
+    if (bp) {
+      [].slice.call(bp.querySelectorAll('[data-count]')).forEach(function (n) {
+        delete n.dataset.done; n.textContent = '0';
+      });
+      bp.classList.remove('drafted');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          bp.classList.add('drafted');
+          setTimeout(function () {
+            [].slice.call(bp.querySelectorAll('[data-count]')).forEach(function (n) {
+              if (n.dataset.done) return;
+              n.dataset.done = '1';
+              countUp(n);
+            });
+          }, reduce ? 0 : 1100);
+        });
+      });
+    }
+  }
+
+  [].slice.call(document.querySelectorAll('.switcher button')).forEach(function (b) {
+    b.addEventListener('click', function () {
+      var id = b.getAttribute('data-go');
+      [].slice.call(document.querySelectorAll('.switcher button')).forEach(function (x) {
+        x.setAttribute('aria-pressed', String(x === b));
+      });
+      [].slice.call(document.querySelectorAll('.c')).forEach(function (c) {
+        c.hidden = (c.id !== 'concept-' + id);
+      });
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      build();
+    });
+  });
+
+  build();
+})();
+</script>
+</body>
+</html>
