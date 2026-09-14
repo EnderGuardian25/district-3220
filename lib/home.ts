@@ -51,6 +51,8 @@ export type Flagship = {
   imageAlt: string;
   /** True where the district has no photograph yet and this is a placeholder. */
   needsPhoto?: boolean;
+  /** True where the copy itself is a placeholder awaiting the district. */
+  needsContent?: boolean;
 };
 
 export const FLAGSHIPS: Flagship[] = [
@@ -88,6 +90,36 @@ export const FLAGSHIPS: Flagship[] = [
     image: '/images/blog/blog-35th-district-assembly.jpg',
     imageAlt: 'Placeholder for Race4Change photography',
     needsPhoto: true,
+  },
+  /**
+   * TODO(district): IBTS and Intercede have no content anywhere in the repo.
+   * Each needs a name check, the one figure it is known for, a one-line
+   * headline, a sentence of detail, and a photograph. Everything below is a
+   * deliberate placeholder so the five-tile layout is real.
+   */
+  {
+    slug: 'ibts',
+    name: 'IBTS',
+    figure: 'TODO',
+    figureLabel: 'Awaiting figure',
+    headline: 'Headline to come from the district.',
+    blurb: 'Placeholder. Send the one-line description and the number this project is known for.',
+    image: '/images/media-crew/media-designing.jpg',
+    imageAlt: 'Placeholder for IBTS photography',
+    needsPhoto: true,
+    needsContent: true,
+  },
+  {
+    slug: 'intercede',
+    name: 'Intercede',
+    figure: 'TODO',
+    figureLabel: 'Awaiting figure',
+    headline: 'Headline to come from the district.',
+    blurb: 'Placeholder. Send the one-line description and the number this project is known for.',
+    image: '/images/media-crew/media-photo-booths.jpg',
+    imageAlt: 'Placeholder for Intercede photography',
+    needsPhoto: true,
+    needsContent: true,
   },
 ];
 
@@ -156,33 +188,41 @@ export const AVENUE_PANELS: AvenuePanel[] = [
   },
 ];
 
-export type WallTile = {
+export type WallItem = {
   src: string;
   alt: string;
-  /** Grid span. The rhythm is deliberate, not decorative. */
-  span?: 'wide' | 'tall' | 'block';
+  /** Shown above the image, the way the reference strip labels each plate. */
+  caption: string;
+  /** Plate size in the horizontal collage. */
+  size: 'sm' | 'md' | 'lg';
+  /** Vertical placement, which is what stops the strip reading as a row. */
+  drop: 'top' | 'mid' | 'low';
 };
 
 /**
- * Ten tiles, spanned so the grid closes with no empty cell at 6 columns, and
- * `grid-flow-dense` in the component covers the narrower breakpoints.
+ * The horizontal collage. Sizes and drops alternate on purpose: a strip where
+ * every plate is the same size at the same height reads as a filmstrip, not as
+ * an edit.
  *
- * `blog-shawn-shiek-tribute.jpg` is deliberately NOT here. It is a memorial
- * card, and a tribute used as decorative filler in a "year in photographs"
- * mosaic reads badly however good the image is. If the district wants it on the
- * site it belongs in News with its own context, not in a wall.
+ * Captions carry no year. The repo does not record when most of these were
+ * taken, and inventing dates on a district's own record is worse than omitting
+ * them. Add years here once the district confirms them.
+ *
+ * `blog-shawn-shiek-tribute.jpg` is deliberately absent. It is a memorial card,
+ * and a tribute used as decorative filler reads badly however good the image
+ * is. If the district wants it on the site it belongs in News with its context.
  */
-export const WALL_TILES: WallTile[] = [
-  { src: '/images/hero/assembly.webp', alt: 'District assembly hall', span: 'block' },
-  { src: '/images/media-crew/media-photography.jpg', alt: 'Student photographer on assignment' },
-  { src: '/images/media-crew/media-videography.jpg', alt: 'Student videographer filming' },
-  { src: '/images/blog/blog-35th-district-assembly.jpg', alt: 'The 35th District Assembly', span: 'wide' },
-  { src: '/images/media-crew/media-livestreaming.jpg', alt: 'Livestream desk at a district event' },
-  { src: '/images/media-crew/media-designing.jpg', alt: 'Student designer at work' },
-  { src: '/images/media-crew/media-compering.jpg', alt: 'Students compering an event', span: 'wide' },
-  { src: '/images/decor/decor-sphere-stairs.jpg', alt: 'Event venue detail', span: 'wide' },
-  { src: '/images/media-crew/media-photo-booths.jpg', alt: 'Event photo booth', span: 'wide' },
-  { src: '/images/decor/decor-white-structure.jpg', alt: 'Venue architecture', span: 'wide' },
+export const WALL_ITEMS: WallItem[] = [
+  { src: '/images/hero/assembly.webp', alt: 'Interactors filling the district assembly hall', caption: 'District Assembly, Colombo', size: 'lg', drop: 'mid' },
+  { src: '/images/media-crew/media-photography.jpg', alt: 'Student photographer on assignment', caption: 'Media Crew, photography', size: 'sm', drop: 'top' },
+  { src: '/images/blog/blog-35th-district-assembly.jpg', alt: 'Delegates at the 35th District Assembly', caption: '35th District Assembly', size: 'md', drop: 'low' },
+  { src: '/images/media-crew/media-compering.jpg', alt: 'Student compères running the floor', caption: 'Compères on the floor', size: 'lg', drop: 'top' },
+  { src: '/images/media-crew/media-livestreaming.jpg', alt: 'Students operating a livestream desk', caption: 'Media Crew, livestream desk', size: 'sm', drop: 'mid' },
+  { src: '/images/media-crew/media-videography.jpg', alt: 'Student videographer filming', caption: 'Media Crew, videography', size: 'md', drop: 'low' },
+  { src: '/images/decor/decor-sphere-stairs.jpg', alt: 'Event venue detail', caption: 'Venue detail', size: 'sm', drop: 'top' },
+  { src: '/images/media-crew/media-designing.jpg', alt: 'Student designer at work', caption: 'Media Crew, design', size: 'md', drop: 'mid' },
+  { src: '/images/media-crew/media-photo-booths.jpg', alt: 'Event photo booth', caption: 'Photo booth', size: 'sm', drop: 'low' },
+  { src: '/images/decor/decor-white-structure.jpg', alt: 'Venue architecture', caption: 'Venue architecture', size: 'md', drop: 'top' },
 ];
 
 /** The member-facing utility band. Mirrors the nav, minus the public pages. */

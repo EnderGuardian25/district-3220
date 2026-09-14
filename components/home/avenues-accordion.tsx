@@ -49,7 +49,11 @@ export function AvenuesAccordion() {
               backgroundColor: `color-mix(in srgb, ${a.colour} ${isOpen ? 15 : 9}%, #FFFFFF)`,
               flexGrow: isOpen ? 4.4 : 1,
             }}
-            className="group relative grid min-h-[92px] grid-cols-[92px_1fr] items-center overflow-hidden rounded-media border-l-4 border-l-[var(--k)] text-left transition-[flex-grow,background-color] duration-[600ms] ease-out-expo md:block md:min-h-0 md:min-w-0 md:border-l-0"
+            // flex-grow is the only layout property animating here, on a
+            // longer, gentler curve than the default. The description used to
+            // animate max-height alongside it, which is never linear with the
+            // real content height and was most of the roughness.
+            className="group relative grid min-h-[92px] grid-cols-[92px_1fr] items-center overflow-hidden rounded-media border-l-4 border-l-[var(--k)] text-left transition-[flex-grow,background-color] duration-[750ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[flex-grow] md:block md:min-h-0 md:min-w-0 md:border-l-0"
           >
             {/* Logo. Centred in the plate above the band on desktop; a fixed
                 column on mobile. */}
@@ -85,12 +89,21 @@ export function AvenuesAccordion() {
               >
                 {a.name}
               </span>
+              {/* grid-template-rows 0fr -> 1fr, not max-height. It resolves to
+                  the content's real height, so the reveal finishes exactly when
+                  the text does instead of easing toward a guessed ceiling. */}
               <span
-                className={`block max-w-[38ch] overflow-hidden text-[0.93rem] text-content-muted transition-[max-height,opacity,margin-top] duration-500 ease-out-expo md:text-white/85 ${
-                  a.onSolid === 'dark' ? 'md:text-chalk-950/80' : ''
-                } ${isOpen ? 'mt-2 max-h-40 opacity-100' : 'mt-0 max-h-0 opacity-0'}`}
+                className={`grid transition-[grid-template-rows,opacity,margin-top] duration-[750ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  isOpen ? 'mt-2 grid-rows-[1fr] opacity-100' : 'mt-0 grid-rows-[0fr] opacity-0'
+                }`}
               >
-                {a.blurb}
+                <span
+                  className={`block max-w-[38ch] overflow-hidden text-[0.93rem] text-content-muted md:text-white/85 ${
+                    a.onSolid === 'dark' ? 'md:text-chalk-950/80' : ''
+                  }`}
+                >
+                  {a.blurb}
+                </span>
               </span>
             </span>
           </button>

@@ -29,15 +29,20 @@ export function OfficersBand() {
         <ul className="mt-9 grid grid-cols-1 gap-px overflow-hidden rounded-panel bg-ink-panel-line outline outline-ink-panel-line sm:grid-cols-2 lg:grid-cols-4">
           {OFFICER_LINKS.map((l) => (
             <li key={l.href}>
+              {/* The whole tile fills Signal on hover and focus. A tint was not
+                  readable as a state change on a near-black band; a solid fill
+                  is unmistakable and reads as selection. */}
               <Link
                 href={l.href}
                 data-morph
-                className="block h-full bg-ink-panel px-6 py-7 transition-colors duration-200 hover:bg-[#1b1812]"
+                className="group block h-full bg-ink-panel px-6 py-7 transition-colors duration-200 hover:bg-accent-fill focus-visible:bg-accent-fill"
               >
-                <span className="block font-display text-base font-semibold tracking-[-0.01em]">
+                <span className="block font-display text-base font-semibold tracking-[-0.01em] transition-colors duration-200 group-hover:text-white group-focus-visible:text-white">
                   {l.label}
                 </span>
-                <span className="label-micro mt-2 block text-on-ink-muted">{l.note}</span>
+                <span className="label-micro mt-2 block text-on-ink-muted transition-colors duration-200 group-hover:text-white/85 group-focus-visible:text-white/85">
+                  {l.note}
+                </span>
               </Link>
             </li>
           ))}

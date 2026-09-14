@@ -270,43 +270,52 @@
 }
 
 /* ==========================================================================
-   HORIZONTAL JOURNEY
+   PINNED HORIZONTAL SCROLL
    The pan is a CSS scroll-driven animation, so it runs off the main thread and
-   needs no scroll listener. Two load-bearing details:
+   needs no scroll listener. Three load-bearing details:
      - the timeline is named on the TALL section, not on the sticky rail. A
        timeline scoped to the rail never leaves the viewport, so it would never
        advance.
      - `contain` is the correct range for a subject taller than the viewport:
        it starts when the section bottom reaches the viewport bottom and ends
        when its top reaches the top, which is exactly the pinned stretch.
-     - --pan is measured in JS (see flagship-journey.tsx). A percentage
-       translate is a percentage of the rail's own width and overshoots.
-   Unsupported browsers fall through to a snap-scroll rail, which is a real
-   control rather than a half-working pin.
+     - --pan is measured in JS. A percentage translate is a percentage of the
+       rail's own width and overshoots badly.
+   Below md, and where scroll-driven animation is unsupported, this collapses
+   to an ordinary vertical stack rather than a half-working pin.
    ========================================================================== */
-.journey {
-  height: 340vh;
-  view-timeline-name: --journey;
-  view-timeline-axis: block;
-}
+@media (width >= 48rem) {
+  .hscroll {
+    height: 340vh;
+    view-timeline-name: --hscroll;
+    view-timeline-axis: block;
+  }
 
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .journey-rail {
-      animation: journey-pan linear both;
-      animation-timeline: --journey;
-      animation-range: contain 0% contain 100%;
-      will-change: transform;
-    }
-    .jprog > i {
-      animation: journey-fill linear both;
-      animation-timeline: --journey;
-      animation-range: contain 0% contain 100%;
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .hscroll-rail {
+        animation: hscroll-pan linear both;
+        animation-timeline: --hscroll;
+        animation-range: contain 0% contain 100%;
+        will-change: transform;
+      }
+      /* pathLength="1" normalises the path, so the draw is a 1 -> 0 dashoffset
+         regardless of how long the generated line actually is. */
+      .hscroll-line {
+        animation: hscroll-draw linear both;
+        animation-timeline: --hscroll;
+        animation-range: contain 0% contain 100%;
+      }
+      .hscroll-prog > i {
+        animation: hscroll-fill linear both;
+        animation-timeline: --hscroll;
+        animation-range: contain 0% contain 100%;
+      }
     }
   }
 }
 
-@keyframes journey-pan {
+@keyframes hscroll-pan {
   from {
     transform: translateX(0);
   }
@@ -315,7 +324,7 @@
   }
 }
 
-@keyframes journey-fill {
+@keyframes hscroll-fill {
   from {
     transform: scaleX(0);
   }
@@ -324,42 +333,55 @@
   }
 }
 
-@supports not (animation-timeline: view()) {
-  .journey {
-    height: auto;
+@keyframes hscroll-draw {
+  from {
+    stroke-dashoffset: 1;
   }
-  .journey-pin {
-    position: static;
-    height: auto;
-    padding-block: 1rem;
-  }
-  .journey-rail {
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 1rem;
-  }
-  .journey-rail > * {
-    scroll-snap-align: center;
-  }
-  .jprog {
-    display: none;
+  to {
+    stroke-dashoffset: 0;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .journey {
-    height: auto;
+/* Fallbacks: a real swipe rail, never a broken pin. */
+@media (width >= 48rem) {
+  @supports not (animation-timeline: view()) {
+    .hscroll {
+      height: auto;
+    }
+    .hscroll-pin {
+      position: static;
+      height: auto;
+    }
+    .hscroll-rail {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+    }
+    .hscroll-prog {
+      display: none;
+    }
+    .hscroll-line {
+      stroke-dashoffset: 0;
+    }
   }
-  .journey-pin {
-    position: static;
-    height: auto;
-  }
-  .journey-rail {
-    overflow-x: auto;
-    transform: none !important;
-  }
-  .jprog {
-    display: none;
+
+  @media (prefers-reduced-motion: reduce) {
+    .hscroll {
+      height: auto;
+    }
+    .hscroll-pin {
+      position: static;
+      height: auto;
+    }
+    .hscroll-rail {
+      overflow-x: auto;
+      transform: none !important;
+    }
+    .hscroll-prog {
+      display: none;
+    }
+    .hscroll-line {
+      stroke-dashoffset: 0;
+    }
   }
 }
 
