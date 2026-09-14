@@ -22,6 +22,13 @@ const INTERVAL = 6000;
 
 export function HeroCarousel() {
   const [index, setIndex] = useState(0);
+  /**
+   * Highest slide reached. Slides mount lazily as they are first needed, so on
+   * first paint only slide 0 exists. Mounting all four up front meant a
+   * non-priority image could win Largest Contentful Paint, which is both a
+   * real regression and what Next was warning about.
+   */
+  const [maxSeen, setMaxSeen] = useState(0);
   const [paused, setPaused] = useState(false);
   const [reduced, setReduced] = useState(false);
   const dragStart = useRef<number | null>(null);
@@ -35,7 +42,14 @@ export function HeroCarousel() {
     return () => mq.removeEventListener('change', sync);
   }, []);
 
-  const go = useCallback((next: number) => setIndex((next + count) % count), [count]);
+  const go = useCallback(
+    (next: number) => {
+      const target = (next + count) % count;
+      setIndex(target);
+      setMaxSeen((m) => Math.max(m, target));
+    },
+    [count],
+  );
 
   useEffect(() => {
     if (paused || reduced) return;
@@ -80,6 +94,7 @@ export function HeroCarousel() {
       className="relative isolate -mt-16 h-[min(92svh,880px)] min-h-[520px] overflow-hidden bg-chalk-950 md:-mt-18"
     >
       {HERO_SLIDES.map((s, i) => {
+        if (i > maxSeen) return null;
         const state = i === index ? 'live' : i < index ? 'past' : 'ahead';
         return (
           <div
@@ -91,12 +106,17 @@ export function HeroCarousel() {
               zIndex: state === 'live' ? 3 : state === 'past' ? 2 : 1,
             }}
           >
+            {/* Slide 0 is the LCP element, so it gets priority. Later slides
+                are above the fold too, and because they only mount once
+                reached, `eager` loads them exactly when they are needed rather
+                than competing with the first paint. Leaving them lazy made
+                whichever slide was showing register as an un-prioritised LCP. */}
             <Image
               src={s.src}
               alt={s.alt}
               fill
-              priority={i === 0}
               sizes="100vw"
+              {...(i === 0 ? { priority: true } : { loading: 'eager' as const })}
               className="object-cover"
             />
             <div
@@ -173,9 +193,13 @@ export function HeroCarousel() {
         </div>
       </div>
 
-      {/* Marks the bottom of the full-screen hero. SiteHeader observes this to
-          decide when to appear; pages without one show the bar immediately. */}
-      <div data-hero-end aria-hidden="true" className="absolute inset-x-0 bottom-0 h-px" />
+      {/* SiteHeader watches this to decide whether the bar is transparent (the
+          photograph showing through) or solid.
+
+          It sits near the TOP of the hero, not the bottom. Anchored at the
+          bottom, the bar stayed transparent for the hero's whole height, and
+          the white CTA pills scrolled up through it as visible ghosts. */}
+      <div data-hero-top aria-hidden="true" className="absolute inset-x-0 top-32 h-px" />
     </section>
   );
 }

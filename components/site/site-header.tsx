@@ -30,17 +30,19 @@ export function SiteHeader() {
    * rather than a scroll listener, so nothing runs per frame.
    */
   useEffect(() => {
-    const sentinel = document.querySelector('[data-hero-end]');
+    const sentinel = document.querySelector('[data-hero-top]');
     if (!sentinel) {
       setScrolled(true);
       return;
     }
     const io = new IntersectionObserver(
       ([entry]) => {
-        // Past the hero once the sentinel has left through the top.
+        // Solid once the marker has passed up behind the bar.
         setScrolled(!entry.isIntersecting && entry.boundingClientRect.top < 0);
       },
-      { threshold: 0 },
+      // Shrink the root by the bar's own height so the swap happens exactly as
+      // the marker slides under it, not a bar-height later.
+      { threshold: 0, rootMargin: '-72px 0px 0px 0px' },
     );
     io.observe(sentinel);
     return () => io.disconnect();
@@ -78,22 +80,26 @@ export function SiteHeader() {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
   };
 
+  /**
+   * Over the hero the bar itself is invisible so the photograph reads straight
+   * through it; the nav stays fully present and usable, just inverted to white
+   * so it survives on top of the image. Once the hero is past, the solid chalk
+   * bar fades in and the nav returns to ink.
+   */
+  const overHero = !scrolled;
+
   return (
-    <header
-      // Invisible and inert while the hero fills the screen; fades in with the
-      // solid bar once the hero is behind you.
-      className={`sticky top-0 z-50 transition-[opacity,translate] duration-300 ease-out-expo ${
-        scrolled ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'
-      }`}
-    >
-      {/* The solid bar is its own layer, cross-faded by OPACITY rather than by
-          swapping classes on the header. `transition-colors` does not
-          interpolate `backdrop-filter`, so adding the blur on scroll made it pop
-          in abruptly — that was the snap. At opacity 0 the layer is fully
-          transparent, so its blur has no visible effect either. */}
+    <header className="sticky top-0 z-50">
+      {/* The bar is its own layer, cross-faded by opacity so nothing about the
+          header snaps as it arrives.
+
+          Fully opaque, and no backdrop-filter. At 80% the hero's white CTA
+          pills ghosted straight through it as they scrolled under, and a live
+          backdrop-filter across the full width is a real cost on the mid-range
+          Android this site is mostly read on. */}
       <div
         aria-hidden="true"
-        className={`pointer-events-none absolute inset-0 -z-10 border-b border-hairline bg-bg/80 backdrop-blur-xl backdrop-saturate-150 transition-opacity duration-300 ${
+        className={`pointer-events-none absolute inset-0 -z-10 border-b border-hairline bg-bg transition-opacity duration-300 ${
           scrolled ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -101,22 +107,34 @@ export function SiteHeader() {
       <div className="container-page flex h-16 items-center justify-between gap-4 md:h-18">
         <Link
           href="/"
+          data-morph
           className="flex shrink-0 items-center gap-2.5"
           aria-label={`${SITE.name} — home`}
         >
-          {/* Official Interact wordmark + Rotary wheel. Replaces the old Wix
-              logo-header.jpg, which was an opaque JPEG and showed a grey box in
-              dark mode. Logotypes are exempt from contrast minimums. */}
+          {/* Official Interact wordmark + Rotary wheel. Logotypes are exempt
+              from contrast minimums, but over photography it still needs a
+              shadow to hold its edge. */}
           <Image
             src="/images/branding/interact-logo.png"
             alt=""
             width={633}
             height={215}
             priority
-            className="h-6 w-auto md:h-7"
+            className={`h-6 w-auto transition-[filter] duration-300 md:h-7 ${
+              overHero ? 'drop-shadow-[0_1px_8px_rgba(10,12,14,0.7)]' : ''
+            }`}
           />
-          <span aria-hidden="true" className="h-5 w-px bg-hairline" />
-          <span className="text-[13px] leading-tight font-medium tracking-tight text-content-muted">
+          <span
+            aria-hidden="true"
+            className={`h-5 w-px transition-colors duration-300 ${
+              overHero ? 'bg-white/45' : 'bg-hairline'
+            }`}
+          />
+          <span
+            className={`text-[13px] leading-tight font-medium tracking-tight transition-colors duration-300 ${
+              overHero ? 'text-white [text-shadow:0_1px_8px_rgba(10,12,14,0.7)]' : 'text-content-muted'
+            }`}
+          >
             District 3220
           </span>
         </Link>
@@ -153,8 +171,14 @@ export function SiteHeader() {
                     aria-current={active ? 'page' : undefined}
                     aria-expanded={hasChildren ? openMenu === item.href : undefined}
                     data-morph
-                    className={`relative flex items-center gap-1 rounded-full px-3.5 py-2 text-[13.5px] font-medium transition-colors ${
-                      active ? 'text-content' : 'text-content-muted hover:text-content'
+                    className={`relative flex items-center gap-1 rounded-full px-3.5 py-2 text-[13.5px] font-medium transition-colors duration-300 ${
+                      overHero
+                        ? `[text-shadow:0_1px_8px_rgba(10,12,14,0.7)] ${
+                            active ? 'text-white' : 'text-white/80 hover:text-white'
+                          }`
+                        : active
+                          ? 'text-content'
+                          : 'text-content-muted hover:text-content'
                     }`}
                   >
                     {item.label}
@@ -224,7 +248,10 @@ export function SiteHeader() {
             aria-expanded={drawerOpen}
             aria-controls="mobile-nav"
             aria-label={drawerOpen ? 'Close menu' : 'Open menu'}
-            className="inline-flex size-9 items-center justify-center rounded-lg border border-hairline text-content lg:hidden"
+            data-morph
+            className={`inline-flex size-9 items-center justify-center rounded-full border transition-colors duration-300 lg:hidden ${
+              overHero ? 'border-white/50 text-white' : 'border-hairline text-content'
+            }`}
           >
             <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
               {drawerOpen ? <path d="M5 5l10 10M15 5L5 15" /> : <path d="M3 6h14M3 10h14M3 14h14" />}

@@ -93,9 +93,15 @@ export const FLAGSHIPS: Flagship[] = [
 
 /**
  * The five avenues, with the colour sampled from each logo. The mark sits on a
- * tint of its own colour and the name sits on the solid version, so `onSolid`
- * records which text colour clears 4.5:1 there. Community Service is the only
- * light one: white on it measures 2.6 and fails, so it takes dark text.
+ * tint of its own colour and the name sits on the solid version; `onSolid` sets
+ * the text colour on that band.
+ *
+ * CONTRAST NOTE: all five are now 'light' (white) by request. Four of them pass
+ * WCAG AA comfortably. Community Service does not: white on #D8951C measures
+ * about 2.6:1 against a 4.5 requirement, because that amber is the one light
+ * colour in the set. If it needs to pass, the one-line fix is to darken only
+ * that band to #A86F12 (white reaches 4.6) while the logo tint keeps the true
+ * brand amber.
  */
 export type AvenuePanel = {
   slug: string;
@@ -114,7 +120,7 @@ export const AVENUE_PANELS: AvenuePanel[] = [
       'The heart and soul of the movement, and the avenue most club projects are built under.',
     logo: '/images/avenues/avenue-community-service.png',
     colour: '#D8951C',
-    onSolid: 'dark',
+    onSolid: 'light',
   },
   {
     slug: 'international-understanding',
