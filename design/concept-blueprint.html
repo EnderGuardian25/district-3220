@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>District 3220 · Blueprint direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&family=Archivo:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   PROTOTYPE. One concept direction: FRONTLINE + BLUEPRINT merged.
+   Follows the design/directions.html pattern: a picker bar drives the live
+   mock below, so the visual direction can be steered from the page itself.
+
+   Dials: Palette · Type · Shape · Accent · Hero treatment
+   Effects, all from lab.damiandc.com:
+     Floating Panels (hero A) · full-bleed photograph (hero B)
+     Horizontal Journey (flagships) · Accordion Gallery (avenues)
+     Odometer Roll (stats) · Line Draw (section rules) · Morph Cursor
+     Iris transition (nav) · Mosaic wall (from Frontline)
+   Nine zones removed. Buttons are pills so the morph cursor has something
+   to wrap. Picsum stand-ins are marked TODO.
+   ========================================================================== */
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#E8E9E6;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+button{font:inherit;color:inherit}
+h1,h2,h3,p,figure,ul,ol{margin:0}
+ul{list-style:none;padding:0}
+
+/* ---------- doc chrome (the directions.html shell) ----------------------- */
+.doc{font-family:"Geist",ui-sans-serif,system-ui,sans-serif;color:#14171A}
+.wrapd{max-width:1180px;margin:0 auto;padding-inline:clamp(18px,4vw,40px)}
+.masthead{padding:clamp(40px,6vw,72px) 0 clamp(22px,3vw,34px)}
+.masthead .eyebrow{font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:#7C8189}
+.masthead h1{margin-top:16px;font-size:clamp(1.7rem,3.4vw,2.6rem);letter-spacing:-.035em;font-weight:600;line-height:1.1}
+.masthead .lede{margin-top:14px;max-width:74ch;color:#5C6168;font-size:1rem;line-height:1.6}
+.masthead code{font-family:"Geist Mono",monospace;font-size:.9em;background:#DCDED9;padding:1px 5px;border-radius:3px}
+
+.picker{position:sticky;top:0;z-index:200;background:rgba(232,233,230,.94);backdrop-filter:blur(12px);
+  border-block:1px solid #D2D4CF}
+.picker-row{display:flex;flex-wrap:wrap;gap:10px 28px;padding-block:14px;align-items:center}
+.picker-group{display:flex;align-items:center;gap:10px}
+.picker-label{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:#7C8189}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{border:1px solid #C9CBC6;background:#F3F4F1;color:#3E4349;padding:7px 12px;border-radius:999px;
+  font-size:12px;cursor:pointer;transition:background .15s,color .15s,border-color .15s;white-space:nowrap}
+.chip:hover{border-color:#8E9299}
+.chip[aria-pressed="true"]{background:#14171A;border-color:#14171A;color:#fff}
+.chip .sw{display:inline-block;width:9px;height:9px;border-radius:999px;margin-right:6px;vertical-align:-1px}
+.docnote{padding:18px 0 26px;color:#5C6168;font-size:13.5px;line-height:1.65;max-width:82ch}
+.docnote b{color:#14171A}
+.foot-doc{padding:30px 0 64px;color:#7C8189;font-size:12.5px;line-height:1.7}
+
+/* ==========================================================================
+   THE MOCK. Everything below is driven by CSS variables set on #stage.
+   ========================================================================== */
+/* Tokens live on :root, NOT on #stage. The morph cursor and the iris overlay
+   are siblings of #stage, so tokens scoped to #stage never reached them and
+   they rendered fully transparent. */
+:root{
+  --paper:#F2F4F3; --card:#FFFFFF; --ink:#14171A; --grey:#5B6066; --faint:#8C9198;
+  --rule:#DFE3E1; --draft:#1B244A; --draftSoft:rgba(27,36,74,.20);
+  --acc:#01B4E6; --accText:#026B87; --accSoft:#E2F6FD;
+  --fd:"Instrument Sans",ui-sans-serif,system-ui,sans-serif;
+  --fb:"Instrument Sans",ui-sans-serif,system-ui,sans-serif;
+  --fm:"Geist Mono",ui-monospace,monospace;
+  --r:20px; --rp:18px; --rb:999px;
+  --pad:clamp(18px,4vw,56px)}
+#stage{background:var(--paper);color:var(--ink);font-family:var(--fb);font-size:16px;line-height:1.55;
+  position:relative;overflow-x:clip}
+#stage .wrap{max-width:1440px;margin:0 auto;padding-inline:var(--pad)}
+#stage .mono{font-family:var(--fm)}
+#stage .coarseonly{display:none}
+@media (pointer:coarse){#stage .fineonly{display:none}#stage .coarseonly{display:inline}}
+/* .heroB sets display:flex, which outranks the UA [hidden] rule */
+#stage [hidden]{display:none!important}
+#stage ::selection{background:var(--acc);color:#fff}
+#stage a:focus-visible,#stage button:focus-visible{outline:2px solid var(--accText);outline-offset:3px;border-radius:4px}
+
+/* ---------- MORPH CURSOR (lab.damiandc.com/morph-cursor) ----------------- */
+.mcur{position:fixed;left:0;top:0;z-index:9000;pointer-events:none;width:13px;height:13px;
+  border-radius:999px;background:var(--acc);opacity:.92;
+  transform:translate(-50%,-50%);
+  transition:width .32s cubic-bezier(.16,1,.3,1),height .32s cubic-bezier(.16,1,.3,1),
+    border-radius .32s cubic-bezier(.16,1,.3,1),opacity .22s,background .22s;
+  display:none}
+/* parked on a pill: multiply keeps the label underneath readable */
+.mcur.morph{opacity:1;background:color-mix(in srgb,var(--acc) 26%,transparent);
+  mix-blend-mode:multiply;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--acc) 55%,transparent)}
+body.has-morph .mcur{display:block}
+@media (pointer:fine){
+  body.has-morph #stage,body.has-morph #stage *{cursor:none}
+}
+@media (prefers-reduced-motion:reduce){.mcur{display:none!important}
+  body.has-morph #stage,body.has-morph #stage *{cursor:auto}}
+
+/* ---------- IRIS transition (lab.damiandc.com/iris-transition) ----------- */
+.iris{position:fixed;inset:0;z-index:8000;pointer-events:none;background:var(--draft);
+  clip-path:circle(0% at var(--ix,50%) var(--iy,50%));
+  transition:clip-path .5s cubic-bezier(.72,0,.2,1)}
+.iris.in{clip-path:circle(155% at var(--ix,50%) var(--iy,50%))}
+@media (prefers-reduced-motion:reduce){.iris{display:none}}
+
+/* ---------- reveal + LINE DRAW ------------------------------------------ */
+[data-reveal]{opacity:0;transform:translateY(18px);
+  transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)}
+[data-reveal].in{opacity:1;transform:none}
+.drawline{height:1px;background:var(--draft);opacity:.3;transform:scaleX(0);transform-origin:left;
+  transition:transform .9s cubic-bezier(.16,1,.3,1)}
+.drawline.in{transform:scaleX(1)}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  [data-reveal],.drawline{opacity:1!important;transform:none!important;transition:none!important}
+  .fp-panel,.fp-word{transform:none!important}
+  .journey-rail{animation:none!important}
+}
+
+/* ---------- nav --------------------------------------------------------- */
+#stage .nav{position:relative;z-index:30}
+#stage .nav-in{display:flex;align-items:center;justify-content:space-between;gap:24px;height:74px}
+#stage .mark{display:flex;align-items:center;gap:10px;font-family:var(--fd);font-weight:700;
+  letter-spacing:-.02em;font-size:15.5px;text-decoration:none}
+#stage .mark s{text-decoration:none;width:11px;height:11px;border-radius:var(--rb);background:var(--acc)}
+#stage .nav ul{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--grey)}
+#stage .nav ul a{text-decoration:none;padding:8px 13px;border-radius:var(--rb);transition:color .15s,background .15s}
+#stage .nav ul a:hover{color:var(--ink)}
+@media (max-width:1120px){#stage .nav ul{display:none}}
+
+#stage .btn{display:inline-flex;align-items:center;text-decoration:none;font-family:var(--fd);
+  font-size:14px;font-weight:600;padding:13px 24px;border-radius:var(--rb);border:1px solid var(--draft);
+  background:var(--draft);color:#fff;white-space:nowrap;
+  transition:transform .15s,background .2s,border-color .2s,color .2s}
+#stage .btn:hover{background:var(--accText);border-color:var(--accText)}
+#stage .btn:active{transform:translateY(1px)}
+#stage .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+#stage .btn.ghost:hover{background:transparent;color:var(--ink);border-color:var(--draft)}
+#stage .btn.sm{padding:10px 18px;font-size:13px}
+#stage .btn.onphoto{background:#fff;color:var(--ink);border-color:#fff}
+#stage .btn.onphoto:hover{background:var(--acc);border-color:var(--acc);color:#05222C}
+#stage .btn.onphoto.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.55)}
+#stage .btn.onphoto.ghost:hover{background:rgba(255,255,255,.15);color:#fff;border-color:#fff}
+
+/* ---------- HERO A · FLOATING PANELS over a drafted ground -------------- */
+#stage .heroA{position:relative;min-height:min(88vh,840px);overflow:hidden;isolation:isolate;
+  display:flex;align-items:center}
+#stage .fp-ground{position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--draftSoft) 1px,transparent 1px),
+    linear-gradient(90deg,var(--draftSoft) 1px,transparent 1px);
+  background-size:72px 72px;opacity:0;transition:opacity 1s ease .1s;
+  mask-image:radial-gradient(130% 100% at 38% 50%,#000 30%,transparent 82%)}
+#stage .heroA.drafted .fp-ground{opacity:.55}
+#stage .fp-leaders{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+#stage .fp-leaders line{stroke:var(--draft);stroke-width:1;opacity:.34;
+  stroke-dasharray:var(--len,1600);stroke-dashoffset:var(--len,1600);
+  transition:stroke-dashoffset 1.2s cubic-bezier(.16,1,.3,1)}
+#stage .heroA.drafted .fp-leaders line{stroke-dashoffset:0}
+#stage .heroA.drafted .fp-leaders line:nth-child(2){transition-delay:.14s}
+#stage .heroA.drafted .fp-leaders line:nth-child(3){transition-delay:.28s}
+
+#stage .fp-word{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-family:var(--fd);font-size:clamp(10rem,32vw,30rem);font-weight:800;letter-spacing:-.06em;
+  line-height:.8;color:var(--ink);opacity:.045;pointer-events:none;user-select:none;white-space:nowrap;
+  will-change:transform}
+
+#stage .fp-panel{position:absolute;border-radius:var(--rp);overflow:hidden;will-change:transform;
+  box-shadow:0 24px 60px rgba(20,23,26,.18);background:var(--card)}
+#stage .fp-panel img{width:100%;height:100%;object-fit:cover}
+#stage .fp-panel.p1{width:clamp(150px,17vw,250px);aspect-ratio:3/4;right:7%;top:9%}
+#stage .fp-panel.p2{width:clamp(180px,21vw,320px);aspect-ratio:4/3;right:23%;bottom:12%}
+#stage .fp-panel.p3{width:clamp(120px,13vw,190px);aspect-ratio:1/1;right:2%;bottom:26%}
+/* the left half is reserved for the headline and CTAs, so every panel lives
+   on the right. A fourth panel bottom-left sat directly on the buttons. */
+#stage .fp-panel.p4{width:clamp(110px,12vw,168px);aspect-ratio:4/5;right:36%;top:12%}
+@media (max-width:1240px){#stage .fp-panel.p4{display:none}}
+@media (max-width:820px){
+  #stage .fp-panel.p2,#stage .fp-panel.p3{display:none}
+  #stage .fp-panel.p1{width:130px;right:4%;top:6%;opacity:.9}}
+
+#stage .heroA .hcopy{position:relative;z-index:5;width:100%;padding-block:clamp(40px,6vw,72px)}
+#stage .eyebrow{font-family:var(--fm);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--draft);opacity:0;transform:translateY(6px);
+  transition:opacity .5s ease .5s,transform .5s ease .5s}
+#stage .heroA.drafted .eyebrow{opacity:.74;transform:none}
+#stage .h1{margin-top:18px;font-family:var(--fd);font-size:clamp(2rem,5vw,4.4rem);line-height:1.03;
+  letter-spacing:-.04em;font-weight:700;max-width:15ch}
+#stage .h1 em{font-style:normal;display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.04em}
+#stage .h1 em i{font-style:normal;display:inline-block;transform:translateY(104%);
+  transition:transform .9s cubic-bezier(.16,1,.3,1)}
+#stage .heroA.drafted .h1 em i,#stage .heroB.drafted .h1 em i{transform:none}
+#stage .heroA.drafted .h1 em:nth-child(2) i,#stage .heroB.drafted .h1 em:nth-child(2) i{transition-delay:.1s}
+#stage .heroA.drafted .h1 em:nth-child(3) i,#stage .heroB.drafted .h1 em:nth-child(3) i{transition-delay:.2s}
+#stage .lede{margin-top:20px;max-width:44ch;color:var(--grey);font-size:1.05rem;
+  opacity:0;transition:opacity .6s ease .85s}
+#stage .heroA.drafted .lede,#stage .heroB.drafted .lede{opacity:1}
+#stage .acts{margin-top:28px;display:flex;flex-wrap:wrap;gap:10px;opacity:0;transition:opacity .6s ease 1s}
+#stage .heroA.drafted .acts,#stage .heroB.drafted .acts{opacity:1}
+
+/* ---------- HERO B · full bleed photograph, drafted cards over it ------- */
+#stage .heroB{position:relative;min-height:min(88vh,840px);overflow:hidden;isolation:isolate;
+  display:flex;align-items:flex-end;background:#0F1113}
+#stage .heroB .bleed{position:absolute;inset:0;z-index:-2}
+#stage .heroB .bleed img{width:100%;height:100%;object-fit:cover;
+  transform:scale(1.05);transition:transform 9s linear}
+#stage .heroB.drafted .bleed img{transform:scale(1)}
+#stage .heroB::after{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(to top,rgba(9,11,13,.90),rgba(9,11,13,.34) 54%,rgba(9,11,13,.42))}
+#stage .heroB .hcopy{position:relative;z-index:5;width:100%;padding-block:clamp(34px,5vw,62px);color:#fff}
+#stage .heroB .eyebrow{color:#fff}
+#stage .heroB.drafted .eyebrow{opacity:.8}
+#stage .heroB .lede{color:rgba(255,255,255,.86)}
+#stage .heroB .h1{max-width:17ch}
+
+/* slide indicator shared by hero B */
+#stage .hbars{position:absolute;z-index:6;left:var(--pad);bottom:22px;display:flex;gap:6px;width:min(36%,300px)}
+#stage .hbars button{flex:1;height:3px;padding:0;border:0;background:rgba(255,255,255,.3);
+  cursor:pointer;border-radius:2px;overflow:hidden;position:relative}
+#stage .hbars button i{position:absolute;inset:0;background:#fff;transform:scaleX(0);transform-origin:left}
+#stage .hbars button[aria-current="true"] i{transform:scaleX(1);transition:transform .6s cubic-bezier(.16,1,.3,1)}
+
+/* ---------- ODOMETER ROLL stats (lab.damiandc.com/odometer-roll) -------- */
+#stage .statband{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+#stage .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+#stage .stats div{padding:32px 24px 34px 0;border-right:1px solid var(--rule)}
+#stage .stats div:last-child{border-right:0}
+#stage .stats b{display:block;font-family:var(--fd);font-size:clamp(2rem,4.2vw,3.3rem);font-weight:700;
+  letter-spacing:-.045em;line-height:1}
+#stage .stats div > span{display:block;margin-top:12px;font-family:var(--fm);font-size:10px;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+/* nowrap matters: without it an absolutely positioned card shrink-wraps to
+   one digit and the odometer stacks vertically */
+#stage .odo{display:inline-flex;align-items:flex-end;white-space:nowrap}
+.odo-d{display:inline-block;overflow:hidden;height:1em;line-height:1}
+.odo-s{display:block;transition:transform 1.15s cubic-bezier(.16,1,.3,1)}
+.odo-s u{display:block;height:1em;line-height:1;text-decoration:none;font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){.odo-s{transition:none}}
+@media (max-width:760px){
+  #stage .stats{grid-template-columns:1fr 1fr}
+  #stage .stats div{padding-right:18px}
+  #stage .stats div:nth-child(2){border-right:0}
+  #stage .stats div:nth-child(-n+2){border-bottom:1px solid var(--rule)}}
+
+#stage .sec{padding-block:clamp(56px,8vw,104px)}
+#stage .h2{font-family:var(--fd);font-size:clamp(1.55rem,3.1vw,2.45rem);letter-spacing:-.036em;
+  font-weight:700;line-height:1.1;max-width:20ch}
+#stage .sub{margin-top:14px;max-width:56ch;color:var(--grey);font-size:1.02rem}
+#stage .sechead{display:flex;flex-direction:column;gap:22px}
+#stage .sechead .drawline{margin-top:6px}
+
+/* ---------- HORIZONTAL JOURNEY (lab.damiandc.com/horizontal-journey) ---- */
+#stage .journey{height:340vh;position:relative;view-timeline-name:--journey;view-timeline-axis:block}
+#stage .journey-pin{position:sticky;top:0;height:100dvh;overflow:hidden;display:flex;align-items:center}
+#stage .journey-rail{display:flex;gap:clamp(14px,2vw,26px);padding-inline:var(--pad);will-change:transform}
+#stage .jcard{flex:0 0 min(78vw,800px);position:relative;height:min(72vh,600px);overflow:hidden;
+  border-radius:var(--r);background:var(--draft);color:#fff;display:flex;flex-direction:column;
+  justify-content:flex-end}
+#stage .jcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55}
+#stage .jcard::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(9,11,13,.92),rgba(9,11,13,.3) 62%,transparent)}
+#stage .jcard .jin{position:relative;z-index:1;padding:clamp(22px,3vw,40px)}
+#stage .jtag{display:inline-block;font-family:var(--fm);font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--acc)}
+#stage .jcard .fig{margin-top:14px;font-family:var(--fd);font-size:clamp(2.4rem,6vw,5rem);font-weight:800;
+  letter-spacing:-.055em;line-height:.88}
+#stage .jcard .figlabel{margin-top:10px;font-family:var(--fm);font-size:10px;letter-spacing:.15em;
+  text-transform:uppercase;color:rgba(255,255,255,.64)}
+#stage .jcard h3{margin-top:22px;font-family:var(--fd);font-size:clamp(1.1rem,1.8vw,1.55rem);
+  font-weight:700;letter-spacing:-.028em}
+#stage .jcard p{margin-top:10px;max-width:44ch;color:rgba(255,255,255,.8);font-size:.97rem}
+#stage .jprog{position:absolute;left:var(--pad);right:var(--pad);bottom:30px;height:2px;background:var(--rule)}
+#stage .jprog i{display:block;height:100%;background:var(--draft);transform-origin:left;transform:scaleX(0)}
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    #stage .journey-rail{animation:jpan linear both;animation-timeline:--journey;
+      animation-range:contain 0% contain 100%}
+    #stage .jprog i{animation:jfill linear both;animation-timeline:--journey;
+      animation-range:contain 0% contain 100%}}}
+@keyframes jpan{from{transform:translateX(0)}to{transform:translateX(calc(-1 * var(--pan,1000px)))}}
+@keyframes jfill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@supports not (animation-timeline:view()){
+  #stage .journey{height:auto}
+  #stage .journey-pin{position:static;height:auto;padding-block:16px}
+  #stage .journey-rail{overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:14px}
+  #stage .jcard{scroll-snap-align:center}
+  #stage .jprog{display:none}}
+
+/* ---------- ACCORDION GALLERY avenues (lab.../accordion-gallery) -------- */
+#stage .acc{display:flex;gap:8px;height:clamp(300px,42vw,520px);margin-top:clamp(24px,3.4vw,40px)}
+/* Each panel carries the avenue's own logo artwork on a tint of its own
+   sampled colour, with a solid band beneath it for the name. */
+#stage .apanel{position:relative;flex:1;min-width:0;border:0;padding:0;overflow:hidden;cursor:pointer;
+  border-radius:var(--rp);background:color-mix(in srgb,var(--k) 9%,#FFFFFF);
+  transition:flex-grow .6s cubic-bezier(.16,1,.3,1),background .3s}
+#stage .apanel[aria-expanded="true"]{flex-grow:4.4;background:color-mix(in srgb,var(--k) 15%,#FFFFFF)}
+#stage .aart{position:absolute;left:0;right:0;top:0;bottom:96px;display:grid;place-items:center;padding:18px}
+#stage .aart img{width:auto;max-width:74%;max-height:74%;object-fit:contain;
+  transition:transform .6s cubic-bezier(.16,1,.3,1)}
+#stage .apanel[aria-expanded="true"] .aart img{transform:scale(1.05)}
+#stage .anum{position:absolute;z-index:2;top:14px;left:15px;font-family:var(--fm);font-size:10.5px;
+  letter-spacing:.14em;color:color-mix(in srgb,var(--k) 78%,#000000)}
+#stage .apanel.locked .anum::after{content:" LOCKED";opacity:.65}
+/* --kt is the text colour for the band. Community Service amber is a light
+   colour: white on it measures about 2.6:1 and fails AA, so that one panel
+   carries dark text instead. Every other avenue colour is dark enough. */
+#stage .abody{position:absolute;z-index:2;left:0;right:0;bottom:0;min-height:96px;padding:16px 16px 18px;
+  text-align:left;color:var(--kt,#fff);background:var(--k);overflow:hidden}
+/* Fixed height when collapsed so all five bands line up across the row.
+   The description must be display:none, not just transparent: as a flex item
+   it still claims height and shoves the name out of the clipped box. */
+#stage .apanel[aria-expanded="false"] .abody{height:96px;min-height:0;
+  display:flex;align-items:flex-end}
+#stage .apanel[aria-expanded="false"] .abody p{display:none}
+#stage .abody b{display:block;font-family:var(--fd);font-size:clamp(.95rem,1.5vw,1.2rem);font-weight:700;
+  letter-spacing:-.02em;line-height:1.15;overflow-wrap:anywhere}
+/* a collapsed panel is only ~140px wide, so the name has to come down to fit */
+#stage .apanel[aria-expanded="false"] .abody b{font-size:.78rem;letter-spacing:0;line-height:1.25}
+#stage .abody p{margin-top:9px;max-width:38ch;font-size:.93rem;
+  color:color-mix(in srgb,var(--kt,#fff) 88%,transparent);
+  opacity:0;transform:translateY(8px);
+  transition:opacity .35s ease .16s,transform .45s cubic-bezier(.16,1,.3,1) .16s}
+#stage .apanel[aria-expanded="true"] .abody p{opacity:1;transform:none}
+/* A five-across accordion cannot work at 390px, so below 860 it becomes a
+   plain list: logo, name, and the description revealed on open. The avenue
+   colour moves to a left edge so the text can sit on the light tint. */
+@media (max-width:860px){
+  #stage .acc{flex-direction:column;height:auto;gap:10px}
+  #stage .apanel{flex:none;height:auto;min-height:92px;display:grid;
+    grid-template-columns:92px 1fr;align-items:center;border-left:4px solid var(--k)}
+  #stage .apanel[aria-expanded="true"]{flex-grow:0}
+  #stage .aart{position:static;inset:auto;padding:14px;height:auto}
+  #stage .aart img{max-width:100%;max-height:54px}
+  #stage .abody{position:static;height:auto;min-height:0;background:transparent;
+    color:var(--ink);padding:14px 16px 14px 0;display:block}
+  #stage .apanel[aria-expanded="false"] .abody{height:auto;display:block}
+  #stage .abody b,#stage .apanel[aria-expanded="false"] .abody b{font-size:1rem;letter-spacing:-.01em}
+  #stage .abody p{color:var(--grey);opacity:1;transform:none;margin-top:0;max-height:0;overflow:hidden;
+    transition:max-height .45s cubic-bezier(.16,1,.3,1),margin-top .3s}
+  #stage .apanel[aria-expanded="true"] .abody p{max-height:150px;margin-top:8px}
+  #stage .anum{top:10px;right:13px;left:auto}}
+
+/* ---------- mosaic wall (carried over from Frontline) ------------------- */
+#stage .wall{background:var(--draft)}
+#stage .wall .h2{color:#fff}
+#stage .wall .sub{color:rgba(255,255,255,.68)}
+#stage .wall .drawline{background:#fff;opacity:.26}
+#stage .mosaic{margin-top:clamp(26px,3.4vw,42px);display:grid;grid-template-columns:repeat(6,1fr);
+  gap:8px;grid-auto-rows:clamp(84px,9.5vw,142px)}
+#stage .tile{position:relative;overflow:hidden;border-radius:calc(var(--rp) * .6);background:#222735;
+  transition:transform .45s cubic-bezier(.16,1,.3,1)}
+#stage .tile img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.16,1,.3,1)}
+#stage .tile:hover img{transform:scale(1.07)}
+#stage .tile.w2{grid-column:span 2}
+#stage .tile.h2x{grid-row:span 2}
+@media (max-width:860px){#stage .mosaic{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:520px){#stage .mosaic{grid-template-columns:repeat(2,1fr)}}
+
+/* ---------- member utility ---------------------------------------------- */
+#stage .dir{margin-top:clamp(24px,3.4vw,40px);display:grid;grid-template-columns:repeat(4,1fr);
+  gap:clamp(10px,1.4vw,16px)}
+#stage .dir a{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);padding:20px 18px;
+  text-decoration:none;transition:background .18s,transform .18s,border-color .18s}
+#stage .dir a:hover{background:var(--accSoft);border-color:var(--acc);transform:translateY(-2px)}
+#stage .dir b{display:block;font-family:var(--fd);font-weight:600;font-size:.99rem}
+#stage .dir i{display:block;margin-top:7px;font-style:normal;font-family:var(--fm);font-size:9.5px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+@media (max-width:900px){#stage .dir{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){#stage .dir{grid-template-columns:1fr}}
+
+#stage .close .panel{background:var(--draft);color:#fff;border-radius:var(--r);padding:clamp(32px,5.5vw,72px)}
+#stage .close .h2{font-size:clamp(1.8rem,4vw,3.1rem);color:#fff;max-width:16ch}
+#stage .close .sub{color:rgba(255,255,255,.76)}
+#stage .close .btn{background:#fff;color:var(--draft);border-color:#fff}
+#stage .close .btn:hover{background:var(--acc);border-color:var(--acc);color:#05222C}
+#stage .close .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.42)}
+#stage .close .btn.ghost:hover{background:transparent;color:#fff;border-color:#fff}
+#stage .footm{padding-block:36px;font-size:13px;color:var(--grey);border-top:1px solid var(--rule)}
+#stage .footm-in{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between}
+#stage .footm a{text-decoration:none;transition:color .15s}
+#stage .footm a:hover{color:var(--ink)}
+#stage .footm ul{display:flex;flex-wrap:wrap;gap:16px}
+</style>
+</head>
+<body>
+
+<div class="doc">
+  <header class="masthead">
+    <div class="wrapd">
+      <p class="eyebrow">Interact District 3220 · Concept direction</p>
+      <h1>Frontline and Blueprint, merged.</h1>
+      <p class="lede">
+        One direction now, not three. The blueprint structure is the ground and the photography sits on
+        top of it as floating panels. Use the picker to drive palette, type, shape and accent, and to
+        switch between the two hero treatments. Everything below is live: the accordion opens, the
+        flagships pan sideways under a pin, the stats roll, and the cursor morphs onto every pill.
+      </p>
+    </div>
+  </header>
+
+  <div class="picker">
+    <div class="wrapd picker-row">
+      <div class="picker-group"><span class="picker-label">Hero</span><div class="chips" id="heroChips"></div></div>
+      <div class="picker-group"><span class="picker-label">Palette</span><div class="chips" id="palChips"></div></div>
+      <div class="picker-group"><span class="picker-label">Type</span><div class="chips" id="typeChips"></div></div>
+      <div class="picker-group"><span class="picker-label">Shape</span><div class="chips" id="shapeChips"></div></div>
+      <div class="picker-group"><span class="picker-label">Accent</span><div class="chips" id="accChips"></div></div>
+      <div class="picker-group"><span class="picker-label">Cursor</span><div class="chips" id="curChips"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="mcur" id="mcur" aria-hidden="true"></div>
+<div class="iris" id="iris" aria-hidden="true"></div>
+
+<!-- ======================================================================
+     THE MOCK
+     ====================================================================== -->
+<main id="stage">
+
+  <header class="nav">
+    <div class="wrap nav-in">
+      <a class="mark" href="#stage" data-morph><s></s>Interact District 3220</a>
+      <ul>
+        <li><a href="#m-projects" data-iris data-morph>Projects</a></li>
+        <li><a href="#m-avenues" data-iris data-morph>Avenues</a></li>
+        <li><a href="#m-wall" data-iris data-morph>Our work</a></li>
+        <li><a href="#m-members" data-iris data-morph>Calendar</a></li>
+        <li><a href="#m-members" data-iris data-morph>Archives</a></li>
+        <li><a href="#m-members" data-iris data-morph>Contact</a></li>
+      </ul>
+      <a class="btn sm" href="#m-close" data-morph>Join a club</a>
+    </div>
+  </header>
+
+  <!-- HERO A · FLOATING PANELS -->
+  <section class="heroA" id="heroA" data-hero="panels">
+    <div class="fp-ground" aria-hidden="true"></div>
+    <svg class="fp-leaders" aria-hidden="true" preserveAspectRatio="none">
+      <line x1="0" y1="16%" x2="100%" y2="16%" style="--len:1800"></line>
+      <line x1="5%" y1="10%" x2="5%" y2="90%" style="--len:900"></line>
+      <line x1="0" y1="84%" x2="100%" y2="84%" style="--len:1800"></line>
+    </svg>
+    <div class="fp-word" aria-hidden="true" data-depth="6">3220</div>
+
+    <!-- real district photography -->
+    <div class="fp-panel p1" data-depth="30"><img src="../public/images/media-crew/media-photography.jpg" alt="Student photographer covering a district event"></div>
+    <div class="fp-panel p2" data-depth="46"><img src="../public/images/blog/blog-35th-district-assembly.jpg" alt="Delegates at the district assembly"></div>
+    <div class="fp-panel p3" data-depth="20"><img src="../public/images/media-crew/media-livestreaming.jpg" alt="Students running a livestream desk"></div>
+    <div class="fp-panel p4" data-depth="38"><img src="../public/images/media-crew/media-compering.jpg" alt="Students compering a district conference"></div>
+
+    <div class="wrap hcopy">
+      <p class="eyebrow">Fig. 01 · District 3220 · Sri Lanka and Maldives · Est. 1964</p>
+      <h1 class="h1"><em><i>3,500 students.</i></em> <em><i>100+ clubs.</i></em> <em><i>One district.</i></em></h1>
+      <p class="lede">Youth-led service across Sri Lanka and the Maldives.</p>
+      <div class="acts">
+        <a class="btn" href="#m-close" data-morph>Join a club</a>
+        <a class="btn ghost" href="#m-projects" data-morph>See the projects</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HERO B · FULL BLEED -->
+  <section class="heroB" id="heroB" data-hero="bleed" hidden>
+    <div class="bleed">
+      <img src="../public/images/hero/assembly.webp" alt="Interactors filling a district assembly hall" data-bleed>
+    </div>
+    <div class="wrap hcopy">
+      <p class="eyebrow">Fig. 01 · District 3220 · Sri Lanka and Maldives · Est. 1964</p>
+      <h1 class="h1"><em><i>3,500 students.</i></em> <em><i>100+ clubs.</i></em> <em><i>One district.</i></em></h1>
+      <p class="lede">Youth-led service across Sri Lanka and the Maldives.</p>
+      <div class="acts">
+        <a class="btn onphoto" href="#m-close" data-morph>Join a club</a>
+        <a class="btn onphoto ghost" href="#m-projects" data-morph>See the projects</a>
+      </div>
+    </div>
+    <div class="hbars" id="hbars"></div>
+  </section>
+
+  <!-- ODOMETER stats -->
+  <div class="statband">
+    <div class="wrap">
+      <div class="stats" data-stats>
+        <div><b class="odo" data-odo="3500" data-group="1"></b><span>Members</span></div>
+        <div><b class="odo" data-odo="100" data-suffix="+"></b><span>Clubs</span></div>
+        <div><b class="odo" data-odo="9"></b><span>Zones</span></div>
+        <div><b class="odo" data-odo="1964" data-raw="1"></b><span>In the district since</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- flagships -->
+  <section class="wrap sec" id="m-projects" style="padding-bottom:clamp(24px,3vw,40px)">
+    <div class="sechead">
+      <div>
+        <h2 class="h2" data-reveal>Three projects the district is known for.</h2>
+        <p class="sub" data-reveal>Each one is planned, funded and run by school students, with the council behind them and Rotary alongside.</p>
+      </div>
+      <div class="drawline"></div>
+    </div>
+  </section>
+
+  <section class="journey">
+    <div class="journey-pin">
+      <div class="journey-rail">
+        <article class="jcard">
+          <!-- TODO: real Interflash photography. Picsum stand-in. -->
+          <img src="https://picsum.photos/seed/interflash-concert-crowd/1400/900" alt="Crowd at a large outdoor concert">
+          <div class="jin">
+            <p class="jtag">Interflash</p>
+            <div class="fig">10,000+</div>
+            <p class="figlabel">Guests</p>
+            <h3>A concert on a ten thousand seat scale.</h3>
+            <p>The district's largest public event, staged and run end to end by school students.</p>
+          </div>
+        </article>
+        <article class="jcard">
+          <img src="../public/images/media-crew/media-compering.jpg" alt="Students compering a district conference">
+          <div class="jin">
+            <p class="jtag">DIMUN</p>
+            <div class="fig">6</div>
+            <p class="figlabel">Committees</p>
+            <h3>The first Interact Model UN in Sri Lanka.</h3>
+            <p>District Interact Model United Nations, with its own committees, topics and study guides.</p>
+          </div>
+        </article>
+        <article class="jcard">
+          <!-- TODO: real Race4Change photography. Picsum stand-in. -->
+          <img src="https://picsum.photos/seed/race4change-runners-seafront/1400/900" alt="Runners at a charity road race">
+          <div class="jin">
+            <p class="jtag">Race4Change</p>
+            <div class="fig">5 km</div>
+            <p class="figlabel">Galle Face Green</p>
+            <h3>A public charity run for the Little Hearts Foundation.</h3>
+            <p>Open registration and corporate teams, raising funds for children's cardiac care.</p>
+          </div>
+        </article>
+      </div>
+      <div class="jprog" aria-hidden="true"><i></i></div>
+    </div>
+  </section>
+
+  <!-- ACCORDION GALLERY avenues -->
+  <section class="wrap sec" id="m-avenues">
+    <div class="sechead">
+      <div>
+        <h2 class="h2" data-reveal>Five avenues of service.</h2>
+        <p class="sub" data-reveal>Every club project sits under one of these. <span class="fineonly">Hover to open, click to lock.</span><span class="coarseonly">Tap one to open it.</span></p>
+      </div>
+      <div class="drawline"></div>
+    </div>
+    <div class="acc" data-acc>
+      <button class="apanel" type="button" aria-expanded="true" style="--k:#D8951C;--kt:#2A1B04">
+        <span class="aart"><img src="../public/images/avenues/avenue-community-service.png" alt="Community Service avenue mark"></span>
+        <span class="anum">01</span>
+        <span class="abody"><b>Community Service</b><p>The heart and soul of the movement, and the avenue most club projects are built under.</p></span>
+      </button>
+      <button class="apanel" type="button" aria-expanded="false" style="--k:#97114B">
+        <span class="aart"><img src="../public/images/avenues/avenue-international-understanding.png" alt="International Understanding avenue mark"></span>
+        <span class="anum">02</span>
+        <span class="abody"><b>International Understanding</b><p>Promotes good will and understanding between communities, at home and beyond.</p></span>
+      </button>
+      <button class="apanel" type="button" aria-expanded="false" style="--k:#A85619">
+        <span class="aart"><img src="../public/images/avenues/avenue-club-service.png" alt="Club Service avenue mark"></span>
+        <span class="anum">03</span>
+        <span class="abody"><b>Club Service</b><p>The wellbeing and development of the basic foundation of every club in the district.</p></span>
+      </button>
+      <button class="apanel" type="button" aria-expanded="false" style="--k:#187777">
+        <span class="aart"><img src="../public/images/avenues/avenue-green-life.png" alt="Green Life avenue mark"></span>
+        <span class="anum">04</span>
+        <span class="abody"><b>Green Life</b><p>Service that answers to the planet, and the avenue that has grown fastest.</p></span>
+      </button>
+      <button class="apanel" type="button" aria-expanded="false" style="--k:#1B244A">
+        <span class="aart"><img src="../public/images/avenues/avenue-finance.png" alt="Finance avenue mark"></span>
+        <span class="anum">05</span>
+        <span class="abody"><b>Finance</b><p>Fundraisers that pay for the projects running under every other avenue.</p></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- mosaic wall -->
+  <section class="wall" id="m-wall">
+    <div class="wrap sec">
+      <div class="sechead">
+        <div>
+          <h2 class="h2" data-reveal>A year of the district, in photographs.</h2>
+          <p class="sub" data-reveal>Assemblies, training, media crew and club projects across nine zones.</p>
+        </div>
+        <div class="drawline"></div>
+      </div>
+      <div class="mosaic">
+        <a class="tile w2 h2x" href="#m-wall"><img src="../public/images/hero/assembly.webp" alt="District assembly hall"></a>
+        <a class="tile" href="#m-wall"><img src="../public/images/media-crew/media-photography.jpg" alt="Student photographer"></a>
+        <a class="tile" href="#m-wall"><img src="../public/images/media-crew/media-videography.jpg" alt="Student videographer"></a>
+        <a class="tile w2" href="#m-wall"><img src="../public/images/blog/blog-35th-district-assembly.jpg" alt="District assembly"></a>
+        <a class="tile" href="#m-wall"><img src="../public/images/media-crew/media-livestreaming.jpg" alt="Livestream desk"></a>
+        <a class="tile" href="#m-wall"><img src="../public/images/media-crew/media-designing.jpg" alt="Student designer at work"></a>
+        <a class="tile w2" href="#m-wall"><img src="../public/images/media-crew/media-compering.jpg" alt="Students compering"></a>
+        <a class="tile" href="#m-wall"><img src="../public/images/decor/decor-sphere-stairs.jpg" alt="Event venue detail"></a>
+        <a class="tile" href="#m-wall"><img src="../public/images/media-crew/media-photo-booths.jpg" alt="Event photo booth"></a>
+        <a class="tile w2" href="#m-wall"><img src="../public/images/blog/blog-shawn-shiek-tribute.jpg" alt="District gathering"></a>
+        <a class="tile" href="#m-wall"><img src="../public/images/decor/decor-white-structure.jpg" alt="Venue architecture"></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- member utility -->
+  <section class="wrap sec" id="m-members">
+    <div class="sechead">
+      <div>
+        <h2 class="h2" data-reveal>For Interactors and club officers.</h2>
+        <p class="sub" data-reveal>The working side of the district. Dates, documents, records and the people who run them.</p>
+      </div>
+      <div class="drawline"></div>
+    </div>
+    <div class="dir" data-reveal>
+      <a href="#m-members" data-morph><b>Calendar</b><i>Dates and deadlines</i></a>
+      <a href="#m-members" data-morph><b>Admin Documents</b><i>Forms and reporting</i></a>
+      <a href="#m-members" data-morph><b>News</b><i>District bulletin</i></a>
+      <a href="#m-members" data-morph><b>Newsletter</b><i>Every issue</i></a>
+      <a href="#m-members" data-morph><b>Archives</b><i>1988 to today</i></a>
+      <a href="#m-members" data-morph><b>Meet the Council</b><i>2026 / 27</i></a>
+      <a href="#m-members" data-morph><b>College of DIRs</b><i>Past district reps</i></a>
+      <a href="#m-members" data-morph><b>Media Crew</b><i>Request coverage</i></a>
+    </div>
+  </section>
+
+  <section class="wrap close" id="m-close" style="padding-bottom:clamp(44px,6vw,84px)">
+    <div class="panel" data-reveal>
+      <h2 class="h2">Your school can start a club this year.</h2>
+      <p class="sub">Tell the council where you are and who is interested. Chartering a new Interact club takes one conversation to begin.</p>
+      <div class="acts" style="margin-top:28px;opacity:1;display:flex;flex-wrap:wrap;gap:10px">
+        <a class="btn" href="#m-close" data-morph>Join a club</a>
+        <a class="btn ghost" href="#m-close" data-morph>Contact the council</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footm">
+    <div class="wrap footm-in">
+      <p>Interact District 3220, Sri Lanka and Maldives. Sponsored by Rotary International.</p>
+      <ul>
+        <li><a href="#stage" data-morph>Instagram</a></li>
+        <li><a href="#stage" data-morph>Facebook</a></li>
+        <li><a href="#stage" data-morph>LinkedIn</a></li>
+        <li><a href="#stage" data-morph>YouTube</a></li>
+        <li><a href="#stage" data-morph>interactdistrictcouncil3220@gmail.com</a></li>
+      </ul>
+    </div>
+  </footer>
+</main>
+
+<div class="doc">
+  <div class="wrapd docnote">
+    <p><b>Still missing photography.</b> Interflash and Race4Change have no images in the repo, so both
+    use clearly-marked Picsum stand-ins. Each of the five avenues also needs its own photograph; the
+    accordion currently borrows district and media-crew shots.</p>
+  </div>
+  <div class="wrapd foot-doc">
+    <p>Effects from lab.damiandc.com: Floating Panels, Horizontal Journey, Accordion Gallery,
+    Odometer Roll, Line Draw, Morph Cursor, Iris. Nine zones removed as requested.</p>
+    <p>The morph cursor hides the native pointer on fine-pointer devices. It is off on touch and under
+    reduced motion, and keyboard focus rings are untouched. Toggle it above if you want to compare.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine = window.matchMedia('(pointer: fine)').matches;
+  var stage = document.getElementById('stage');
+
+  /* ======================= dials ======================= */
+  var PALETTES = [
+    { id:'paper', name:'Paper', v:{ paper:'#F2F4F3', card:'#FFFFFF', ink:'#14171A', grey:'#5B6066',
+        faint:'#8C9198', rule:'#DFE3E1', draft:'#1B244A', draftSoft:'rgba(27,36,74,.20)' } },
+    { id:'chalk', name:'Warm chalk', v:{ paper:'#F7F5F0', card:'#FFFDFA', ink:'#17150F', grey:'#5F5A50',
+        faint:'#928C80', rule:'#E5E1D7', draft:'#2C3350', draftSoft:'rgba(44,51,80,.18)' } },
+    { id:'mist', name:'Cool mist', v:{ paper:'#EFF3F5', card:'#FFFFFF', ink:'#0F1519', grey:'#54606A',
+        faint:'#87939C', rule:'#DCE3E7', draft:'#12354F', draftSoft:'rgba(18,53,79,.20)' } },
+    { id:'bone', name:'Bone', v:{ paper:'#F6F5F1', card:'#FFFFFF', ink:'#1A1D1F', grey:'#5E6367',
+        faint:'#8F9497', rule:'#E3E2DC', draft:'#2E3438', draftSoft:'rgba(46,52,56,.18)' } }
+  ];
+  var TYPES = [
+    { id:'instrument', name:'Instrument', d:'"Instrument Sans",sans-serif', b:'"Instrument Sans",sans-serif' },
+    { id:'geist', name:'Geist', d:'"Geist",sans-serif', b:'"Geist",sans-serif' },
+    { id:'archivo', name:'Archivo', d:'"Archivo",sans-serif', b:'"Instrument Sans",sans-serif' },
+    { id:'outfit', name:'Outfit', d:'"Outfit",sans-serif', b:'"Outfit",sans-serif' }
+  ];
+  var SHAPES = [
+    { id:'drafted', name:'Drafted', r:'3px', rp:'3px', rb:'6px' },
+    { id:'soft', name:'Soft', r:'12px', rp:'10px', rb:'999px' },
+    { id:'rounded', name:'Rounded', r:'20px', rp:'18px', rb:'999px' },
+    { id:'generous', name:'Generous', r:'30px', rp:'26px', rb:'999px' }
+  ];
+  var ACCENTS = [
+    { id:'cyan', name:'Interact cyan', acc:'#01B4E6', accText:'#026B87', accSoft:'#E2F6FD' },
+    { id:'azure', name:'Azure', acc:'#2563EB', accText:'#1D4ED8', accSoft:'#E4EBFE' },
+    { id:'ember', name:'Ember', acc:'#E4572E', accText:'#B03C18', accSoft:'#FCEAE3' },
+    { id:'jade', name:'Jade', acc:'#17876B', accText:'#0F6650', accSoft:'#E2F1EC' }
+  ];
+  var HEROES = [ { id:'panels', name:'Floating panels' }, { id:'bleed', name:'Full bleed' } ];
+
+  var sel = { pal:PALETTES[0], type:TYPES[0], shape:SHAPES[2], acc:ACCENTS[0], hero:HEROES[0], cursor:true };
+
+  function applyDials() {
+    var s = document.documentElement.style, p = sel.pal.v;
+    Object.keys(p).forEach(function (k) { s.setProperty('--' + k, p[k]); });
+    s.setProperty('--fd', sel.type.d);
+    s.setProperty('--fb', sel.type.b);
+    s.setProperty('--r', sel.shape.r);
+    s.setProperty('--rp', sel.shape.rp);
+    s.setProperty('--rb', sel.shape.rb);
+    s.setProperty('--acc', sel.acc.acc);
+    s.setProperty('--accText', sel.acc.accText);
+    s.setProperty('--accSoft', sel.acc.accSoft);
+    document.getElementById('heroA').hidden = sel.hero.id !== 'panels';
+    document.getElementById('heroB').hidden = sel.hero.id !== 'bleed';
+    document.body.classList.toggle('has-morph', sel.cursor && fine && !reduce);
+  }
+
+  function chips(hostId, list, key, render) {
+    var host = document.getElementById(hostId);
+    host.innerHTML = list.map(function (o) {
+      return '<button class="chip" data-id="' + o.id + '" aria-pressed="' +
+        (sel[key].id === o.id) + '" data-morph>' + render(o) + '</button>';
+    }).join('');
+    host.addEventListener('click', function (e) {
+      var b = e.target.closest('.chip'); if (!b) return;
+      sel[key] = list.filter(function (o) { return o.id === b.dataset.id; })[0];
+      [].slice.call(host.children).forEach(function (c) {
+        c.setAttribute('aria-pressed', String(c === b));
+      });
+      applyDials();
+      if (key === 'hero') { resetHero(); }
+      measureJourney();
+    });
+  }
+
+  chips('heroChips', HEROES, 'hero', function (o) { return o.name; });
+  chips('palChips', PALETTES, 'pal', function (o) {
+    return '<span class="sw" style="background:' + o.v.draft + '"></span>' + o.name; });
+  chips('typeChips', TYPES, 'type', function (o) {
+    return '<span style="font-family:' + o.d + '">' + o.name + '</span>'; });
+  chips('shapeChips', SHAPES, 'shape', function (o) { return o.name; });
+  chips('accChips', ACCENTS, 'acc', function (o) {
+    return '<span class="sw" style="background:' + o.acc + '"></span>' + o.name; });
+
+  /* cursor toggle is a plain two-state chip set */
+  (function () {
+    var host = document.getElementById('curChips');
+    host.innerHTML = '<button class="chip" data-v="1" aria-pressed="true" data-morph>Morph</button>' +
+      '<button class="chip" data-v="0" aria-pressed="false" data-morph>Default</button>';
+    host.addEventListener('click', function (e) {
+      var b = e.target.closest('.chip'); if (!b) return;
+      sel.cursor = b.dataset.v === '1';
+      [].slice.call(host.children).forEach(function (c) {
+        c.setAttribute('aria-pressed', String(c === b));
+      });
+      applyDials();
+    });
+  })();
+
+  /* ======================= ODOMETER ROLL ======================= */
+  function group(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  function buildOdo(el) {
+    var target = el.getAttribute('data-odo');
+    var suffix = el.getAttribute('data-suffix') || '';
+    var grouped = el.getAttribute('data-group') === '1';
+    var raw = el.getAttribute('data-raw') === '1';
+    var text = raw ? target : (grouped ? group(target) : target);
+    var html = '';
+    text.split('').forEach(function (ch) {
+      if (ch >= '0' && ch <= '9') {
+        var strip = '';
+        for (var d = 0; d <= 9; d++) strip += '<u>' + d + '</u>';
+        html += '<span class="odo-d"><span class="odo-s" data-target="' + ch + '">' + strip + '</span></span>';
+      } else { html += '<span>' + ch + '</span>'; }
+    });
+    el.innerHTML = html + (suffix ? '<span>' + suffix + '</span>' : '');
+    el.classList.add('odo');
+  }
+  function rollOdo(el) {
+    var strips = el.querySelectorAll('.odo-s');
+    strips.forEach(function (s, i) {
+      var d = parseInt(s.getAttribute('data-target'), 10);
+      if (reduce) { s.style.transform = 'translateY(-' + d + 'em)'; return; }
+      s.style.transitionDelay = (i * 0.07) + 's';
+      requestAnimationFrame(function () {
+        s.style.transform = 'translateY(-' + d + 'em)';
+      });
+    });
+  }
+  function resetOdo(el) {
+    el.querySelectorAll('.odo-s').forEach(function (s) { s.style.transform = 'translateY(0)'; });
+  }
+  [].slice.call(document.querySelectorAll('[data-odo]')).forEach(buildOdo);
+
+  /* ======================= FLOATING PANELS lean ======================= */
+  var floaters = [], fx = 0, fy = 0, tx = 0, ty = 0, fraf = null;
+  function collectFloaters() {
+    floaters = [].slice.call(stage.querySelectorAll('[data-depth]')).filter(function (el) {
+      return el.offsetParent !== null;
+    });
+  }
+  function onStageMove(e) {
+    var r = stage.getBoundingClientRect();
+    tx = (e.clientX - r.left) / r.width - 0.5;
+    ty = (e.clientY - r.top) / Math.max(r.height, 1) - 0.5;
+  }
+  function floatLoop() {
+    fx += (tx - fx) * 0.06;
+    fy += (ty - fy) * 0.06;
+    floaters.forEach(function (el) {
+      var d = parseFloat(el.getAttribute('data-depth')) || 10;
+      el.style.transform = (el.classList.contains('fp-word')
+        ? 'translate(-50%,-50%) ' : '') +
+        'translate3d(' + (-fx * d).toFixed(2) + 'px,' + (-fy * d * 0.6).toFixed(2) + 'px,0)';
+    });
+    fraf = requestAnimationFrame(floatLoop);
+  }
+  if (fine && !reduce) {
+    collectFloaters();
+    window.addEventListener('pointermove', onStageMove, { passive: true });
+    fraf = requestAnimationFrame(floatLoop);
+  }
+
+  /* ======================= hero reset ======================= */
+  function resetHero() {
+    ['heroA', 'heroB'].forEach(function (id) {
+      var h = document.getElementById(id);
+      h.classList.remove('drafted');
+      h.querySelectorAll('.odo').forEach(resetOdo);
+    });
+    var live = document.getElementById(sel.hero.id === 'panels' ? 'heroA' : 'heroB');
+    collectFloaters();
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        live.classList.add('drafted');
+        setTimeout(function () { live.querySelectorAll('.odo').forEach(rollOdo); }, reduce ? 0 : 900);
+      });
+    });
+  }
+
+  /* hero B backing plate cycles through district photographs */
+  (function () {
+    var shots = [
+      ['../public/images/hero/assembly.webp', 'Interactors filling a district assembly hall'],
+      ['../public/images/blog/blog-35th-district-assembly.jpg', 'Delegates at the district assembly'],
+      ['../public/images/media-crew/media-compering.jpg', 'Students compering a district conference']
+    ];
+    var img = document.querySelector('[data-bleed]');
+    var bars = document.getElementById('hbars');
+    var i = 0;
+    bars.innerHTML = shots.map(function (s, n) {
+      return '<button type="button" aria-label="Slide ' + (n + 1) + '" aria-current="' + (n === 0) +
+        '" data-morph><i></i></button>';
+    }).join('');
+    bars.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      i = [].slice.call(bars.children).indexOf(b);
+      img.src = shots[i][0]; img.alt = shots[i][1];
+      [].slice.call(bars.children).forEach(function (c, n) {
+        c.setAttribute('aria-current', String(n === i));
+      });
+    });
+  })();
+
+  /* ======================= ACCORDION GALLERY ======================= */
+  (function () {
+    var acc = document.querySelector('[data-acc]');
+    var panels = [].slice.call(acc.querySelectorAll('.apanel'));
+    var locked = null;
+
+    function open(n) {
+      panels.forEach(function (p, i) {
+        p.setAttribute('aria-expanded', String(i === n));
+        p.classList.toggle('locked', locked === i);
+      });
+    }
+    panels.forEach(function (p, i) {
+      /* deliberately NOT data-morph: a collapsed panel is 140x520, so the
+         cursor would inflate into a slab and fight the hover-to-open */
+      p.addEventListener('mouseenter', function () { if (fine && locked === null) open(i); });
+      p.addEventListener('focus', function () { if (locked === null) open(i); });
+      p.addEventListener('click', function () {
+        locked = (locked === i) ? null : i;
+        open(locked === null ? i : locked);
+      });
+    });
+    acc.addEventListener('mouseleave', function () {
+      if (fine) open(locked === null ? 0 : locked);
+    });
+    open(0);
+  })();
+
+  /* ======================= HORIZONTAL JOURNEY ======================= */
+  function measureJourney() {
+    var rail = stage.querySelector('.journey-rail');
+    if (!rail) return;
+    var pad = parseFloat(getComputedStyle(rail).paddingLeft) || 0;
+    rail.style.setProperty('--pan', Math.max(0, rail.scrollWidth - window.innerWidth + pad) + 'px');
+  }
+  measureJourney();
+  window.addEventListener('resize', function () { measureJourney(); collectFloaters(); });
+
+  /* ======================= reveal + line draw + stat roll ============ */
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      if (e.target.hasAttribute('data-stats')) {
+        e.target.querySelectorAll('.odo').forEach(rollOdo);
+      }
+      io.unobserve(e.target);
+    });
+  }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
+  [].slice.call(document.querySelectorAll('[data-reveal],.drawline,[data-stats]')).forEach(function (el) {
+    io.observe(el);
+  });
+
+  /* ======================= MORPH CURSOR ======================= */
+  (function () {
+    var cur = document.getElementById('mcur');
+    var mx = window.innerWidth / 2, my = window.innerHeight / 2, cx = mx, cy = my;
+    var locked = null, raf = null;
+
+    window.addEventListener('pointermove', function (e) { mx = e.clientX; my = e.clientY; }, { passive: true });
+
+    function loop() {
+      if (locked) {
+        var r = locked.getBoundingClientRect();
+        cx += (r.left + r.width / 2 - cx) * 0.22;
+        cy += (r.top + r.height / 2 - cy) * 0.22;
+      } else {
+        cx += (mx - cx) * 0.2;
+        cy += (my - cy) * 0.2;
+      }
+      cur.style.translate = cx + 'px ' + cy + 'px';
+      raf = requestAnimationFrame(loop);
+    }
+    raf = requestAnimationFrame(loop);
+
+    document.addEventListener('pointerover', function (e) {
+      var t = e.target.closest('[data-morph]');
+      if (!t) return;
+      var r = t.getBoundingClientRect();
+      /* Guard: only park on things that are actually control-sized. Anything
+         bigger and the blob becomes a slab covering the content. */
+      if (r.width > 340 || r.height > 150) return;
+      locked = t;
+      var cs = getComputedStyle(t);
+      /* park exactly on the element, the way the lab demo does */
+      cur.style.width = r.width + 'px';
+      cur.style.height = r.height + 'px';
+      cur.style.borderRadius = cs.borderRadius;
+      cur.classList.add('morph');
+    });
+    document.addEventListener('pointerout', function (e) {
+      var t = e.target.closest('[data-morph]');
+      if (!t || (e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('[data-morph]') === t)) return;
+      locked = null;
+      cur.style.width = '13px';
+      cur.style.height = '13px';
+      cur.style.borderRadius = '999px';
+      cur.classList.remove('morph');
+    });
+  })();
+
+  /* ======================= IRIS transition ======================= */
+  (function () {
+    var iris = document.getElementById('iris');
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('[data-iris]');
+      if (!a || reduce) return;
+      e.preventDefault();
+      var target = document.querySelector(a.getAttribute('href'));
+      iris.style.setProperty('--ix', e.clientX + 'px');
+      iris.style.setProperty('--iy', e.clientY + 'px');
+      iris.classList.add('in');
+      setTimeout(function () {
+        if (target) target.scrollIntoView({ behavior: 'auto', block: 'start' });
+        iris.classList.remove('in');
+      }, 500);
+    });
+  })();
+
+  applyDials();
+  resetHero();
+})();
+</script>
+</body>
+</html>

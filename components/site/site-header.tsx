@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { NAV, SITE } from '@/lib/site';
-import { ThemeToggle } from './theme-toggle';
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -22,12 +21,32 @@ export function SiteHeader() {
     setOpenMenu(null);
   }, [pathname]);
 
+  /**
+   * The header is hidden while a full-screen hero owns the viewport, and
+   * appears once that hero has scrolled past. Pages without a hero mark
+   * (everything except home) get the solid bar immediately.
+   *
+   * Driven by an IntersectionObserver on a sentinel at the hero's bottom edge
+   * rather than a scroll listener, so nothing runs per frame.
+   */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    const sentinel = document.querySelector('[data-hero-top]');
+    if (!sentinel) {
+      setScrolled(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        // Solid once the marker has passed up behind the bar.
+        setScrolled(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      },
+      // No rootMargin: the marker sits 16px into the hero, so this flips on the
+      // first real scroll rather than a bar-height later.
+      { threshold: 0 },
+    );
+    io.observe(sentinel);
+    return () => io.disconnect();
+  }, [pathname]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -61,49 +80,61 @@ export function SiteHeader() {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
   };
 
+  /**
+   * Over the hero the bar itself is invisible so the photograph reads straight
+   * through it; the nav stays fully present and usable, just inverted to white
+   * so it survives on top of the image. Once the hero is past, the solid chalk
+   * bar fades in and the nav returns to ink.
+   */
+  const overHero = !scrolled;
+
   return (
     <header className="sticky top-0 z-50">
-      {/* The solid bar is its own layer, cross-faded by OPACITY rather than by
-          swapping classes on the header. `transition-colors` does not
-          interpolate `backdrop-filter`, so adding the blur on scroll made it pop
-          in abruptly — that was the snap. At opacity 0 the layer is fully
-          transparent, so its blur has no visible effect either. */}
-      <div
-        aria-hidden="true"
-        className={`pointer-events-none absolute inset-0 -z-10 border-b border-hairline bg-bg/80 backdrop-blur-xl backdrop-saturate-150 transition-opacity duration-300 ${
-          scrolled ? 'opacity-100' : 'opacity-0'
-        }`}
-      />
+      {/* The bar is its own layer, cross-faded by opacity so nothing about the
+          header snaps as it arrives.
 
-      {/* Legibility scrim for the transparent state. The hero photo bleeds up
-          behind the nav, and light nav text over a bright LED wall is
-          unreadable without this. Fades out as the solid bar fades in. */}
+          Fully opaque, and no backdrop-filter. At 80% the hero's white CTA
+          pills ghosted straight through it as they scrolled under, and a live
+          backdrop-filter across the full width is a real cost on the mid-range
+          Android this site is mostly read on. */}
       <div
         aria-hidden="true"
-        className={`pointer-events-none absolute inset-x-0 top-0 -z-10 h-28 bg-gradient-to-b from-bg via-bg/70 to-transparent transition-opacity duration-300 ${
-          scrolled ? 'opacity-0' : 'opacity-100'
+        className={`pointer-events-none absolute inset-0 -z-10 border-b border-hairline bg-bg transition-opacity duration-300 ${
+          scrolled ? 'opacity-100' : 'opacity-0'
         }`}
       />
 
       <div className="container-page flex h-16 items-center justify-between gap-4 md:h-18">
         <Link
           href="/"
+          data-morph
           className="flex shrink-0 items-center gap-2.5"
           aria-label={`${SITE.name} — home`}
         >
-          {/* Official Interact wordmark + Rotary wheel. Replaces the old Wix
-              logo-header.jpg, which was an opaque JPEG and showed a grey box in
-              dark mode. Logotypes are exempt from contrast minimums. */}
+          {/* Official Interact wordmark + Rotary wheel. Logotypes are exempt
+              from contrast minimums, but over photography it still needs a
+              shadow to hold its edge. */}
           <Image
             src="/images/branding/interact-logo.png"
             alt=""
             width={633}
             height={215}
             priority
-            className="h-6 w-auto md:h-7"
+            className={`h-6 w-auto transition-[filter] duration-300 md:h-7 ${
+              overHero ? 'drop-shadow-[0_1px_8px_rgba(10,12,14,0.7)]' : ''
+            }`}
           />
-          <span aria-hidden="true" className="h-5 w-px bg-hairline" />
-          <span className="text-[13px] leading-tight font-medium tracking-tight text-content-muted">
+          <span
+            aria-hidden="true"
+            className={`h-5 w-px transition-colors duration-300 ${
+              overHero ? 'bg-white/45' : 'bg-hairline'
+            }`}
+          />
+          <span
+            className={`text-[13px] leading-tight font-medium tracking-tight transition-colors duration-300 ${
+              overHero ? 'text-white [text-shadow:0_1px_8px_rgba(10,12,14,0.7)]' : 'text-content-muted'
+            }`}
+          >
             District 3220
           </span>
         </Link>
@@ -139,8 +170,15 @@ export function SiteHeader() {
                     href={item.href}
                     aria-current={active ? 'page' : undefined}
                     aria-expanded={hasChildren ? openMenu === item.href : undefined}
-                    className={`relative flex items-center gap-1 rounded-md px-2.5 py-2 text-[13.5px] font-medium transition-colors ${
-                      active ? 'text-content' : 'text-content-muted hover:text-content'
+                    data-morph
+                    className={`relative flex items-center gap-1 rounded-full px-3.5 py-2 text-[13.5px] font-medium transition-colors duration-300 ${
+                      overHero
+                        ? `[text-shadow:0_1px_8px_rgba(10,12,14,0.7)] ${
+                            active ? 'text-white' : 'text-white/80 hover:text-white'
+                          }`
+                        : active
+                          ? 'text-content'
+                          : 'text-content-muted hover:text-content'
                     }`}
                   >
                     {item.label}
@@ -164,7 +202,7 @@ export function SiteHeader() {
                     {active && (
                       <motion.span
                         layoutId="nav-active"
-                        className="absolute inset-x-2.5 -bottom-px h-0.5 rounded-full bg-accent"
+                        className="absolute inset-x-3.5 -bottom-px h-0.5 rounded-full bg-accent"
                         transition={
                           reduced ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 34 }
                         }
@@ -204,14 +242,16 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <button
             type="button"
             onClick={() => setDrawerOpen((v) => !v)}
             aria-expanded={drawerOpen}
             aria-controls="mobile-nav"
             aria-label={drawerOpen ? 'Close menu' : 'Open menu'}
-            className="inline-flex size-9 items-center justify-center rounded-lg border border-hairline text-content lg:hidden"
+            data-morph
+            className={`inline-flex size-9 items-center justify-center rounded-full border transition-colors duration-300 lg:hidden ${
+              overHero ? 'border-white/50 text-white' : 'border-hairline text-content'
+            }`}
           >
             <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
               {drawerOpen ? <path d="M5 5l10 10M15 5L5 15" /> : <path d="M3 6h14M3 10h14M3 14h14" />}

@@ -53,6 +53,9 @@ export const SITE = {
   /** Rotary theme for 2026-27 — RI President Olayinka "Yinka" H. Babalola. */
   rotaryYear: '2026–27',
   rotaryTheme: 'Create Lasting Impact',
+  /** Prose forms of the headline figures, for metadata and copy. */
+  memberCountLabel: '3,500',
+  clubCountLabel: '100+',
 } as const;
 
 export const STATS = [

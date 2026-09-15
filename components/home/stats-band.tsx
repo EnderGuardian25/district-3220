@@ -1,68 +1,38 @@
-'use client';
-
-import { useEffect, useRef, useState } from 'react';
-import { useInView, useReducedMotion } from 'framer-motion';
+import { Odometer } from '@/components/ui/odometer';
 import { STATS } from '@/lib/site';
 
-/** Counts up to `value` once, when scrolled into view. */
-function Odometer({ value, display }: { value: number; display: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-15% 0px' });
-  const reduced = useReducedMotion();
-  const [shown, setShown] = useState(0);
-
-  useEffect(() => {
-    if (!inView || reduced) return;
-    let frame = 0;
-    const start = performance.now();
-    const duration = 1100;
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / duration);
-      // easeOutExpo — fast then settles, which reads as mechanical rather than linear.
-      const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-      setShown(value * eased);
-      if (t < 1) frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [inView, reduced, value]);
-
-  // The real string ("3,500", "100+", "1964") is authoritative; the count-up
-  // only ever renders an intermediate approximation of it.
-  //
-  // Digit grouping is taken FROM the display string rather than applied blindly:
-  // a year must not pick up a thousands separator. Formatting 1964 through
-  // toLocaleString renders "1,964" mid-count before snapping to "1964".
-  const settled = reduced || !inView || shown >= value;
-  const grouped = display.includes(',');
-  const partial = Math.floor(shown);
-  const text = settled
-    ? display
-    : (grouped ? partial.toLocaleString('en-US') : String(partial)) +
-      (display.endsWith('+') ? '+' : '');
-
-  return (
-    <span ref={ref} className="tabular-nums">
-      {text}
-    </span>
-  );
-}
-
+/**
+ * The live index. Hairline-divided columns rather than cards: these are four
+ * bare figures and a box around each would add nothing but weight.
+ */
 export function StatsBand() {
   return (
-    <section aria-label="District at a glance" className="container-page pt-2 pb-2">
-      <div className="grid grid-cols-2 gap-x-6 gap-y-10 border-t border-hairline pt-10 md:grid-cols-4">
-        {STATS.map((stat, i) => (
-          <div key={stat.label} className={i > 0 ? 'md:border-l md:border-hairline md:pl-8' : ''}>
-            {/* Big enough to be a moment — these four figures ARE the section. */}
-            <p className="text-[clamp(2.4rem,5vw,3.5rem)] leading-none font-semibold tracking-[-0.035em]">
-              <Odometer value={stat.value} display={stat.display} />
-            </p>
-            <p className="mt-3 text-[11px] font-medium tracking-[0.12em] text-content-muted uppercase">
-              {stat.label}
-            </p>
-          </div>
-        ))}
+    <section aria-label="The district in numbers" className="border-y border-hairline bg-bg">
+      <div className="container-page">
+        <dl className="grid grid-cols-2 md:grid-cols-4">
+          {STATS.map((stat, i) => {
+            // Inner padding on every column except the outer edges, so a figure
+            // never butts up against the divider beside it. On mobile the grid
+            // is 2-up, so the "first in row" columns are 0 and 2.
+            const firstInRow = i % 2 === 0 ? 'pl-0 md:pl-6' : 'pl-5 md:pl-6';
+            const lastInRow = i % 2 === 1 ? 'pr-0 md:pr-6' : 'pr-5 md:pr-6';
+            return (
+              <div
+                key={stat.label}
+                className={`border-hairline py-8 md:py-10 md:first:pl-0 md:last:pr-0 ${firstInRow} ${lastInRow} ${
+                  i < 2 ? 'border-b md:border-b-0' : ''
+                } ${i % 2 === 0 ? 'border-r' : 'md:border-r'} ${
+                  i === STATS.length - 1 ? 'md:border-r-0' : ''
+                }`}
+              >
+                <dd className="font-display text-[clamp(2rem,4.2vw,3.3rem)] leading-none font-semibold tracking-[-0.03em]">
+                  <Odometer value={stat.display} />
+                </dd>
+                <dt className="label-micro mt-3 text-content-soft">{stat.label}</dt>
+              </div>
+            );
+          })}
+        </dl>
       </div>
     </section>
   );

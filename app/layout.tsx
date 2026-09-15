@@ -1,36 +1,41 @@
 import type { Metadata, Viewport } from 'next';
-import { Outfit } from 'next/font/google';
+import { Fraunces, Instrument_Sans } from 'next/font/google';
 import './globals.css';
-import { ThemeScript } from '@/components/theme/theme-script';
-import { ThemeProvider } from '@/components/theme/theme-provider';
 import { SmoothScroll } from '@/components/motion/smooth-scroll';
+import { MorphCursor } from '@/components/motion/morph-cursor';
 import { SiteHeader } from '@/components/site/site-header';
 import { SiteFooter } from '@/components/site/site-footer';
-import { SiteBackground } from '@/components/site/site-background';
 import { SITE } from '@/lib/site';
 
 /**
- * One variable family for the whole site — hierarchy comes from weight and
- * scale (design/DECISIONS.md §4). Cheapest of the pairings considered, which
- * leaves budget for the 150 images and the motion.
+ * Pairing 2 from design/directions.html: Fraunces for display, Instrument Sans
+ * for everything else. Fraunces is variable, so weight and optical size are
+ * tunable; the pairing notes warn it tips into "over the top" at heavy weights,
+ * which is why --text-display caps at 600.
  */
-const outfit = Outfit({
+const fraunces = Fraunces({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-outfit',
-  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-fraunces',
+  style: ['normal', 'italic'],
+});
+
+const instrument = Instrument_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-instrument',
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: `${SITE.name} | Service`,
+    default: `${SITE.name} | Youth-led service in Sri Lanka and the Maldives`,
     template: `%s | ${SITE.name}`,
   },
-  description: `${SITE.name} brings together young people across ${SITE.region} to serve their communities. Interact is Rotary International's service club for people aged 12–19.`,
+  description: `${SITE.shortName} brings together ${SITE.memberCountLabel} students across ${SITE.clubCountLabel} clubs in ${SITE.region}. Interact is Rotary International's service club for young people.`,
   openGraph: {
     title: SITE.name,
-    description: `Young people across ${SITE.region}, serving their communities.`,
+    description: `Youth-led service across ${SITE.region}.`,
     url: SITE.url,
     siteName: SITE.name,
     type: 'website',
@@ -38,36 +43,24 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f4f7fa' },
-    { media: '(prefers-color-scheme: dark)', color: '#050c17' },
-  ],
+  themeColor: '#f7f5f0',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // suppressHydrationWarning: ThemeScript mutates data-theme before React
-    // hydrates, so the server and client values legitimately differ here.
-    <html lang="en" className={outfit.variable} suppressHydrationWarning>
-      <head>
-        <ThemeScript />
-      </head>
+    <html lang="en" className={`${fraunces.variable} ${instrument.variable}`}>
       <body>
-        <ThemeProvider>
-          <SiteBackground />
-          {/* Static film grain over everything (see .site-grain in globals.css). */}
-          <div aria-hidden="true" className="site-grain" />
-          <SmoothScroll />
-          <a
-            href="#main"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-100 focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-accent-on"
-          >
-            Skip to content
-          </a>
-          <SiteHeader />
-          {children}
-          <SiteFooter />
-        </ThemeProvider>
+        <SmoothScroll />
+        <MorphCursor />
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-100 focus:rounded-full focus:bg-accent-fill focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-accent-on"
+        >
+          Skip to content
+        </a>
+        <SiteHeader />
+        {children}
+        <SiteFooter />
       </body>
     </html>
   );

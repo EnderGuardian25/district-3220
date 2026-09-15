@@ -1,16 +1,35 @@
 @import 'tailwindcss';
 
-/* Dark mode is driven by a data-theme attribute on <html>, stamped before first
-   paint by the inline script in app/layout.tsx. That lets us follow the OS
-   preference by default AND allow an explicit override, with no theme flash. */
-@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+/* ==========================================================================
+   Interact District 3220 — design system
+   Light theme only. Decided 2026-09-14; there is no dark variant and no
+   toggle, so every token below is a single value.
+
+   Palette   Signal (directions.html) on Warm Chalk neutrals
+   Type      Fraunces 600 display + Instrument Sans body (pairing 2)
+   Shape     Pill controls, rounded panels. Nothing square.
+   ========================================================================== */
 
 /* ==========================================================================
    PRIMITIVES
-   Ramps only — never reference these directly in components. Use the semantic
-   tokens below, so light/dark switching is automatic.
+   Ramps only. Never reference these in components — use the semantic tokens
+   further down, so a value change happens in exactly one place.
    ========================================================================== */
 @theme {
+  /* Signal: one bright blue lifted out of the same family as the navy, so the
+     page stays near-monochrome and layout and type carry the work. */
+  --color-signal-50: #eff5ff;
+  --color-signal-100: #dbe7fe;
+  --color-signal-200: #bad1fd;
+  --color-signal-300: #8db2fb;
+  --color-signal-400: #5b90f8;
+  --color-signal-500: #2e7df6;
+  --color-signal-600: #155fd9;
+  --color-signal-700: #124aad;
+  --color-signal-800: #133e8a;
+  --color-signal-900: #14356d;
+
+  /* Navy: structural. Draft rules, deep panels, the ink end of the ramp. */
   --color-navy-50: #f4f7fa;
   --color-navy-100: #e5ebf2;
   --color-navy-200: #c8d5e4;
@@ -23,237 +42,124 @@
   --color-navy-900: #0a1628;
   --color-navy-950: #050c17;
 
-  --color-signal-50: #eff5ff;
-  --color-signal-100: #dbe7fe;
-  --color-signal-200: #bad1fd;
-  --color-signal-300: #8db2fb;
-  --color-signal-400: #5b90f8;
-  --color-signal-500: #2e7df6;
-  --color-signal-600: #155fd9;
-  --color-signal-700: #124aad;
-  --color-signal-800: #133e8a;
-  --color-signal-900: #14356d;
+  /* Warm chalk: the paper. Warm enough to read as printed rather than as a
+     dashboard, without tipping into cream. */
+  --color-chalk-50: #fffdfa;
+  --color-chalk-100: #faf8f4;
+  --color-chalk-200: #f7f5f0;
+  --color-chalk-300: #efece4;
+  --color-chalk-400: #e5e1d7;
+  --color-chalk-500: #d6d1c4;
+  --color-chalk-600: #928c80;
+  --color-chalk-700: #6e695e;
+  --color-chalk-800: #5f5a50;
+  --color-chalk-900: #2a2720;
+  --color-chalk-950: #17150f;
 
-  /* Official Interact brand cyan, sampled from the supplied logo (#01B4E6).
-     Note it CANNOT carry text on the light background — 2.25:1 — so light-mode
-     text and links use cyan-700. Full-strength cyan is for graphics, glows and
-     dark-mode accents, where logotypes are exempt from contrast rules anyway. */
-  --color-cyan-50: #ecfbff;
-  --color-cyan-100: #d0f4fe;
-  --color-cyan-200: #a6eafd;
-  --color-cyan-300: #6edbfa;
-  --color-cyan-400: #2ec6f2;
-  --color-cyan-500: #01b4e6;
-  --color-cyan-600: #0193bc;
-  --color-cyan-700: #026b87;
-  --color-cyan-800: #075a70;
-  --color-cyan-900: #0b4859;
+  /* The five avenue marks, sampled from the supplied logo artwork. These are
+     identity colours, not palette colours: they only ever appear on their own
+     avenue and are never the sole carrier of meaning. */
+  --color-avenue-community: #d8951c;
+  --color-avenue-international: #97114b;
+  --color-avenue-club: #a85619;
+  --color-avenue-green: #187777;
+  --color-avenue-finance: #1b244a;
 
-  /* Warm neutrals. Cool grey + blue is what made this read like a dashboard;
-     a little warmth in the surfaces reads more human without touching the
-     navy brand colour, which still carries all the text. */
-  --color-sand-50: #faf9f7;
-  --color-sand-100: #f7f6f3;
-  --color-sand-200: #f1efea;
-  --color-sand-300: #e6e3dc;
-  --color-sand-400: #d5d1c7;
-  --color-ink-900: #0a0e14;
-  --color-ink-800: #141a24;
-  --color-ink-700: #1e242e;
-  --color-ink-100: #edebe6;
-  --color-ink-300: #a9afb9;
+  /* Shape. Controls are fully round so the morph cursor has a pill to park on;
+     panels are generous but not bubbly. */
+  --radius-control: 999px;
+  --radius-media: 1.125rem; /* 18px — photographs, tiles */
+  --radius-panel: 1.25rem; /* 20px — cards, trays, bands */
 
-  /* Softer shape language — sharp small radii read utilitarian. */
-  --radius-control: 0.875rem; /* 14px — buttons, inputs */
-  --radius-card: 1.5rem; /* 24px — cards */
-  --radius-panel: 1.75rem; /* 28px — large panels */
+  --font-display: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
-  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
-
-  /* Display sizes. Tight tracking is what stops Outfit reading generic at scale.
-     Max raised 5.25 → 5.75rem in the visual-style pass: the headline is three
-     words, which earns the scale without risking a third line. */
-  --text-display: clamp(2.75rem, 7.4vw, 5.75rem);
+  /* Display scale. Fraunces at 600 with -0.02em tracking and 1.06 leading is
+     the pairing as specified in directions.html. Heavier weights are where it
+     tips into "over the top", so 600 is a ceiling, not a starting point. */
+  --text-display: clamp(2.35rem, 5.2vw, 4.6rem);
   --text-display--line-height: 1.06;
-  --text-display--letter-spacing: -0.032em;
+  --text-display--letter-spacing: -0.02em;
 
-  --text-title: clamp(1.75rem, 3.4vw, 2.75rem);
+  --text-title: clamp(1.6rem, 3.1vw, 2.5rem);
   --text-title--line-height: 1.1;
-  --text-title--letter-spacing: -0.026em;
+  --text-title--letter-spacing: -0.018em;
 
-  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
-}
+  --text-micro: 0.65rem;
+  --text-micro--line-height: 1.2;
+  --text-micro--letter-spacing: 0.14em;
 
-/* Background poster as a CSS background rather than an <img>.
-   The server can't know the theme, so a React-rendered <img> guesses, paints
-   the wrong poster, then swaps — fetching both. Browsers only fetch the
-   background-image whose selector actually matches, and ThemeScript stamps
-   data-theme before first paint, so exactly one is ever requested. */
-.site-bg-poster {
-  background-image: url('/videos/bg-light-poster.avif');
-  background-size: cover;
-  background-position: center;
-}
-
-[data-theme='dark'] .site-bg-poster {
-  background-image: url('/videos/bg-dark-poster.avif');
-}
-
-/* Light mode only: the graded light clip barely moves and its waves sink under
-   the 80% ivory veil. Sharpening the MEDIA layer (not the veil) makes the
-   waves read without reopening the Revision-3 haze problem — the veil that
-   fixed it stays at 80%. A colour-matrix filter is GPU-cheap; on touch devices
-   only the static poster exists anyway, so it costs one paint. */
-.site-bg-poster,
-#site-bg-video {
-  filter: contrast(1.2) saturate(1.15);
-}
-
-[data-theme='dark'] .site-bg-poster,
-[data-theme='dark'] #site-bg-video {
-  filter: none;
-}
-
-/* ==========================================================================
-   HERO APERTURE REVEAL — geometry
-   Single source of truth for the pin runway, in CSS rather than JS.
-   It previously lived as a constant exported from the 'use client' hero-reveal
-   module and read by the server-rendered page; Next replaces client modules
-   with a reference proxy, so the constant arrived `undefined` and produced
-   `margin-top: -NaNsvh`. Keeping it here means both sides can't disagree.
-   NOTE: must be >= the WIPE_VH used in hero-reveal.tsx, or the aperture would
-   still be opening when the pin releases.
-   ========================================================================== */
-:root {
-  /* Pin travel. Must be >= the WIPE_VH in hero-reveal.tsx so the aperture is
-     fully open before the pin releases. */
-  --hero-runway: 100svh;
-}
-
-/* The runway: one viewport of stage plus the travel the pin needs. */
-.hero-runway {
-  height: calc(100svh + var(--hero-runway));
-}
-
-/* Pulls the following content up so it sits BEHIND the pinned hero and is what
-   shows through the aperture. Without it the content is a viewport lower and
-   the hole reveals only the page background. */
-.hero-runway-offset {
-  margin-top: calc(-1 * var(--hero-runway));
-}
-
-/* Static cover over the hero, opened by the scroll-driven aperture wipe.
-   A FLAT page colour, not a video frame — a still frame clashed with the
-   assembly photo alongside it. The mask itself is written per-frame from JS
-   (see HeroStaticCover), because the radius depends on measured element size. */
-.hero-lid {
-  background: var(--hero-lid);
-  will-change: mask-image;
-}
-
-/* The background video fades in over its poster, so a slow connection degrades
-   to a still image rather than to a blank frame. */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Film grain — one fixed composited layer tiling a static SVG noise square.
-   Cheap even on mid-range Android: no animation, no blend mode, no scroll
-   repaints, pointer-events: none. What it buys is physical texture over the
-   silk video, which otherwise reads slightly too digital. */
-.site-grain {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  opacity: 0.045;
-}
-
-[data-theme='dark'] .site-grain {
-  opacity: 0.06;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-clip: cubic-bezier(0.72, 0, 0.18, 1);
 }
 
 /* ==========================================================================
    SEMANTIC TOKENS
-   Values are the verified set from design/DECISIONS.md §3. The ratios in the
-   comments are computed, not estimated — do not "tidy" these to rounder ramp
-   steps without re-checking, two of them are deliberately non-obvious.
+   Every ratio in a comment is computed against the WCAG 2.1 formula, not
+   estimated. Do not round these to neater ramp steps without re-checking:
+   three of them are deliberately non-obvious.
    ========================================================================== */
+:root {
+  color-scheme: light;
+  scrollbar-color: var(--color-chalk-500) transparent;
+  accent-color: var(--accent-fill);
+
+  --bg: var(--color-chalk-200); /* #F7F5F0 warm chalk */
+  --surface: var(--color-chalk-50); /* #FFFDFA, reads as elevated paper */
+  --sunk: var(--color-chalk-300); /* recessed bands */
+
+  --content: var(--color-chalk-950); /* 16.63 on bg */
+  --content-muted: var(--color-chalk-800); /* 6.14 on bg */
+  /* Micro-labels are small, so they still owe 4.5:1. chalk-600 measures 2.92
+     and fails; chalk-700 is the first step that clears it at 5.02. */
+  --content-soft: var(--color-chalk-700); /* 5.02 on bg */
+
+  --hairline: var(--color-chalk-400); /* decorative — exempt from 1.4.11 */
+  --rule-draft: var(--color-navy-800); /* blueprint leaders, used at low alpha */
+  --control-border: var(--color-chalk-500); /* 3.02 on bg — clears the 3:1 boundary */
+
+  /* Signal has to split into three roles. signal-500 as a button fill gives
+     white text only 3.90 and fails, so the fill drops a step to signal-600
+     (5.78 with white). signal-500 survives as a graphic mark, where contrast
+     minimums do not apply. */
+  --accent: var(--color-signal-500); /* graphics, marks, the cursor */
+  --accent-fill: var(--color-signal-600); /* button backgrounds */
+  --accent-on: #ffffff; /* 5.78 on the fill */
+  --accent-text: var(--color-signal-700); /* 7.30 on bg — links, inline accents */
+  --accent-soft: var(--color-signal-50);
+  --focus: var(--color-signal-700); /* 7.30 */
+
+  /* Inverted band (the officers section). Warm near-black, not navy: navy at
+     this size reads corporate and fights the chalk. */
+  --ink-panel: #14120d;
+  --ink-panel-line: #2e2a22;
+  --on-ink: #f2efe8; /* 15.9 on the panel */
+  --on-ink-muted: #a09a8d; /* 6.21 on the panel */
+
+  --danger: #c01f1f; /* 5.62 on bg */
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-sunk: var(--sunk);
   --color-content: var(--content);
   --color-content-muted: var(--content-muted);
+  --color-content-soft: var(--content-soft);
   --color-hairline: var(--hairline);
   --color-control-border: var(--control-border);
   --color-accent: var(--accent);
+  --color-accent-fill: var(--accent-fill);
   --color-accent-on: var(--accent-on);
   --color-accent-text: var(--accent-text);
+  --color-accent-soft: var(--accent-soft);
   --color-focus: var(--focus);
+  --color-ink-panel: var(--ink-panel);
+  --color-ink-panel-line: var(--ink-panel-line);
+  --color-on-ink: var(--on-ink);
+  --color-on-ink-muted: var(--on-ink-muted);
   --color-danger: var(--danger);
-}
-
-:root {
-  color-scheme: light;
-  /* Palette reaching parts CSS colour utilities don't: the scroll thumb and
-     native form controls (checkboxes, radios, date pickers) pick up the ramp
-     instead of browser blue. Values come from the existing navy scale. */
-  scrollbar-color: var(--color-navy-300) transparent;
-  accent-color: var(--accent);
-  --bg: var(--color-sand-100); /* warm ivory, not cool grey */
-  --surface: #ffffff;
-  --content: var(--color-navy-900); /* 16.78 on bg */
-  --content-muted: var(--color-navy-600); /* 8.43 on bg */
-  --hairline: var(--color-sand-300); /* decorative — exempt from 1.4.11 */
-  /* Stays cool navy deliberately: every warm grey tested topped out at 2.72
-     against the ivory bg and failed the 3:1 control-boundary rule. 3.37 here. */
-  --control-border: var(--color-navy-400);
-
-  /* cyan-700, NOT the brand cyan-500: #01B4E6 is 2.25 on this bg and fails
-     badly. cyan-700 gives 5.65 as text and 6.08 with a white label on it. */
-  --accent: var(--color-cyan-700);
-  --accent-on: #ffffff; /* 6.08 on the fill */
-  --accent-text: var(--color-cyan-700); /* 5.65 on bg */
-  --focus: var(--color-cyan-700); /* 5.65 */
-
-  /* #DC2626 is 4.49 on this bg — fails by 0.01. This is 5.16. */
-  --danger: #cc1f1f;
-
-  /* Light mode's ivory already matches its high-key video, so no override. */
-  --hero-lid: var(--bg);
-}
-
-[data-theme='dark'] {
-  color-scheme: dark;
-  scrollbar-color: var(--color-navy-600) transparent;
-  /* Near-neutral surfaces with a faint navy cast, warmed slightly. Saturated
-     navy surfaces collapse text contrast and read as a dated intranet. */
-  --bg: var(--color-ink-900); /* #0A0E14 */
-  --surface: var(--color-ink-800); /* #141A24 */
-  --content: var(--color-ink-100); /* warm off-white — 16.23 on bg */
-  --content-muted: var(--color-ink-300); /* 8.77 on bg */
-  --hairline: var(--color-ink-700);
-  --control-border: var(--color-navy-500); /* 3.20 — cool, for the same reason */
-
-  /* Dark mode can use the true brand cyan — it's excellent on near-black. */
-  --accent: var(--color-cyan-500); /* brand #01B4E6 */
-  --accent-on: var(--color-navy-900); /* navy label on bright fill — 7.49 */
-  --accent-text: var(--color-cyan-500); /* 8.09 on bg, 7.21 on surface */
-  --focus: var(--color-cyan-400); /* 9.78 on bg */
-  --danger: #f87171; /* 7.09 on bg */
-
-  /* The hero lid reads too grey against the blue-navy video background, because
-     --bg is a near-neutral ink. navy-900 is the blue-leaning ramp step that sits
-     closest to the veiled video, so the static hero and the revealed background
-     belong to the same family. */
-  --hero-lid: var(--color-navy-900);
 }
 
 /* ==========================================================================
@@ -267,9 +173,10 @@
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+    background: var(--bg);
   }
 
-  /* Lenis owns the scroll when it's active, so hand it over. */
+  /* Lenis owns the scroll while it is active. */
   html.lenis,
   html.lenis body {
     height: auto;
@@ -281,19 +188,12 @@
     overscroll-behavior: contain;
   }
 
-  /* The base colour lives on <html> and <body> stays transparent, so the fixed
-     SiteBackground layer (z-index -10) is visible. An opaque body would paint
-     straight over it. */
-  html {
-    background: var(--bg);
-  }
-
   body {
-    background: transparent;
+    background: var(--bg);
     color: var(--content);
     font-family: var(--font-sans);
     font-weight: 400;
-    line-height: 1.65;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -302,6 +202,7 @@
   h2,
   h3,
   h4 {
+    font-family: var(--font-display);
     font-weight: 600;
     text-wrap: balance;
   }
@@ -312,18 +213,16 @@
 
   :focus-visible {
     outline: 2px solid var(--focus);
-    outline-offset: 2px;
-    border-radius: 3px;
+    outline-offset: 3px;
+    border-radius: 4px;
   }
-
-  /* Never remove focus outright — only replace it where a custom ring exists. */
   :focus:not(:focus-visible) {
     outline: none;
   }
 
   ::selection {
     background: var(--accent);
-    color: var(--accent-on);
+    color: #ffffff;
   }
 
   img,
@@ -336,9 +235,161 @@
 }
 
 /* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+@utility container-page {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 88rem;
+  padding-inline: 1.125rem;
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+  }
+  @media (width >= 80rem) {
+    padding-inline: 3.5rem;
+  }
+}
+
+/* Uppercase micro-label. One definition so tracking never drifts between
+   sections, which is what made the previous build read inconsistent. */
+@utility label-micro {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* The blueprint ground: a faint measured grid, masked so it fades out rather
+   than meeting the section edge. */
+@utility draft-grid {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--rule-draft) 16%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--rule-draft) 16%, transparent) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+/* ==========================================================================
+   PINNED HORIZONTAL SCROLL
+   The pan is a CSS scroll-driven animation, so it runs off the main thread and
+   needs no scroll listener. Three load-bearing details:
+     - the timeline is named on the TALL section, not on the sticky rail. A
+       timeline scoped to the rail never leaves the viewport, so it would never
+       advance.
+     - `contain` is the correct range for a subject taller than the viewport:
+       it starts when the section bottom reaches the viewport bottom and ends
+       when its top reaches the top, which is exactly the pinned stretch.
+     - --pan is measured in JS. A percentage translate is a percentage of the
+       rail's own width and overshoots badly.
+   Below md, and where scroll-driven animation is unsupported, this collapses
+   to an ordinary vertical stack rather than a half-working pin.
+   ========================================================================== */
+@media (width >= 48rem) {
+  .hscroll {
+    height: 340vh;
+    view-timeline-name: --hscroll;
+    view-timeline-axis: block;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .hscroll-rail {
+        animation: hscroll-pan linear both;
+        animation-timeline: --hscroll;
+        animation-range: contain 0% contain 100%;
+        will-change: transform;
+      }
+      /* pathLength="1" normalises the path, so the draw is a 1 -> 0 dashoffset
+         regardless of how long the generated line actually is. */
+      .hscroll-line {
+        animation: hscroll-draw linear both;
+        animation-timeline: --hscroll;
+        animation-range: contain 0% contain 100%;
+      }
+      .hscroll-prog > i {
+        animation: hscroll-fill linear both;
+        animation-timeline: --hscroll;
+        animation-range: contain 0% contain 100%;
+      }
+    }
+  }
+}
+
+@keyframes hscroll-pan {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-1 * var(--pan, 1000px)));
+  }
+}
+
+@keyframes hscroll-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes hscroll-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Fallbacks: a real swipe rail, never a broken pin. */
+@media (width >= 48rem) {
+  @supports not (animation-timeline: view()) {
+    .hscroll {
+      height: auto;
+    }
+    .hscroll-pin {
+      position: static;
+      height: auto;
+    }
+    .hscroll-rail {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+    }
+    .hscroll-prog {
+      display: none;
+    }
+    .hscroll-line {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hscroll {
+      height: auto;
+    }
+    .hscroll-pin {
+      position: static;
+      height: auto;
+    }
+    .hscroll-rail {
+      overflow-x: auto;
+      transform: none !important;
+    }
+    .hscroll-prog {
+      display: none;
+    }
+    .hscroll-line {
+      stroke-dashoffset: 0;
+    }
+  }
+}
+
+/* ==========================================================================
    MOTION
-   Every animation must be reachable by this switch. The audience is largely on
-   mid-range Android phones, so this is a real performance lever, not just a11y.
+   Everything animated must be reachable by this switch. The audience is
+   largely on mid-range Android, so this is a performance lever as much as an
+   accessibility one.
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -354,12 +405,17 @@
   }
 }
 
-@utility container-page {
-  width: 100%;
-  margin-inline: auto;
-  max-width: 80rem;
-  padding-inline: 1.25rem;
-  @media (width >= 48rem) {
-    padding-inline: 2rem;
+/* The morph cursor hides the native pointer, so it is fine-pointer only and
+   off entirely under reduced motion. Keyboard focus rings are untouched. */
+@media (pointer: fine) {
+  body.cursor-morph,
+  body.cursor-morph * {
+    cursor: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.cursor-morph,
+  body.cursor-morph * {
+    cursor: auto;
   }
 }
