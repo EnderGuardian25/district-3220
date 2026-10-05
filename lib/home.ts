@@ -53,6 +53,8 @@ export type Flagship = {
   needsPhoto?: boolean;
   /** True where the copy itself is a placeholder awaiting the district. */
   needsContent?: boolean;
+  /** The project's own page, where one exists. */
+  href?: string;
 };
 
 export const FLAGSHIPS: Flagship[] = [
@@ -78,6 +80,7 @@ export const FLAGSHIPS: Flagship[] = [
       'District Interact Model United Nations, with its own committees, topics and study guides.',
     image: '/images/media-crew/media-compering.jpg',
     imageAlt: 'Student delegates at a district conference',
+    href: '/events/dimun-2025',
   },
   {
     slug: 'race4change',
