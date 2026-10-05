@@ -385,6 +385,57 @@
   }
 }
 
+/* ==========================================================================
+   VERTICAL LINE DRAW
+   The College of DIRs timeline: a Signal line that draws down the list as
+   you read it, and year nodes that light as they cross the middle of the
+   viewport. Same CSS scroll-driven technique as the photo band above, so no
+   scroll listener.
+     - The line fills to wherever the viewport centre is: its range runs from
+       the track's top reaching the centre to its bottom reaching the centre.
+     - Each node has its own view() timeline and flips across a 2px window
+       at the centre line.
+   Without support, or under reduced motion, the line is simply drawn and
+   every node is lit.
+   ========================================================================== */
+.vtrack-line {
+  transform-origin: top;
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .vtrack {
+      view-timeline-name: --vtrack;
+      view-timeline-axis: block;
+    }
+    .vtrack-line {
+      animation: vtrack-draw linear both;
+      animation-timeline: --vtrack;
+      animation-range: cover 50vh cover calc(100% - 50vh);
+    }
+    .vtrack-node {
+      animation: vtrack-node linear both;
+      animation-timeline: view();
+      animation-range: cover calc(50vh - 1px) cover calc(50vh + 1px);
+    }
+  }
+}
+@keyframes vtrack-draw {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes vtrack-node {
+  from {
+    background-color: var(--color-chalk-400);
+  }
+  to {
+    background-color: var(--accent);
+  }
+}
+
 /* Clip Reveal for media that is already in view on load (an inner page's
    lead image). A CSS animation rather than an observer, so it starts with the
    first paint and needs no hydration; the reduced-motion switch below collapses
