@@ -25,15 +25,21 @@ export function ClipReveal({
   return <ClipRevealOnEnter className={className}>{children}</ClipRevealOnEnter>;
 }
 
+/**
+ * The observer watches an unclipped outer box and the wipe runs on an inner
+ * one. Chrome's IntersectionObserver applies the target's own clip-path, so a
+ * box clipped to zero width never reports as intersecting and never reveals.
+ */
 function ClipRevealOnEnter({ children, className }: { children: ReactNode; className: string }) {
   const { ref, shown } = useEnterOnce<HTMLDivElement>();
   return (
-    <div
-      ref={ref}
-      className={`transition-[clip-path] duration-[950ms] ease-clip ${className}`}
-      style={{ clipPath: shown ? 'inset(0 0 0 0)' : 'inset(0 0 0 100%)' }}
-    >
-      {children}
+    <div ref={ref} className={className}>
+      <div
+        className="relative h-full w-full transition-[clip-path] duration-[950ms] ease-clip"
+        style={{ clipPath: shown ? 'inset(0 0 0 0)' : 'inset(0 0 0 100%)' }}
+      >
+        {children}
+      </div>
     </div>
   );
 }
