@@ -286,7 +286,9 @@
    ========================================================================== */
 @media (width >= 48rem) {
   .hscroll {
-    height: 340vh;
+    /* Scroll distance for the pan. A longer track sets a larger value so the
+       sideways speed stays readable (the archive rail is ~3x the photo band). */
+    height: var(--hscroll-h, 340vh);
     view-timeline-name: --hscroll;
     view-timeline-axis: block;
   }
