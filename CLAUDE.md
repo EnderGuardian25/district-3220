@@ -33,4 +33,10 @@ names.
 
 - Dev server: `npx next dev --port 3100` (3000 is taken on this machine).
 - Checks: `npx tsc --noEmit` and `npx next build`.
+- `/kit` (dev only) renders every shared inner-page component. New pages build
+  from `components/page`, `components/people` and `components/forms`, not from
+  one-off markup.
+- Every content gap goes through `<Placeholder>`; never invent facts, dates or
+  names to fill one.
+- Hosting is Vercel. Forms send via pre-filled email until a back-end exists.
 - Verify UI in a real browser at 1440×900 and 390×844 before calling it done.

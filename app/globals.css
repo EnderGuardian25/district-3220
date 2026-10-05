@@ -385,6 +385,23 @@
   }
 }
 
+/* Clip Reveal for media that is already in view on load (an inner page's
+   lead image). A CSS animation rather than an observer, so it starts with the
+   first paint and needs no hydration; the reduced-motion switch below collapses
+   it to the final frame. Below-the-fold media uses the observer version in
+   components/motion/clip-reveal.tsx instead. */
+@keyframes clip-in {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@utility clip-in-load {
+  animation: clip-in 950ms var(--ease-clip) 120ms both;
+}
+
 /* ==========================================================================
    MOTION
    Everything animated must be reachable by this switch. The audience is
