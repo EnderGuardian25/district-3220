@@ -8,7 +8,28 @@
 
 ---
 
-## Current Status — 2026-09-14
+## Current Status — 2026-10-05
+
+**Phase:** Home page done and merged to `main` (PR #1). Design direction
+**locked** at the user's request on 2026-10-05: the home page as built is the
+design system, written up in [`design/DECISIONS.md`](design/DECISIONS.md) with
+reference screenshots in `design/reference/` and a summary in `CLAUDE.md`.
+The superseded July/August decisions moved to `design/archive/`.
+
+### Next
+1. Send the district the content request list (BLOCKING content gaps, below).
+2. Exercise `prefers-reduced-motion` in a browser (the one unverified item).
+3. Build the inner pages on the locked system: shared page template first, then
+   About, Meet the Council 2026/27, College of DIRs (content already in
+   CONTENT.md / ARCHIVES.md), then Archives (14 year pages), News, Calendar,
+   Admin Documents, Media Crew, Contact.
+4. Decide hosting before the form back-ends (Contact, Request a Date, Media Crew).
+5. Image pipeline over the ~150 council/archive/DIMUN assets; throttled-mobile
+   and Lighthouse pass.
+
+---
+
+## Status — 2026-09-14
 
 **Phase:** Home page rebuilt on a new design direction. Branch `redesign/blueprint`.
 
@@ -16,7 +37,7 @@ The silk-video / aperture-reveal home page is gone. Everything below supersedes
 the 2026-08-03 status; that entry is kept for the decisions still in force
 (nav labels, URL mapping, 301s, the two founding dates, the 2026-27 theme).
 
-### Design direction (locked 2026-09-14)
+### Design direction (locked 2026-09-14; full spec now in `design/DECISIONS.md`)
 Chosen by comparing prototypes in `design/concepts.html` (three directions) and
 `design/concept-blueprint.html` (the merged direction, with live palette / type
 / shape / accent pickers in the style of `design/directions.html`).
@@ -109,6 +130,12 @@ written throughout but have not been exercised in a browser.
 ---
 
 ## Earlier Status — 2026-08-03
+
+> **SUPERSEDED.** This section describes the navy + cyan / Outfit / dark-mode /
+> silk-video build that the 2026-09-14 redesign replaced. Its design notes,
+> "Remaining tasks" and file references are history only; the current plan is
+> under Current Status. Still in force: the nav labels and URL map, the 301s,
+> the two founding dates and the 2026-27 theme (all restated in DECISIONS.md §8).
 
 **Phase:** Site build. Home page substantially built; design direction locked.
 
@@ -286,17 +313,17 @@ Prompts and settings for regenerating the background videos manually are in
 ## Files in this project
 | File | Purpose |
 |------|---------|
+| `CLAUDE.md` | Project instructions loaded by every Claude session, including the design-lock summary. |
 | `CONTENT.md` | Full content inventory of the existing site — the migration source of truth. |
 | `ARCHIVES.md` | Deep year-by-year detail for every Archives sub-page (1988→2025). |
 | `HANDOFF.md` | This file — running status & decisions. |
+| `design/DECISIONS.md` | **The locked design system.** Read before changing anything visual. |
+| `design/reference/` | Screenshots of the approved home page, the visual ground truth. |
+| `design/archive/` | Superseded design decisions. History only. |
+| `design/directions.html`, `concepts.html`, `concept-blueprint.html` | The prototypes the direction was chosen from. |
 | `images-manifest.js` | Shared list of all original images (id, friendly name, category, page, alt). |
-| `download-images.js` | Node bulk downloader → `./images/<category>/`. |
-| `download-images.html` | Browser-based image downloader (interactive gallery). |
-| `public/images/` | Original full-resolution assets (moved from `images/` when the site was scaffolded). |
-| `design/DECISIONS.md` | **Locked design decisions** — palette with verified contrast, type, motion, URL map. Read before changing anything visual. |
-| `design/directions.html` | The interactive palette/type comparison the direction was chosen from. |
-| `design/higgsfield/VIDEO-BRIEF.md` | Prompts + settings for regenerating the background videos. |
-| `scripts/encode-bg-video.mjs` | Encodes background renders to web loops; finds the seamless cut by measurement. |
+| `download-images.js` / `.html` | Node bulk / browser image downloaders. |
+| `public/images/` | Original full-resolution assets. |
 | `app/`, `components/`, `lib/` | The Next.js site. |
 
 ## How to download the images
@@ -318,6 +345,10 @@ Open `download-images.html` in any browser. Click **Download All** (saves to you
 - CMS need: will council/DIR/events/newsletter data be edited by non-developers (suggests a CMS or structured data files)?
 
 ## Change log
+- **2026-10-05** — Design direction locked at the user's request. `design/DECISIONS.md`
+  rewritten from the code and a browser walk-through of the home page; old
+  decisions archived to `design/archive/`; reference screenshots in
+  `design/reference/`; `CLAUDE.md` added so every session loads the lock.
 - **2026-08-03 (animation review + background retune)** — /review-animations pass:
   underline butt caps (stretched round caps read as end dots), press/hover timings
   brought into budget (150/200ms). Background rebalanced by live iteration:
