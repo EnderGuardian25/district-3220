@@ -6,30 +6,22 @@
 export type NavItem = {
   label: string;
   href: string;
-  children?: { label: string; href: string }[];
+  /** Other sections this item lights up for: the pages reached from it. */
+  match?: string[];
 };
 
 /**
- * Labels and order are IDENTICAL to the previous Wix site — that was an explicit
- * requirement. Only the URLs are cleaned; next.config.ts 301s every old path.
+ * Top-level labels and order are the previous Wix site's (an explicit
+ * requirement). Only the URLs are cleaned; next.config.ts 301s every old path.
+ * No dropdowns (decided by the user 2026-10-06): the council page is reached
+ * from About, the newsletter from News, the College of DIRs from Archives.
  */
 export const NAV: NavItem[] = [
   { label: 'Home', href: '/' },
-  {
-    label: 'About',
-    href: '/about',
-    children: [
-      { label: 'Meet The Council 2026/27', href: '/council/2026-27' },
-      { label: 'College of DIRs', href: '/college-of-dirs' },
-    ],
-  },
+  { label: 'About', href: '/about', match: ['/council'] },
   { label: 'Calendar', href: '/calendar' },
   { label: 'Admin Documents', href: '/admin-documents' },
-  {
-    label: 'News',
-    href: '/news',
-    children: [{ label: 'Newsletter', href: '/newsletter' }],
-  },
+  { label: 'News', href: '/news', match: ['/newsletter'] },
   { label: 'Archives', href: '/archives' },
   { label: 'Media Crew', href: '/media-crew' },
   { label: 'Contact', href: '/contact' },
