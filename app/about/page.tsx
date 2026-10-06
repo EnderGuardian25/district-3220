@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 const PEOPLE_LINKS = [
-  { href: '/council/2026-27', label: 'Meet the Council 2026/27', note: 'The students running the district this year' },
+  { href: '/council/2026-27', label: 'Meet the Council 2026/27', note: 'This year’s district council' },
   { href: '/archives', label: 'Archives', note: 'Councils, projects and events, year by year' },
 ];
 
@@ -23,7 +23,7 @@ export default function AboutPage() {
     <main id="main">
       <PageHeader
         title={`Interact in ${SITE.region}, since ${SITE.districtFounded}.`}
-        lede={`Interact is Rotary International’s service club for young people aged 12–19. In District 3220 it is run by the students themselves: about ${SITE.memberCountLabel} of them in ${SITE.clubCountLabel} school clubs.`}
+        lede={`Interact is Rotary International’s service club for young people aged 12–19. In District 3220 it is run by its members: about ${SITE.memberCountLabel} students in more than 100 school clubs.`}
       />
       <PageMedia
         src="/images/hero/assembly.webp"
@@ -37,7 +37,7 @@ export default function AboutPage() {
 
       {/* ---------- vision, mission, goals ---------- */}
       <section aria-labelledby="purpose-heading" className="container-page py-16 md:py-24">
-        <SectionHeader id="purpose-heading" title="What the district is for." />
+        <SectionHeader id="purpose-heading" title="Vision, mission and goals." />
         <ol className="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
           {PURPOSE.map((p, i) => (
             <Reveal key={p.title} step={Math.min(i, 4)} as="li">
@@ -108,7 +108,7 @@ export default function AboutPage() {
 
       {/* ---------- the people ---------- */}
       <section aria-labelledby="people-heading" className="container-page py-16 md:py-24">
-        <SectionHeader id="people-heading" title="The people who run it." />
+        <SectionHeader id="people-heading" title="The council and its history." />
         <ul className="mt-8 grid gap-3 md:grid-cols-2">
           {PEOPLE_LINKS.map((l, i) => (
             <Reveal key={l.href} step={Math.min(i, 4)} as="li">

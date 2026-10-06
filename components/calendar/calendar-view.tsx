@@ -187,9 +187,9 @@ export function CalendarView({ events, today }: { events: CalendarEvent[]; today
             </>
           ) : (
             <p className="mt-4 border-t border-hairline pt-5 text-content-muted">
-              No upcoming events have been published yet. Planning one?{' '}
+              No upcoming events are listed. Clubs planning one can{' '}
               <Link href="/calendar/request-a-date" className="text-accent-text underline underline-offset-3">
-                Request a date
+                request a date
               </Link>
               .
             </p>

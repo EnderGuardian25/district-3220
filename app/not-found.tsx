@@ -8,8 +8,8 @@ export default function NotFound() {
   return (
     <main id="main">
       <PageHeader
-        title="This page isn’t here."
-        lede="The district’s website moved to a new address structure. Most old links forward automatically; this one didn’t. The archives and the council are a click away."
+        title="Page not found."
+        lede="There is no page at this address. Links from the previous district website redirect automatically, but this one could not be matched."
       >
         <Button href="/">Back to the home page</Button>
         <Button href="/archives" tone="ghost">

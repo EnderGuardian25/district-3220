@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     default: `${SITE.name} | Youth-led service in Sri Lanka and the Maldives`,
     template: `%s | ${SITE.name}`,
   },
-  description: `${SITE.shortName} brings together ${SITE.memberCountLabel} students across ${SITE.clubCountLabel} clubs in ${SITE.region}. Interact is Rotary International's service club for young people.`,
+  description: `${SITE.name} has about ${SITE.memberCountLabel} students in more than 100 school clubs across Sri Lanka and the Maldives. Interact is Rotary International's service club for young people aged 12–19.`,
   openGraph: {
     title: SITE.name,
     description: `Youth-led service across ${SITE.region}.`,

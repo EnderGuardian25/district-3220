@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/page/page-header';
 import { SectionHeader } from '@/components/page/section-header';
-import { Placeholder } from '@/components/page/placeholder';
 import { Reveal } from '@/components/motion/reveal';
 import { ClipReveal } from '@/components/motion/clip-reveal';
 import { Button } from '@/components/ui/button';
@@ -38,7 +37,7 @@ export default async function ArchiveYearPage({ params }: { params: Promise<{ ye
       <PageHeader
         crumbs={[{ label: 'Archives', href: '/archives' }]}
         title={y.theme ? `${y.label}: ${y.theme}.` : `${y.label}.`}
-        lede={y.shape === 'compiling' ? undefined : y.summary}
+        lede={y.summary}
       >
         {y.councilPage && <Button href={`/archives/council/${y.slug}`}>Meet the {y.label} council</Button>}
       </PageHeader>
@@ -71,16 +70,6 @@ export default async function ArchiveYearPage({ params }: { params: Promise<{ ye
                   );
                 })}
               </dl>
-            )}
-
-            {y.notes && (
-              <div className="mt-10 flex max-w-3xl flex-col gap-3">
-                {y.notes.map((n) => (
-                  <Placeholder key={n} label={y.shape === 'compiling' ? 'Records being compiled' : 'Note'}>
-                    {n}
-                  </Placeholder>
-                ))}
-              </div>
             )}
           </div>
 

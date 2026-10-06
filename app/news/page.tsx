@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PageHeader } from '@/components/page/page-header';
-import { Placeholder } from '@/components/page/placeholder';
 import { Reveal } from '@/components/motion/reveal';
 import { ClipReveal } from '@/components/motion/clip-reveal';
 import { Button } from '@/components/ui/button';
@@ -25,12 +24,6 @@ export default function NewsPage() {
         </Button>
       </PageHeader>
 
-      <div className="container-page mt-10">
-        <Placeholder label="2026/27 posts to come" className="max-w-3xl">
-          These are the posts carried over from the old site. News from the 2026/27 year will appear
-          here as the council publishes it.
-        </Placeholder>
-      </div>
 
       <section aria-label="Posts" className="container-page py-14 md:py-20">
         <ul className="grid gap-x-6 gap-y-14 md:grid-cols-2">

@@ -98,7 +98,7 @@ export function PhotoWall() {
           A year of the district, in photographs.
         </h2>
         <p className="mt-3.5 max-w-[56ch] text-white/70">
-          Assemblies, training, media crew and club projects across nine zones.
+          District assemblies and the services of the Media Crew.
         </p>
       </div>
 

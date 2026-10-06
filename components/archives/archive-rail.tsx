@@ -154,16 +154,11 @@ function Caption({ children }: { children: React.ReactNode }) {
 }
 
 function YearPlate({ year }: { year: ArchiveYear }) {
-  const compiling = year.shape === 'compiling';
+  const unrecorded = year.shape === 'unrecorded';
   return (
     <Link href={`/archives/${year.slug}`} className="group block">
       <Caption>
-        {/* One backing for both parts, so the line can't show through the
-            gap between the year and "Being compiled". */}
-        <span className="label-micro bg-navy-900 text-white/80">
-          {year.label}
-          {compiling && <span className="pl-2 text-white/60">· Being compiled</span>}
-        </span>
+        <span className="label-micro bg-navy-900 text-white/80">{year.label}</span>
       </Caption>
       {/* Year artwork sits on a near-white plate: these are logos and RI
           theme marks in their own colours, never placed straight on navy. */}
@@ -171,7 +166,7 @@ function YearPlate({ year }: { year: ArchiveYear }) {
         className={`relative aspect-[4/3] overflow-hidden rounded-media transition-[translate] duration-[600ms] ease-out-expo group-hover:-translate-y-1 motion-reduce:group-hover:translate-y-0 ${
           year.logo
             ? 'bg-chalk-50'
-            : compiling
+            : unrecorded
               ? 'border border-dashed border-white/30 bg-navy-900'
               : 'bg-navy-800'
         }`}
@@ -206,7 +201,7 @@ function SpanPlate() {
         </span>
       </div>
       <p className="mt-3.5 text-sm text-white/70">
-        No archive pages were kept for these years. Their DIRs and themes are in the College of DIRs.
+        The archive holds no year pages for this period. Each year’s DIR and Rotary theme are listed in the College of DIRs.
       </p>
     </Link>
   );

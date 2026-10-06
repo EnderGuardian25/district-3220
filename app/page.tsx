@@ -24,8 +24,8 @@ export default function HomePage() {
               <span id="projects-heading">The projects the district is known for.</span>
             </Reveal>
             <Reveal step={1} as="p" className="mt-3.5 max-w-[56ch] text-content-muted">
-              Each one is planned, funded and run by school students, with the council behind them
-              and Rotary alongside. Open one to see it.
+              Each project is planned, funded and run by school students, with the support of the
+              district council and Rotary. Select a project for details.
             </Reveal>
           </div>
           <DrawLine />
@@ -40,7 +40,7 @@ export default function HomePage() {
               <span id="avenues-heading">Five avenues of service.</span>
             </Reveal>
             <Reveal step={1} as="p" className="mt-3.5 max-w-[56ch] text-content-muted">
-              Every club project sits under one of these.
+              Every club project belongs to one of these avenues.
             </Reveal>
           </div>
           <DrawLine />

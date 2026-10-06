@@ -25,7 +25,7 @@ export default function ArchivesPage() {
     <main id="main">
       <PageHeader
         title="The district archives."
-        lede="A record of the councils, projects and milestones of Interact clubs across Sri Lanka and the Maldives: who led each year, what they built, and the theme they served under."
+        lede="The councils, projects and milestones of Interact clubs across Sri Lanka and the Maldives: who led each year, what they achieved, and the Rotary theme they served under."
       />
 
       {/* ---------- the timeline ---------- */}
@@ -62,7 +62,6 @@ export default function ArchivesPage() {
               <Link href={`/archives/${y.slug}`} className="block py-5">
                 <span className="flex items-baseline justify-between gap-4">
                   <span className="font-display text-[1.35rem] leading-none font-semibold tracking-[-0.02em]">{y.label}</span>
-                  {y.shape === 'compiling' && <span className="label-micro text-white/60">Being compiled</span>}
                 </span>
                 {y.theme && <span className="mt-2 block font-display text-white/80 italic">“{y.theme}”</span>}
                 {y.dir && <span className="label-micro mt-1.5 block text-white/55">DIR {keepTogether(y.dir)}</span>}
@@ -73,7 +72,7 @@ export default function ArchivesPage() {
                     {UNRECORDED_SPAN.from} – {UNRECORDED_SPAN.to}
                   </span>
                   <span className="mt-2 block text-sm text-white/60">
-                    No archive pages were kept for these years. Their DIRs and themes are in the College of DIRs.
+                    The archive holds no year pages for this period. Each year’s DIR and Rotary theme are listed in the College of DIRs.
                   </span>
                 </Link>
               )}

@@ -30,7 +30,7 @@ export default async function PastCouncilPage({ params }: { params: Promise<{ ye
       <PageHeader
         crumbs={[{ label: 'Archives', href: '/archives' }]}
         title={`Council ${c.label}.`}
-        lede={`The ${count} Interactors who ran the district in ${c.label} under the theme “${c.theme}”, led by DIR ${c.dir}. Open any profile to read more.`}
+        lede={`The ${count} Interactors who ran the district in ${c.label} under the theme “${c.theme}”, led by DIR ${c.dir}. Select a profile to read more.`}
       >
         <Button href={`/archives/${c.year}`} tone="ghost">
           The {c.label} year in the archive

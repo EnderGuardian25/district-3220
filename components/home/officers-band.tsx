@@ -23,7 +23,7 @@ export function OfficersBand() {
           <span id="members-heading">For Interactors and club officers.</span>
         </Reveal>
         <Reveal step={1} as="p" className="mt-3.5 max-w-[54ch] text-on-ink-muted">
-          The working side of the district. Dates, documents, records and the people who run them.
+          Dates, documents, records and the district council, for club officers and members.
         </Reveal>
 
         <ul className="mt-9 grid grid-cols-1 gap-px overflow-hidden rounded-panel bg-ink-panel-line outline outline-ink-panel-line sm:grid-cols-2 lg:grid-cols-4">
