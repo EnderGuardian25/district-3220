@@ -126,35 +126,23 @@ export function SiteHeader() {
       <div className="container-page flex h-16 items-center justify-between gap-4 md:h-18">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2.5"
+          className="flex shrink-0 items-center"
           aria-label={`${SITE.name} — home`}
         >
-          {/* Official Interact wordmark + Rotary wheel. Logotypes are exempt
-              from contrast minimums, but over photography it still needs a
-              shadow to hold its edge. */}
+          {/* The official district lock-up: Interact, District 3220 and the
+              Rotary wheel, cropped from the primary logo before its theme
+              divider. Logotypes are exempt from contrast minimums, but over
+              photography it still needs a shadow to hold its edge. */}
           <Image
-            src="/images/branding/interact-logo.png"
+            src="/images/branding/interact-district-3220-logo.png"
             alt=""
-            width={633}
-            height={215}
+            width={1034}
+            height={380}
             preload
-            className={`h-6 w-auto transition-[filter] duration-300 md:h-7 ${
+            className={`h-10 w-auto transition-[filter] duration-300 md:h-12 ${
               overHero ? 'drop-shadow-[0_1px_8px_rgba(10,12,14,0.7)]' : ''
             }`}
           />
-          <span
-            aria-hidden="true"
-            className={`h-5 w-px transition-colors duration-300 ${
-              overHero ? 'bg-white/45' : 'bg-hairline'
-            }`}
-          />
-          <span
-            className={`text-[13px] leading-tight font-medium tracking-tight transition-colors duration-300 ${
-              overHero ? 'text-white [text-shadow:0_1px_8px_rgba(10,12,14,0.7)]' : 'text-content-muted'
-            }`}
-          >
-            District 3220
-          </span>
         </Link>
 
         {/* ---------- desktop nav ---------- */}

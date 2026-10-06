@@ -10,26 +10,36 @@ export function SiteFooter() {
         <div className="grid gap-12 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1fr)]">
           {/* --- identity --- */}
           <div>
-            <div className="flex items-center gap-3">
-              {/* The official cyan wordmark, not the old Wix logo-footer.png,
-                  which carried the 2025/26 "Unite For Good" lock-up. */}
-              <Image
-                src="/images/branding/interact-logo.png"
-                alt=""
-                width={633}
-                height={215}
-                className="h-6 w-auto"
-              />
-              <span aria-hidden="true" className="h-5 w-px bg-hairline" />
-              <p className="text-[14px] font-semibold tracking-tight">District 3220</p>
-            </div>
+            {/* The official district lock-up, not the old Wix logo-footer.png,
+                which carried the 2025/26 "Unite For Good" theme. */}
+            <Image
+              src="/images/branding/interact-district-3220-logo.png"
+              alt={SITE.name}
+              width={1034}
+              height={380}
+              className="h-14 w-auto"
+            />
             <p className="mt-4 max-w-[34ch] text-sm text-content-muted">
               Rotary International&rsquo;s service club for young people aged 12&ndash;19.
               Serving {SITE.region} since {SITE.districtFounded}.
             </p>
-            <p className="mt-5 text-[11px] font-semibold tracking-[0.12em] text-accent-text uppercase">
-              {SITE.rotaryYear} &middot; {SITE.rotaryTheme}
-            </p>
+            {/* This year's Rotary theme mark, keyed out of RI's social graphic.
+                Like the Interact logo, its own blue is part of the mark and
+                exempt from the one-accent rule (DECISIONS §2). */}
+            <div className="mt-6 flex items-center gap-4">
+              <Image
+                src="/images/branding/create-lasting-impact.png"
+                alt={SITE.rotaryTheme}
+                width={918}
+                height={509}
+                className="h-12 w-auto"
+              />
+              <p className="text-[11px] leading-snug font-semibold tracking-[0.12em] text-content-muted uppercase">
+                Rotary theme
+                <br />
+                {SITE.rotaryYear}
+              </p>
+            </div>
           </div>
 
           {/* --- nav mirror --- */}

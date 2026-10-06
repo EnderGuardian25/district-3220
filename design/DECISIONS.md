@@ -68,6 +68,17 @@ There is **no second accent colour.** No cyan, no orange, no gradients between
 hues. The official Interact cyan `#01B4E6` exists only inside the supplied logo
 artwork in the header and footer.
 
+**Revision 2026-10-06 (requested by the user): official marks.**
+- The header and footer logo is now the district lock-up (Interact,
+  District 3220, the Rotary wheel), cropped from the supplied primary logo
+  before its theme divider: `public/images/branding/interact-district-3220-logo.png`.
+  It replaces the generic Interact logo and the separate "District 3220" text
+  beside it.
+- The footer carries Rotary's 2026–27 theme mark, "Create Lasting Impact",
+  keyed out of RI's social graphic (`create-lasting-impact.png`). Its royal
+  blue `#006BB7` is part of the mark, like the Interact cyan: it never
+  becomes a UI colour.
+
 ### Avenue identity colours
 
 Sampled from the logo artwork. They appear **only** on their own avenue (the
