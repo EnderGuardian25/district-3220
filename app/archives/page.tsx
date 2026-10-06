@@ -131,7 +131,7 @@ export default function ArchivesPage() {
         <SectionHeader
           id="dirs-heading"
           title="College of DIRs."
-          lede={`Every District Interact Representative since ${FIRST_DIR_YEAR}: the ${DIRS.length} people who have led Interact in the district, each with the Rotary theme of their year.`}
+          lede={`The ${DIRS.length} District Interact Representatives who have led Interact in the district since ${FIRST_DIR_YEAR}, with the Rotary theme of each year.`}
         />
         <Reveal className="mt-8">
           <Link
