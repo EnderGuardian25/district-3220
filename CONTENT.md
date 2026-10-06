@@ -3,6 +3,8 @@
 > **Source site:** https://www.interactdistrict3220.org (built on Wix)
 > **Captured:** 2026-06-15
 > **Purpose:** Complete content & structure reference for rebuilding the site with a modern, mobile-friendly design. Every page, section, text block, link, and image on the existing site is catalogued here. All new content will be layered on top of this baseline.
+>
+> **This is a snapshot of the old Wix site as it stood on 2026-06-15, mid-way through the 2025/26 Rotary year. Leave it as captured.** References below to the "current" council, theme ("Unite For Good") and events are 2025/26. The live facts are in the code: the 2026-27 theme is **"Create Lasting Impact"** (`lib/site.ts`), the 2025/26 council now lives in the archive (`/archives/council/2025-26`), and the 2026/27 council is pending (`lib/councils.ts`). Where the rebuilt site deliberately departs from this inventory, `design/DECISIONS.md` §8 and `HANDOFF.md` say why.
 
 ---
 

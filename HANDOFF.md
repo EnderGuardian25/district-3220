@@ -108,8 +108,7 @@ the source for `Placeholder`, lists what is still missing.
 2. A throttled-mobile performance trace on a production deploy (Lighthouse
    accessibility, best-practices and SEO are done; performance needs a real
    build on Vercel, not the dev server).
-3. `CONTENT.md` still carries the 2025/26 theme throughout.
-4. Optional: reflect the calendar's view and month in the URL so it can be
+3. Optional: reflect the calendar's view and month in the URL so it can be
    linked to.
 
 ---
@@ -206,8 +205,9 @@ untouched** — all 156 files, 293MB.
 ### Verified
 `tsc --noEmit` and `next build` clean. No console messages. No horizontal
 overflow at 390x844 across the full scroll. Morph cursor off on touch.
-**Not yet verified: `prefers-reduced-motion` rendering.** The guards are
-written throughout but have not been exercised in a browser.
+~~**Not yet verified: `prefers-reduced-motion` rendering.**~~ Verified
+2026-10-06 in Chrome with `--force-prefers-reduced-motion` (see "Site audit"
+under Current Status).
 
 ### Dev server
 `npx next dev --port 3100` (port 3000 is occupied on this machine).
@@ -251,7 +251,7 @@ written throughout but have not been exercised in a browser.
 | Styling | Tailwind CSS v4 (CSS-first `@theme`) |
 | Motion | Framer Motion 12 + Lenis |
 | Media | sharp, ffmpeg-static, ffprobe-static |
-| Hosting | **Not decided** — build is host-agnostic |
+| Hosting | **Not decided** at the time — Vercel since 2026-10-05 (DECISIONS.md §8) |
 
 Versions deliberately match `EnderGuardian25/personal-portfolio` (the effects lab at
 lab.damiandc.com) so its effects lift across directly.
