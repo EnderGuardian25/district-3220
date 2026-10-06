@@ -48,7 +48,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${instrument.variable}`}>
+    // suppressHydrationWarning: browser extensions (seen: a "crxlauncher"
+    // Chrome extension) write attributes onto <html> before React hydrates.
+    // It silences attribute mismatches on this one element only; anything
+    // inside <body> still reports.
+    <html lang="en" className={`${fraunces.variable} ${instrument.variable}`} suppressHydrationWarning>
       <body>
         <SmoothScroll />
         <MorphCursor />
