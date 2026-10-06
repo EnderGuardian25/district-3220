@@ -236,7 +236,7 @@ design change (see the top of this file).
 | Odometer Roll | Home and About stats | Digits roll to the figure on entering view |
 | Expand Grid (shared element) | Home projects; every council and profile grid; DIMUN committees and executive committee | The image moves from card into the dialog via `layoutId` |
 | Accordion Gallery | Home avenues; Media Crew services | Hover opens after ~80ms intent, click locks; 750ms `flex-grow` |
-| Pinned horizontal scroll + Line Draw | Home photo band; Archives timeline | CSS scroll-driven; progress bar along the bottom |
+| Pinned horizontal scroll + Line Draw | Home photo band; Archives timeline | CSS scroll-driven; progress bar along the bottom. In both rails the line passes through every caption diamond (node = 3px in, caption centre) and behind the label, on one navy backing per caption (home fixed 2026-10-06: its nodes sat 22px above the diamonds) |
 | Vertical Line Draw | College of DIRs | Line fills to mid-screen; each year lights as it crosses |
 | Load fade-up | Every inner-page header | `rise-in-load`, CSS, from first paint |
 | Reveal fade-up + DrawLine | Section headings, rows, cards site-wide | Observer, once per element |

@@ -48,10 +48,14 @@ function layout(items: WallItem[]) {
     const y = TOP[item.drop];
     const x = cursor;
     cursor += w + GAP;
-    // The node is the diamond in the caption row. Captions are forced to a
-    // single line (whitespace-nowrap) precisely so this stays deterministic:
-    // a wrapped caption would move its own diamond and the line would miss it.
-    return { ...item, x, y, w, h, nodeX: x + 3, nodeY: y - 16 };
+    // The node is the diamond in the caption row: 3px in, and on the
+    // caption's centre line (the caption is the figure's first row, so its
+    // centre is ~6px below the figure's top), the same geometry as the
+    // Archives rail. This used to be `y - 16`, which ran the line ~22px above
+    // every diamond so it never touched them. Captions are forced to a single
+    // line (whitespace-nowrap) precisely so this stays deterministic: a
+    // wrapped caption would move its own diamond and the line would miss it.
+    return { ...item, x, y, w, h, nodeX: x + 3, nodeY: y + 6 };
   });
   return { placed, trackWidth: cursor + PAD_X };
 }
@@ -160,14 +164,17 @@ export function PhotoWall() {
                       aria-hidden="true"
                       className="hidden size-1.5 shrink-0 rotate-45 bg-white/70 md:block"
                     />
-                    {/* Labels sit on the band colour: each curve leaves its
-                        node horizontally, and ran through the caption text. */}
+                    {/* The label sits on the band colour: each curve leaves
+                        its node horizontally, and ran through the caption
+                        text. One backing for number and caption, with the
+                        space between them as padding inside it, so the line
+                        can't show through the gap either. */}
                     <span className="label-micro bg-navy-900 text-white/55">
                       {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <span className="label-micro bg-navy-900 text-white/80">
-                      {p.caption}
-                      {p.year ? `, ${p.year}` : ''}
+                      <span className="pl-2 text-white/80">
+                        {p.caption}
+                        {p.year ? `, ${p.year}` : ''}
+                      </span>
                     </span>
                   </figcaption>
                   <div

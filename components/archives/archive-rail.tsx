@@ -158,8 +158,12 @@ function YearPlate({ year }: { year: ArchiveYear }) {
   return (
     <Link href={`/archives/${year.slug}`} className="group block">
       <Caption>
-        <span className="label-micro bg-navy-900 text-white/80">{year.label}</span>
-        {compiling && <span className="label-micro bg-navy-900 text-white/60">· Being compiled</span>}
+        {/* One backing for both parts, so the line can't show through the
+            gap between the year and "Being compiled". */}
+        <span className="label-micro bg-navy-900 text-white/80">
+          {year.label}
+          {compiling && <span className="pl-2 text-white/60">· Being compiled</span>}
+        </span>
       </Caption>
       {/* Year artwork sits on a near-white plate: these are logos and RI
           theme marks in their own colours, never placed straight on navy. */}

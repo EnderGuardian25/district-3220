@@ -48,6 +48,8 @@ DECISIONS.md §2 and §6.
   - names and dates kept on one line (`keepTogether`)
   - centred DIMUN logos
   - doubled hairlines removed
+  - the home photo band's Line Draw now connects the caption diamonds, as on
+    Archives (its nodes sat 22px above them)
   - 24/44px tap targets
   - scroll padding under the sticky header
   - calendar state in the URL
