@@ -39,19 +39,21 @@ export default function NewsPage() {
               <Link href={`/news/${p.slug}`} className="group block">
                 {/* Clip Reveal as each post scrolls in: the same wipe as the hero. */}
                 <ClipReveal className="relative aspect-[4/3] overflow-hidden rounded-panel bg-sunk">
+                  {/* alt="" in the card: the link already reads the title and
+                      standfirst, and the alt made its accessible name a paragraph. */}
                   <Image
                     src={p.image}
-                    alt={p.imageAlt}
+                    alt=""
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    priority={i === 0}
+                    preload={i === 0}
                     className="object-cover transition-[scale] duration-[600ms] ease-out-expo group-hover:scale-[1.03]"
                     style={{ objectPosition: '50% 25%' }}
                   />
                 </ClipReveal>
                 <Reveal step={1}>
                   <p className="label-micro mt-5 text-content-soft">
-                    {formatDate(p.date)} · {p.readMinutes} min read
+                    <time dateTime={p.date}>{formatDate(p.date)}</time> · {p.readMinutes} min read
                   </p>
                   <h2 className="mt-3 max-w-[28ch] text-[clamp(1.4rem,2.4vw,1.85rem)] leading-[1.12] tracking-[-0.018em] transition-colors duration-200 group-hover:text-accent-text">
                     {p.shortTitle ?? p.title}

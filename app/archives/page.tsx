@@ -42,7 +42,7 @@ export default function ArchivesPage() {
               <Link href={`/archives/${y.slug}`} className="block py-5">
                 <span className="flex items-baseline justify-between gap-4">
                   <span className="font-display text-[1.35rem] leading-none font-semibold tracking-[-0.02em]">{y.label}</span>
-                  {y.shape === 'compiling' && <span className="label-micro text-white/45">Being compiled</span>}
+                  {y.shape === 'compiling' && <span className="label-micro text-white/60">Being compiled</span>}
                 </span>
                 {y.theme && <span className="mt-2 block font-display text-white/80 italic">“{y.theme}”</span>}
                 {y.dir && <span className="label-micro mt-1.5 block text-white/55">DIR {y.dir}</span>}

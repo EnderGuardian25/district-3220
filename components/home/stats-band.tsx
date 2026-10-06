@@ -19,16 +19,18 @@ export function StatsBand() {
             return (
               <div
                 key={stat.label}
-                className={`border-hairline py-8 md:py-10 md:first:pl-0 md:last:pr-0 ${firstInRow} ${lastInRow} ${
+                className={`flex flex-col border-hairline py-8 md:py-10 md:first:pl-0 md:last:pr-0 ${firstInRow} ${lastInRow} ${
                   i < 2 ? 'border-b md:border-b-0' : ''
                 } ${i % 2 === 0 ? 'border-r' : 'md:border-r'} ${
                   i === STATS.length - 1 ? 'md:border-r-0' : ''
                 }`}
               >
-                <dd className="font-display text-[clamp(2rem,4.2vw,3.3rem)] leading-none font-semibold tracking-[-0.03em]">
+                {/* dt before dd, as a definition list requires; the figure is
+                    lifted above its label with order, not by source order. */}
+                <dt className="label-micro order-2 mt-3 text-content-soft">{stat.label}</dt>
+                <dd className="order-1 font-display text-[clamp(2rem,4.2vw,3.3rem)] leading-none font-semibold tracking-[-0.03em]">
                   <Odometer value={stat.display} />
                 </dd>
-                <dt className="label-micro mt-3 text-content-soft">{stat.label}</dt>
               </div>
             );
           })}

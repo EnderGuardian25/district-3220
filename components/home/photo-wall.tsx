@@ -77,7 +77,10 @@ export function PhotoWall() {
     const rail = railRef.current;
     if (!rail) return;
     const measure = () => {
-      const pan = Math.max(0, rail.scrollWidth - window.innerWidth);
+      // The rail is container-page: centred with a max width, so on screens
+      // wider than 88rem it starts offsetLeft in from the edge. That offset
+      // has to be panned too, or the last plate stops short, clipped.
+      const pan = Math.max(0, rail.offsetLeft + rail.scrollWidth - window.innerWidth);
       rail.style.setProperty('--pan', `${pan}px`);
     };
     measure();
@@ -187,7 +190,7 @@ export function PhotoWall() {
             aria-hidden="true"
             className="hscroll-prog absolute inset-x-8 bottom-10 hidden h-px bg-white/20 md:block xl:inset-x-14"
           >
-            <i className="block h-full origin-left scale-x-0 bg-white/70" />
+            <i className="block h-full origin-left bg-white/70" />
           </div>
         </div>
       </div>

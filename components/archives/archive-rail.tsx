@@ -52,11 +52,38 @@ export function ArchiveRail({ years }: { years: ArchiveYear[] }) {
     return `${acc} C ${cx} ${a.nodeY}, ${cx} ${p.nodeY}, ${p.nodeX} ${p.nodeY}`;
   }, '');
 
+  /**
+   * Keyboard focus. The pin is overflow-clip rather than overflow-hidden: a
+   * hidden-overflow box is still a scroll container, so tabbing to an
+   * off-screen year made the browser scroll it sideways, and that offset then
+   * stacked on the scroll-driven pan for the rest of the section. Instead, a
+   * focused year scrolls the PAGE to the point in the pan where that year sits
+   * mid-screen. Only while the pan is actually running; in the fallback
+   * layouts the rail is an ordinary sideways scroller and focus works natively.
+   */
+  const onFocusIn = (e: React.FocusEvent<HTMLDivElement>) => {
+    const rail = railRef.current;
+    const section = rail?.closest<HTMLElement>('.hscroll');
+    const target = e.target as HTMLElement;
+    const li = target.closest('li');
+    // Keyboard focus only: a mouse click also focuses the link, and must not
+    // re-centre the pan in the instant before it navigates.
+    if (!target.matches(':focus-visible')) return;
+    if (!rail || !section || !li || getComputedStyle(rail).animationName !== 'hscroll-pan') return;
+    const pan = parseFloat(rail.style.getPropertyValue('--pan')) || 0;
+    const range = section.offsetHeight - window.innerHeight;
+    if (pan <= 0 || range <= 0) return;
+    const centre = rail.offsetLeft + li.offsetLeft + li.offsetWidth / 2 - window.innerWidth / 2;
+    const progress = Math.min(1, Math.max(0, centre / pan));
+    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: sectionTop + progress * range, behavior: 'instant' });
+  };
+
   useEffect(() => {
     const rail = railRef.current;
     if (!rail) return;
     const measure = () => {
-      const pan = Math.max(0, rail.scrollWidth - window.innerWidth);
+      const pan = Math.max(0, rail.offsetLeft + rail.scrollWidth - window.innerWidth);
       rail.style.setProperty('--pan', `${pan}px`);
     };
     measure();
@@ -68,11 +95,11 @@ export function ArchiveRail({ years }: { years: ArchiveYear[] }) {
     // Scroll distance scales with the plate count so the pan runs at about one
     // pixel sideways per pixel scrolled, whatever the number of years.
     <div className="hscroll relative hidden md:block" style={{ ['--hscroll-h' as string]: `${plates.length * 32 + 100}vh` }}>
-      <div className="hscroll-pin md:sticky md:top-0 md:flex md:h-dvh md:items-center md:overflow-hidden">
+      <div className="hscroll-pin md:sticky md:top-0 md:flex md:h-dvh md:items-center md:overflow-clip">
         {/* Rail is viewport-wide with the track inside it, as in the photo band:
             the pinned version translates the rail, and the fallback (no
             scroll-timeline, or reduced motion) scrolls it sideways instead. */}
-        <div ref={railRef} className="hscroll-rail relative w-full">
+        <div ref={railRef} onFocus={onFocusIn} className="hscroll-rail relative w-full">
           <div className="relative" style={{ width: trackWidth, height: STAGE_H }}>
           <svg
             aria-hidden="true"
@@ -108,7 +135,7 @@ export function ArchiveRail({ years }: { years: ArchiveYear[] }) {
         </div>
 
         <div aria-hidden="true" className="hscroll-prog absolute inset-x-8 bottom-10 h-px bg-white/20 xl:inset-x-14">
-          <i className="block h-full origin-left scale-x-0 bg-white/70" />
+          <i className="block h-full origin-left bg-white/70" />
         </div>
       </div>
     </div>
@@ -130,7 +157,7 @@ function YearPlate({ year }: { year: ArchiveYear }) {
     <Link href={`/archives/${year.slug}`} className="group block">
       <Caption>
         <span className="label-micro text-white/80">{year.label}</span>
-        {compiling && <span className="label-micro text-white/45">· Being compiled</span>}
+        {compiling && <span className="label-micro text-white/60">· Being compiled</span>}
       </Caption>
       {/* Year artwork sits on a near-white plate: these are logos and RI
           theme marks in their own colours, never placed straight on navy. */}

@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useModal } from '@/components/motion/use-modal';
 import type { Committee } from '@/lib/event-pages';
 
 /**
@@ -18,24 +19,16 @@ export function CommitteeGrid({ items, scope }: { items: Committee[]; scope: str
   const reduced = useReducedMotion();
   const triggers = useRef<(HTMLButtonElement | null)[]>([]);
   const closeRef = useRef<HTMLButtonElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
   const open = openIndex === null ? null : items[openIndex];
 
-  useEffect(() => {
-    if (openIndex === null) return;
-    const returnTo = triggers.current[openIndex];
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpenIndex(null);
-    };
-    document.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    closeRef.current?.focus({ preventScroll: true });
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
-      returnTo?.focus({ preventScroll: true });
-    };
-  }, [openIndex]);
+  useModal({
+    open: openIndex !== null,
+    onClose: () => setOpenIndex(null),
+    panelRef,
+    initialFocusRef: closeRef,
+    returnFocusTo: () => (openIndex === null ? null : triggers.current[openIndex]),
+  });
 
   const layoutKey = (i: number) => (reduced ? undefined : `committee-${scope}-${i}`);
 
@@ -67,6 +60,7 @@ export function CommitteeGrid({ items, scope }: { items: Committee[]; scope: str
       <AnimatePresence>
         {open && openIndex !== null && (
           <motion.div
+            data-lenis-prevent
             className="fixed inset-0 z-80 flex items-center justify-center p-4 md:p-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -75,11 +69,11 @@ export function CommitteeGrid({ items, scope }: { items: Committee[]; scope: str
           >
             <button type="button" aria-label="Close committee" tabIndex={-1} onClick={() => setOpenIndex(null)} className="absolute inset-0 bg-chalk-950/70" />
             <div
+              ref={panelRef}
               role="dialog"
               aria-modal="true"
               aria-labelledby={`committee-${scope}-name`}
-              data-lenis-prevent
-              className="relative grid max-h-full w-full max-w-3xl overflow-y-auto rounded-panel bg-navy-900 text-white sm:grid-cols-2"
+              className="relative grid max-h-full w-full max-w-3xl overflow-y-auto overscroll-contain rounded-panel bg-navy-900 text-white sm:grid-cols-2"
             >
               <div className="p-4 sm:p-6">
                 <motion.div layoutId={layoutKey(openIndex)} className="relative aspect-[4/3] w-full overflow-hidden rounded-media bg-chalk-50 sm:aspect-square">
@@ -100,7 +94,7 @@ export function CommitteeGrid({ items, scope }: { items: Committee[]; scope: str
                       target="_blank"
                       rel="noreferrer"
                       data-morph
-                      className="rounded-control border border-on-ink bg-on-ink px-5 py-2.5 text-sm font-semibold text-ink-panel transition-colors duration-200 hover:border-accent hover:bg-accent hover:text-white"
+                      className="rounded-control border border-on-ink bg-on-ink px-5 py-2.5 text-sm font-semibold text-ink-panel transition-colors duration-200 hover:border-accent-fill hover:bg-accent-fill hover:text-accent-on"
                     >
                       Study guide
                       <span className="sr-only"> (opens in a new tab)</span>

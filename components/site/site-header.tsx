@@ -13,6 +13,7 @@ export function SiteHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const closeTimer = useRef<number | null>(null);
+  const toggleRef = useRef<HTMLButtonElement | null>(null);
   const reduced = useReducedMotion();
 
   // Close everything on navigation.
@@ -22,8 +23,8 @@ export function SiteHeader() {
   }, [pathname]);
 
   /**
-   * The header is hidden while a full-screen hero owns the viewport, and
-   * appears once that hero has scrolled past. Pages without a hero mark
+   * The bar is transparent while a full-screen hero owns the viewport, and
+   * turns solid once that hero starts to scroll. Pages without a hero mark
    * (everything except home) get the solid bar immediately.
    *
    * Driven by an IntersectionObserver on a sentinel at the hero's bottom edge
@@ -51,8 +52,15 @@ export function SiteHeader() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
+      // Closing unmounts the focused link, which would drop focus to <body>.
+      // Send it back to whatever opened the menu instead.
+      const active = document.activeElement as HTMLElement | null;
+      const inDrawer = active?.closest('#mobile-nav');
+      const submenuParent = active?.closest('li.relative')?.querySelector<HTMLElement>(':scope > a');
       setOpenMenu(null);
       setDrawerOpen(false);
+      if (inDrawer) toggleRef.current?.focus();
+      else if (submenuParent && submenuParent !== active) submenuParent.focus();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
@@ -68,8 +76,17 @@ export function SiteHeader() {
     };
   }, [drawerOpen]);
 
-  const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
+  /**
+   * An item is active on its own page, below it, or on any of its children's
+   * pages, so About lights on /council/2026-27 and /college-of-dirs. Matching
+   * on a segment boundary keeps /newsletter from lighting News by prefix.
+   */
+  const within = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const isActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    const item = NAV.find((n) => n.href === href);
+    return within(href) || Boolean(item?.children?.some((c) => within(c.href)));
+  };
 
   /** Small delay on close so the pointer can cross the gap into the submenu. */
   const scheduleClose = () => {
@@ -119,7 +136,7 @@ export function SiteHeader() {
             alt=""
             width={633}
             height={215}
-            priority
+            preload
             className={`h-6 w-auto transition-[filter] duration-300 md:h-7 ${
               overHero ? 'drop-shadow-[0_1px_8px_rgba(10,12,14,0.7)]' : ''
             }`}
@@ -243,6 +260,7 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <button
+            ref={toggleRef}
             type="button"
             onClick={() => setDrawerOpen((v) => !v)}
             aria-expanded={drawerOpen}
@@ -269,7 +287,9 @@ export function SiteHeader() {
             animate={{ height: 'auto', opacity: 1 }}
             exit={reduced ? undefined : { height: 0, opacity: 0 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden border-t border-hairline bg-bg lg:hidden"
+            // Capped and scrollable: the full nav is taller than a landscape
+            // phone, and body scroll is locked while the drawer is open.
+            className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-hairline bg-bg lg:hidden"
           >
             <nav aria-label="Primary (mobile)" className="container-page py-4">
               <ul className="flex flex-col">
@@ -290,7 +310,10 @@ export function SiteHeader() {
                           <li key={child.href}>
                             <Link
                               href={child.href}
-                              className="block py-2 text-[14px] text-content-muted"
+                              aria-current={pathname === child.href ? 'page' : undefined}
+                              className={`block py-2 text-[14px] ${
+                                pathname === child.href ? 'text-accent-text' : 'text-content-muted'
+                              }`}
                             >
                               {child.label}
                             </Link>

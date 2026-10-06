@@ -37,13 +37,17 @@ export default function CollegeOfDirsPage() {
                   {era.span} · {String(terms.length).padStart(2, '0')} terms
                 </span>
               </Reveal>
-              <ol className="vtrack relative">
+              {/* The line lives on a wrapper, not inside the <ol>: a list may
+                  only contain list items. The wrapper is also the timeline. */}
+              <div className="vtrack relative">
                 <span aria-hidden="true" className="absolute top-0 bottom-0 left-[4px] w-px bg-hairline md:left-[8.5rem]" />
                 <span aria-hidden="true" className="vtrack-line absolute top-0 bottom-0 left-[4px] w-px bg-accent md:left-[8.5rem]" />
-                {terms.map((t, i) => (
-                  <Term key={`${t.year}-${i}`} term={t} />
-                ))}
-              </ol>
+                <ol>
+                  {terms.map((t, i) => (
+                    <Term key={`${t.year}-${i}`} term={t} />
+                  ))}
+                </ol>
+              </div>
             </section>
           );
         })}
@@ -85,6 +89,7 @@ function Term({ term }: { term: DirTerm }) {
             ) : (
               <span
                 data-placeholder
+                aria-hidden="true"
                 title="Portrait to come from the district"
                 className="absolute inset-0 flex items-center justify-center border border-dashed border-control-border font-display text-[1.4rem] font-semibold text-content-soft"
               >

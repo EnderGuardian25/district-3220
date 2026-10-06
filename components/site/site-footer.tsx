@@ -11,9 +11,8 @@ export function SiteFooter() {
           {/* --- identity --- */}
           <div>
             <div className="flex items-center gap-3">
-              {/* The old Wix logo-footer.png is dark artwork and disappeared
-                  against the dark surface. The official cyan wordmark reads on
-                  both themes. */}
+              {/* The official cyan wordmark, not the old Wix logo-footer.png,
+                  which carried the 2025/26 "Unite For Good" lock-up. */}
               <Image
                 src="/images/branding/interact-logo.png"
                 alt=""

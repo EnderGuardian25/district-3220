@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import type { CalendarEvent } from '@/lib/ics';
+import { colomboDayKey, fromDayKey as fromKey, shiftDayKey } from '@/lib/colombo';
 
 /**
  * The district calendar in the house style: an agenda list (default, because
@@ -12,28 +13,42 @@ import type { CalendarEvent } from '@/lib/ics';
 const TZ = 'Asia/Colombo';
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+/** Agenda rows shown before "Show all": a daily series can expand to hundreds. */
+const AGENDA_LIMIT = 30;
+/** Longest span an event is drawn across in the month grid. */
+const MAX_SPAN_DAYS = 31;
+
 /** YYYY-MM-DD of an event's start, in Sri Lanka time. */
 function dayKey(e: Pick<CalendarEvent, 'start' | 'allDay'>) {
   if (e.allDay) return e.start.slice(0, 10);
-  return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(e.start));
+  return colomboDayKey(new Date(e.start));
+}
+
+/** YYYY-MM-DD of an event's LAST day. An all-day DTEND is exclusive. */
+function endKey(e: CalendarEvent) {
+  if (!e.end) return dayKey(e);
+  if (e.allDay) return shiftDayKey(e.end.slice(0, 10), -1);
+  // A timed event ending exactly at midnight belongs to the day before.
+  return colomboDayKey(new Date(new Date(e.end).getTime() - 1));
 }
 
 const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-GB', { timeZone: TZ, ...opts });
-/** Noon UTC on a calendar date, so formatting never slips a day. */
-const fromKey = (key: string) => new Date(`${key}T12:00:00Z`);
 
 function timeLabel(e: CalendarEvent) {
   if (e.timeUnknown) return null;
+  const last = endKey(e);
   if (e.allDay) {
-    // DTEND on an all-day event is exclusive: a one-day event ends the next day.
-    if (!e.end) return 'All day';
-    const last = new Date(fromKey(e.end.slice(0, 10)).getTime() - 86_400_000);
-    const lastKey = last.toISOString().slice(0, 10);
-    if (lastKey === e.start.slice(0, 10)) return 'All day';
-    return `Until ${fmt({ day: 'numeric', month: 'long' }).format(last)}`;
+    if (last === dayKey(e)) return 'All day';
+    return `Until ${fmt({ day: 'numeric', month: 'long' }).format(fromKey(last))}`;
   }
   const t = fmt({ hour: 'numeric', minute: '2-digit', hour12: true });
-  return e.end ? `${t.format(new Date(e.start))} – ${t.format(new Date(e.end))}` : t.format(new Date(e.start));
+  if (!e.end) return t.format(new Date(e.start));
+  // Across days, the end needs its date, or Fri 9am – Sun 5pm reads as one day.
+  const end =
+    last === dayKey(e)
+      ? t.format(new Date(e.end))
+      : `${fmt({ weekday: 'short', day: 'numeric', month: 'short' }).format(fromKey(last))}, ${t.format(new Date(e.end))}`;
+  return `${t.format(new Date(e.start))} – ${end}`;
 }
 
 export function CalendarView({ events, today }: { events: CalendarEvent[]; today: string }) {
@@ -41,21 +56,27 @@ export function CalendarView({ events, today }: { events: CalendarEvent[]; today
   const [month, setMonth] = useState(today.slice(0, 7));
   const [direction, setDirection] = useState<'next' | 'prev' | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
   // "Today" is the server's render date until the browser confirms its own.
   const [now, setNow] = useState(today);
-  useEffect(() => setNow(dayKey({ start: new Date().toISOString(), allDay: false })), []);
+  useEffect(() => setNow(colomboDayKey(new Date())), []);
 
   const byDay = useMemo(() => {
     const m = new Map<string, CalendarEvent[]>();
+    // A multi-day event appears on every day it covers, not only its first.
     for (const e of events) {
-      const k = dayKey(e);
-      m.set(k, [...(m.get(k) ?? []), e]);
+      const last = endKey(e);
+      for (let k = dayKey(e), n = 0; k <= last && n < MAX_SPAN_DAYS; k = shiftDayKey(k, 1), n++) {
+        m.set(k, [...(m.get(k) ?? []), e]);
+      }
     }
     return m;
   }, [events]);
 
-  const upcoming = events.filter((e) => dayKey(e) >= now);
-  const past = events.filter((e) => dayKey(e) < now).reverse();
+  // An event under way (started yesterday, ends tomorrow) is still coming up.
+  const upcoming = events.filter((e) => endKey(e) >= now);
+  const past = events.filter((e) => endKey(e) < now).reverse();
+  const shown = showAll ? upcoming : upcoming.slice(0, AGENDA_LIMIT);
 
   const shiftMonth = (delta: number) => {
     const [y, m] = month.split('-').map(Number);
@@ -91,7 +112,19 @@ export function CalendarView({ events, today }: { events: CalendarEvent[]; today
         <div className="mt-10">
           <h2 className="text-[1.45rem] leading-tight tracking-[-0.015em] md:text-[1.7rem]">Coming up</h2>
           {upcoming.length ? (
-            <EventList events={upcoming} />
+            <>
+              <EventList events={shown} />
+              {upcoming.length > shown.length && (
+                <button
+                  type="button"
+                  data-morph
+                  onClick={() => setShowAll(true)}
+                  className="mt-6 rounded-control border border-control-border px-5 py-2.5 text-sm font-semibold transition-colors duration-200 hover:border-content"
+                >
+                  Show all {upcoming.length} upcoming events
+                </button>
+              )}
+            </>
           ) : (
             <p className="mt-4 border-t border-hairline pt-5 text-content-muted">
               No upcoming events have been published yet. Planning one?{' '}
@@ -142,12 +175,13 @@ function EventList({ events, muted = false }: { events: CalendarEvent[]; muted?:
               <span className="label-micro mt-2 block text-content-soft">{fmt({ month: 'short', year: 'numeric' }).format(d)}</span>
             </p>
             <div className="min-w-0">
-              <h3 className={`text-[1.2rem] leading-snug tracking-[-0.01em] ${muted ? 'text-content-muted' : ''}`}>{e.title}</h3>
+              {/* Feed text is unbounded; long words and bare URLs must wrap. */}
+              <h3 className={`text-[1.2rem] leading-snug tracking-[-0.01em] [overflow-wrap:anywhere] ${muted ? 'text-content-muted' : ''}`}>{e.title}</h3>
               <p className="label-micro mt-2 text-content-soft">
                 {[fmt({ weekday: 'long' }).format(d), timeLabel(e), e.location].filter(Boolean).join(' · ')}
               </p>
               {e.description && (
-                <p className="mt-2.5 line-clamp-3 max-w-[64ch] whitespace-pre-line text-content-muted">{e.description}</p>
+                <p className="mt-2.5 line-clamp-3 max-w-[64ch] whitespace-pre-line text-content-muted [overflow-wrap:anywhere]">{e.description}</p>
               )}
               {e.links.length > 0 && (
                 <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1">

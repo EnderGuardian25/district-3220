@@ -24,7 +24,7 @@ export default function MediaCrewPage() {
       {/* Masthead: the white Media Crew mark on its own pattern artwork. */}
       <div className="container-page mt-8 md:mt-10">
         <ClipReveal onLoad className="relative overflow-hidden rounded-panel bg-navy-900">
-          <Image src={MEDIA_CREW.pattern} alt="" fill priority sizes="(max-width: 1408px) 100vw, 1408px" className="object-cover opacity-25" />
+          <Image src={MEDIA_CREW.pattern} alt="" fill preload sizes="(max-width: 1408px) 100vw, 1408px" className="object-cover opacity-25" />
           <div className="relative flex flex-col items-center gap-6 px-6 py-14 text-center md:py-20">
             <div className="relative aspect-square w-40 md:w-56">
               <Image src={MEDIA_CREW.logo} alt="Interact District 3220 Media Crew" fill sizes="224px" className="object-contain" />

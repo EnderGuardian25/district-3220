@@ -10,21 +10,41 @@
 
 ## Current Status — 2026-10-06
 
-**Phase:** The whole site is built, in seven stacked PRs awaiting review. Every
-page in CONTENT.md exists on the locked design system (`design/DECISIONS.md`,
-§8 records the site-build decisions).
+**Phase:** The whole site is built and merged to `main` (PRs #2–#8), then
+audited end to end (below). Every page in CONTENT.md exists on the locked
+design system (`design/DECISIONS.md`; §6 has the motion map, §8 the
+site-build decisions).
 
-### Merge order
-1. **#2 `pages/foundation`**: shared components, shared data, every 301. First.
-2. **#3–#7**, in any order (each is stacked on #2 and independent of the rest):
-   #3 About / Council 2026/27 / College of DIRs · #4 Archives ·
-   #5 News / Newsletter / Admin Documents · #6 Calendar / Request a Date /
-   events (DIMUN '25) · #7 Media Crew / Contact.
-3. **`pages/finish`** (this branch): sitemap, robots.txt, this file. Last.
+### Site audit — 2026-10-06 (branch `fix/site-audit`)
+Interface-guidelines review of every UI file, a motion audit, Lighthouse on
+every page type, and a real-browser check of each animation. All fixes
+verified in the browser.
 
-All five page branches were merged together locally and checked: the combined
-site builds (42 pages), every internal link returns 200, and all 35 old Wix
-URLs 301 to a live page.
+- **Lighthouse:** accessibility 100 on every page checked (was 93–96 on home,
+  About, Archives). Best practices and SEO 100. Only remaining flags: dev-server
+  source maps, and the locked 10.4px micro-labels.
+- **Reduced motion: verified** in Chrome with `--force-prefers-reduced-motion`
+  on home, About, College of DIRs, Archives, News and a dialog.
+- **Bugs fixed:** progress bars on both pinned rails never showed (a Tailwind
+  `scale` utility multiplied the animation to zero); the page scrolled behind
+  open dialogs (Lenis ignores body overflow); the morph cursor flew to the
+  corner when its target was removed; the hero's first progress bar never
+  animated, ignored pause, and slides restarted their 6s after a hover; the
+  photo band clipped its last plate on screens wider than 88rem; the mobile
+  drawer couldn't reach its last links on a short phone; "Edit the form" wiped
+  everything typed; calendar: long-running series showed nothing, deleted
+  single instances still showed, events under way were filed as past,
+  multi-day times read as one day, floating times would land 5h30 late.
+- **Accessibility fixed:** focus trap, focus-in and focus-return for all three
+  dialog types; a pause button for the hero slideshow; 24px slide-dot targets;
+  stat figures announced (aria-label on a span was ignored); a white focus ring
+  on dark surfaces; contrast on avenue numbers and archive labels; Escape in
+  menus returns focus; About lit on its child pages; keyboard focus in the
+  archive timeline moves the pan instead of breaking it; list and dl markup.
+- **Also:** page headers animate in CSS from first paint (h1 no longer waits
+  on JavaScript); `priority` renamed to `preload` (deprecated in Next 16);
+  white-on-accent hover fills changed to `accent-fill` per DECISIONS §2; the
+  closing CTA's second button now goes to About, not a second link to Contact.
 
 ### To switch on at launch
 - **Hosting is Vercel.** Set `DISTRICT_CALENDAR_ICS_URL` to the district
@@ -82,13 +102,15 @@ the source for `Placeholder`, lists what is still missing.
   in DECISIONS.md §2).
 
 ### Still to do (engineering)
-1. Exercise `prefers-reduced-motion` in a browser across the new pages (guards
-   are written everywhere; the DevTools tooling used here cannot emulate it).
-2. Image pipeline: the council portraits are 2–6MB originals (~290MB total).
+1. Image pipeline: the council portraits are 2–6MB originals (~290MB total).
    `next/image` resizes them on Vercel, but pre-sizing them would cut build and
    cold-cache cost.
-3. Throttled-mobile and Lighthouse pass.
-4. `CONTENT.md` still carries the 2025/26 theme throughout.
+2. A throttled-mobile performance trace on a production deploy (Lighthouse
+   accessibility, best-practices and SEO are done; performance needs a real
+   build on Vercel, not the dev server).
+3. `CONTENT.md` still carries the 2025/26 theme throughout.
+4. Optional: reflect the calendar's view and month in the URL so it can be
+   linked to.
 
 ---
 
@@ -408,6 +430,10 @@ Open `download-images.html` in any browser. Click **Download All** (saves to you
 - CMS need: will council/DIR/events/newsletter data be edited by non-developers (suggests a CMS or structured data files)?
 
 ## Change log
+- **2026-10-06 (later)** — Merges into `main` verified (every branch contained,
+  tree identical to the checked integration). Full-site audit and fixes on
+  `fix/site-audit`; see "Site audit" under Current Status. DECISIONS §5–§6
+  gain the dialog, focus-ring, hover-fill and autoplay rules and a motion map.
 - **2026-10-06** — Whole site built in stacked PRs #2–#7 plus `pages/finish`:
   foundation (shared components, data, 301s), About / Council 2026/27 /
   College of DIRs, Archives (timeline, 18 years, 3 past councils), News /

@@ -57,6 +57,8 @@ export function TextField({
         name={name}
         type={type}
         required={required}
+        // Spellcheck underlines every email address as a misspelling.
+        spellCheck={type === 'email' ? false : undefined}
         data-label={label}
         aria-describedby={`${hint ? `${name}-hint ` : ''}${name}-error`}
         className={`${CONTROL} h-12 rounded-control px-5`}

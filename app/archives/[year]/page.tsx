@@ -86,7 +86,7 @@ export default async function ArchiveYearPage({ params }: { params: Promise<{ ye
 
           {y.logo && (
             <ClipReveal onLoad className="relative aspect-square overflow-hidden rounded-panel border border-hairline bg-surface">
-              <Image src={y.logo} alt={`${y.label} archive artwork`} fill sizes="320px" priority className="object-contain p-8" />
+              <Image src={y.logo} alt={`${y.label} archive artwork`} fill sizes="320px" preload className="object-contain p-8" />
             </ClipReveal>
           )}
         </div>
@@ -143,7 +143,8 @@ export default async function ArchiveYearPage({ params }: { params: Promise<{ ye
       {y.tables?.map((t, ti) => (
         <section key={t.title} aria-labelledby={`table-${ti}`} className="container-page pt-16 md:pt-24">
           <SectionHeader id={`table-${ti}`} title={`${t.title}.`} />
-          <div className="mt-6 overflow-x-auto">
+          {/* Focusable so keyboard users can scroll a table wider than a phone. */}
+          <div className="mt-6 overflow-x-auto" tabIndex={0} role="region" aria-labelledby={`table-${ti}`}>
             <table className="w-full min-w-[36rem] text-left text-sm">
               <thead>
                 <tr className="border-b border-content/20">

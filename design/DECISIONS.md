@@ -113,7 +113,18 @@ Section headings are full sentences ending in a full stop
   `primary` / `ghost` on chalk, `onPhoto` / `onPhotoGhost` over photography,
   `onInk` / `onInkGhost` on dark bands. Pick a tone; never override colours.
 - **`Reveal`** / **`DrawLine`** (`components/motion/reveal.tsx`) for enter
-  motion: 550ms, `ease-out-expo`, 18px rise, 70ms stagger steps.
+  motion below the fold: 550ms, `ease-out-expo`, 18px rise, 70ms stagger
+  steps. Content in the first viewport uses the CSS load animations instead
+  (`rise-in-load`, `clip-in-load`), so nothing above the fold waits on
+  JavaScript to become visible.
+- **Dialogs** go through `useModal` (`components/motion/use-modal.ts`): focus
+  in, Tab trapped, Escape, focus back to the trigger, page scroll locked. The
+  overlay also carries `data-lenis-prevent`, or Lenis scrolls the page behind.
+- **Hover fills:** a control that fills on hover fills with `accent-fill` and
+  `accent-on` text, never `accent` with white (3.90:1, fails).
+- **Focus ring:** Signal (`--focus`) on chalk; white for anything focused
+  inside a navy, ink or photo surface (globals.css), where Signal measures
+  ~2.1:1.
 - **Header:** transparent over a hero photograph at rest, solid chalk with a
   hairline from the first scroll. Active nav item gets a Signal underline.
 - **Footer:** chalk, three columns, micro-label headings, theme line in `accent-text`.
@@ -131,7 +142,30 @@ design change (see the top of this file).
   550–1150ms on `ease-out-expo`; clip moves on `ease-clip`.
 - Everything is reachable by `prefers-reduced-motion`, and the morph cursor is
   off on touch. The audience is mid-range Android, so this is a performance
-  rule too.
+  rule too. Under reduced motion: no autoplay, no smooth-scroll hijack, no
+  custom cursor, pinned rails become ordinary layouts, the DIR line is simply
+  drawn, and every reveal lands on its final frame with no delay (verified
+  in Chrome with `--force-prefers-reduced-motion`, 2026-10-06).
+- **Autoplay must be stoppable.** The hero slideshow has a pause button (touch
+  has no hover), and the progress bar's own `animationend` advances the slide,
+  so pausing freezes bar and countdown together.
+
+### Motion map: where each effect runs
+
+| Effect | Where | Notes |
+|---|---|---|
+| Clip Reveal (slides) | Home hero | 950ms `ease-clip` wipe between photographs; 6s autoplay with pause |
+| Clip Reveal (single image) | Lead photo on About; post images (News, articles); archive-year artwork; DIMUN and Media Crew mastheads | On load (CSS) in the first viewport; on scroll (observer) below it |
+| Clip wipe (control) | Calendar month changes | 650ms, from the side the new month came from |
+| Odometer Roll | Home and About stats | Digits roll to the figure on entering view |
+| Expand Grid (shared element) | Home projects; every council and profile grid; DIMUN committees and executive committee | The image moves from card into the dialog via `layoutId` |
+| Accordion Gallery | Home avenues; Media Crew services | Hover opens, click locks; 750ms `flex-grow` |
+| Pinned horizontal scroll + Line Draw | Home photo band; Archives timeline | CSS scroll-driven; progress bar along the bottom |
+| Vertical Line Draw | College of DIRs | Line fills to mid-screen; each year lights as it crosses |
+| Load fade-up | Every inner-page header | `rise-in-load`, CSS, from first paint |
+| Reveal fade-up + DrawLine | Section headings, rows, cards site-wide | Observer, once per element |
+| Morph Cursor | Sitewide, mouse only | Parks on pills and controls; releases on removal or scroll-away |
+| Header | Sitewide | Transparent over the hero, solid from the first scroll; spring underline on the active item; dropdown and drawer open on 160–280ms tweens |
 
 ## 7. Never (each of these has been tried or proposed and rejected)
 

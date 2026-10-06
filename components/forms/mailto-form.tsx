@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { SITE } from '@/lib/site';
 
 /**
@@ -29,6 +29,17 @@ export function MailtoForm({
   const formRef = useRef<HTMLFormElement | null>(null);
   const [sent, setSent] = useState<{ body: string; href: string } | null>(null);
   const [copied, setCopied] = useState(false);
+  const doneHeading = useRef<HTMLHeadingElement | null>(null);
+  const wasSent = useRef(false);
+
+  // The submit button disappears on send and the form returns on edit; in
+  // both cases focus would fall to <body>. Take it to the confirmation's
+  // heading, and back to the first field on edit.
+  useEffect(() => {
+    if (sent) doneHeading.current?.focus();
+    else if (wasSent.current) formRef.current?.querySelector<HTMLElement>('input, select, textarea')?.focus();
+    wasSent.current = Boolean(sent);
+  }, [sent]);
 
   const setError = (name: string, message: string) => {
     const slot = document.getElementById(`${name}-error`);
@@ -71,91 +82,95 @@ export function MailtoForm({
     setSent({ body, href });
   };
 
-  if (sent) {
-    return (
-      <div role="status" className="rounded-panel border border-hairline bg-surface p-6 md:p-8">
-        <p className="label-micro text-accent-text">Almost done</p>
-        <h2 className="mt-3 text-[1.5rem] leading-tight tracking-[-0.015em]">
-          Your email app should have opened with the message ready to send.
-        </h2>
-        <p className="mt-3 max-w-[56ch] text-content-muted">
-          Press send there and it reaches the council. If nothing opened, copy the message and email it to{' '}
-          <a href={`mailto:${SITE.email}`} className="text-accent-text underline underline-offset-3">
-            {SITE.email}
-          </a>
-          .
-        </p>
-        <pre className="mt-6 max-h-64 overflow-auto rounded-media bg-sunk p-4 font-sans text-sm whitespace-pre-wrap text-content-muted">
-          {sent.body}
-        </pre>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            type="button"
-            data-morph
-            onClick={async () => {
-              try {
-                await navigator.clipboard.writeText(sent.body);
-                setCopied(true);
-              } catch {
-                setCopied(false);
-              }
-            }}
-            className="rounded-control border border-accent-fill bg-accent-fill px-6 py-3 text-sm font-semibold text-accent-on transition-colors duration-200 hover:border-signal-700 hover:bg-signal-700"
-          >
-            {copied ? 'Copied' : 'Copy message'}
-          </button>
-          <a
-            href={sent.href}
-            data-morph
-            className="rounded-control border border-control-border px-6 py-3 text-sm font-semibold transition-colors duration-200 hover:border-content"
-          >
-            Open email again
-          </a>
-          <button
-            type="button"
-            data-morph
-            onClick={() => {
-              setSent(null);
-              setCopied(false);
-            }}
-            className="rounded-control px-6 py-3 text-sm font-semibold text-content-muted transition-colors duration-200 hover:text-content"
-          >
-            Edit the form
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <form
-      ref={formRef}
-      noValidate
-      onSubmit={onSubmit}
-      // Clear a field's error as soon as it becomes valid, not on the next submit.
-      onInput={(e) => {
-        const t = e.target as HTMLInputElement;
-        if (!t.name) return;
-        if (t.type === 'checkbox') {
-          if (t.checked) setError(t.name, '');
-        } else if (t.validity.valid) {
-          setError(t.name, '');
-        }
-      }}
-      className="flex flex-col gap-6"
-    >
-      {children}
-      <div className="flex flex-wrap items-center gap-4 pt-2">
+  const confirmation = sent ? (
+    <div className="rounded-panel border border-hairline bg-surface p-6 md:p-8">
+      <p className="label-micro text-accent-text">Almost done</p>
+      <h2 ref={doneHeading} tabIndex={-1} className="mt-3 text-[1.5rem] leading-tight tracking-[-0.015em]">
+        Your email app should have opened with the message ready to send.
+      </h2>
+      <p className="mt-3 max-w-[56ch] text-content-muted">
+        Press send there and it reaches the council. If nothing opened, copy the message and email it to{' '}
+        <a href={`mailto:${SITE.email}`} className="text-accent-text underline underline-offset-3">
+          {SITE.email}
+        </a>
+        .
+      </p>
+      <pre className="mt-6 max-h-64 overflow-auto rounded-media bg-sunk p-4 font-sans text-sm whitespace-pre-wrap text-content-muted">
+        {sent.body}
+      </pre>
+      <div className="mt-6 flex flex-wrap gap-3">
         <button
-          type="submit"
+          type="button"
           data-morph
-          className="rounded-control border border-accent-fill bg-accent-fill px-6 py-3.5 text-sm font-semibold text-accent-on transition-[background-color,border-color,translate] duration-200 hover:border-signal-700 hover:bg-signal-700 active:translate-y-px"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(sent.body);
+              setCopied(true);
+            } catch {
+              setCopied(false);
+            }
+          }}
+          className="rounded-control border border-accent-fill bg-accent-fill px-6 py-3 text-sm font-semibold text-accent-on transition-colors duration-200 hover:border-signal-700 hover:bg-signal-700"
         >
-          {submitLabel}
+          {copied ? 'Copied' : 'Copy message'}
         </button>
-        <p className="text-[13px] text-content-soft">Opens your email app with the message written for you.</p>
+        <a
+          href={sent.href}
+          data-morph
+          className="rounded-control border border-control-border px-6 py-3 text-sm font-semibold transition-colors duration-200 hover:border-content"
+        >
+          Open email again
+        </a>
+        <button
+          type="button"
+          data-morph
+          onClick={() => {
+            setSent(null);
+            setCopied(false);
+          }}
+          className="rounded-control px-6 py-3 text-sm font-semibold text-content-muted transition-colors duration-200 hover:text-content"
+        >
+          Edit the form
+        </button>
       </div>
-    </form>
+    </div>
+  ) : null;
+
+  // The form stays mounted (hidden) while the confirmation shows, so "Edit
+  // the form" brings back everything the visitor typed instead of a blank form.
+  return (
+    <>
+      {confirmation}
+      <form
+        hidden={Boolean(sent)}
+        ref={formRef}
+        noValidate
+        onSubmit={onSubmit}
+        // Clear a field's error as soon as it becomes valid, not on the next submit.
+        onInput={(e) => {
+          const t = e.target as HTMLInputElement;
+          if (!t.name) return;
+          if (t.type === 'checkbox') {
+            if (t.checked) setError(t.name, '');
+          } else if (t.validity.valid) {
+            setError(t.name, '');
+          }
+        }}
+        className="flex flex-col gap-6"
+      >
+        {children}
+        <div className="flex flex-wrap items-center gap-4 pt-2">
+          <button
+            type="submit"
+            data-morph
+            className="rounded-control border border-accent-fill bg-accent-fill px-6 py-3.5 text-sm font-semibold text-accent-on transition-[background-color,border-color,translate] duration-200 hover:border-signal-700 hover:bg-signal-700 active:translate-y-px"
+          >
+            {submitLabel}
+          </button>
+          <p className="text-[13px] text-content-soft">Opens your email app with the message written for you.</p>
+        </div>
+      </form>
+    </>
   );
 }
 
