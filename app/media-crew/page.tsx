@@ -38,7 +38,7 @@ export default function MediaCrewPage() {
         <SectionHeader
           id="services-heading"
           title="Six services, on request."
-          lede="Open one to request it. Your club can ask for as many as the event needs."
+          lede="Select a service to request it. A club may request as many services as an event needs."
         />
         <ServicesAccordion formId="request" />
       </section>
@@ -48,7 +48,7 @@ export default function MediaCrewPage() {
           <SectionHeader
             id="request-heading"
             title="Request the crew."
-            lede="Tell the crew about the event. The Director of the Media Crew replies by email."
+            lede="Describe the event below. The Director of the Media Crew will reply by email."
           />
           {/* Fields as on the old service request form (CONTENT.md §12). */}
           <div className="mt-8 max-w-3xl">

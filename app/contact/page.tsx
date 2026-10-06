@@ -8,7 +8,7 @@ import { SITE, SOCIALS } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Contact',
-  description: `Contact the ${SITE.name} council: questions, partnerships, or starting an Interact club at your school.`,
+  description: `Write to the ${SITE.name} council with questions, partnership enquiries or a request to start an Interact club at your school.`,
 };
 
 export default function ContactPage() {
@@ -16,7 +16,7 @@ export default function ContactPage() {
     <main id="main">
       <PageHeader
         title="Contact the council."
-        lede="Questions, partnerships, or starting an Interact club at your school: write to the council and the right person will reply."
+        lede="For questions, partnership enquiries or starting an Interact club at your school, write to the council. Your message will be passed to the officer responsible."
       />
 
       <section aria-label="Contact" className="container-page grid gap-14 py-14 md:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)] md:gap-16 md:py-20">
@@ -29,14 +29,6 @@ export default function ContactPage() {
                   {SITE.email.split('@')[0]}
                   {/* Breaks only before the @, never mid-word. */}
                   <wbr />@{SITE.email.split('@')[1]}
-                </a>
-              </dd>
-            </div>
-            <div>
-              <dt className="label-micro text-content-soft">Phone</dt>
-              <dd className="mt-2">
-                <a href={`tel:${SITE.phone.replace(/\s/g, '')}`} className="font-display text-[1.15rem] font-semibold underline-offset-4 hover:underline">
-                  {SITE.phone}
                 </a>
               </dd>
             </div>

@@ -185,7 +185,7 @@ export const AVENUE_PANELS: AvenuePanel[] = [
     slug: 'community-service',
     name: 'Community Service',
     blurb:
-      'The heart and soul of the movement, and the avenue most club projects are built under.',
+      'The heart and soul of the Interact movement.',
     logo: '/images/avenues/avenue-community-service.png',
     colour: '#D8951C',
     solid: '#906413',
@@ -194,7 +194,7 @@ export const AVENUE_PANELS: AvenuePanel[] = [
   {
     slug: 'international-understanding',
     name: 'International Understanding',
-    blurb: 'Promotes good will and understanding between communities, at home and beyond.',
+    blurb: 'Promotes international goodwill and understanding between communities.',
     logo: '/images/avenues/avenue-international-understanding.png',
     colour: '#97114B',
     onSolid: 'light',
@@ -202,7 +202,7 @@ export const AVENUE_PANELS: AvenuePanel[] = [
   {
     slug: 'club-service',
     name: 'Club Service',
-    blurb: 'The wellbeing and development of the basic foundation of every club in the district.',
+    blurb: 'The wellbeing and development of each club, from its foundations.',
     logo: '/images/avenues/avenue-club-service.png',
     colour: '#A85619',
     onSolid: 'light',
@@ -210,7 +210,7 @@ export const AVENUE_PANELS: AvenuePanel[] = [
   {
     slug: 'green-life',
     name: 'Green Life',
-    blurb: 'Service that answers to the planet, and the avenue that has grown fastest.',
+    blurb: 'Projects that protect the environment and encourage respect for it.',
     logo: '/images/avenues/avenue-green-life.png',
     colour: '#187777',
     onSolid: 'light',
@@ -218,7 +218,7 @@ export const AVENUE_PANELS: AvenuePanel[] = [
   {
     slug: 'finance',
     name: 'Finance',
-    blurb: 'Fundraisers that pay for the projects running under every other avenue.',
+    blurb: 'Fundraisers that fund the projects of every other avenue.',
     logo: '/images/avenues/avenue-finance.png',
     colour: '#1B244A',
     onSolid: 'light',
@@ -294,10 +294,10 @@ export const WALL_ITEMS: WallItem[] = [
 export const OFFICER_LINKS = [
   { label: 'Calendar', href: '/calendar', note: 'Dates and deadlines' },
   { label: 'Admin Documents', href: '/admin-documents', note: 'Forms and reporting' },
-  { label: 'News', href: '/news', note: 'District bulletin' },
-  { label: 'Newsletter', href: '/newsletter', note: 'Every issue' },
+  { label: 'News', href: '/news', note: 'Announcements and reports' },
+  { label: 'Newsletter', href: '/newsletter', note: 'Quarterly editions' },
   { label: 'Archives', href: '/archives', note: '1988 to today' },
   { label: 'Meet the Council', href: '/council/2026-27', note: '2026 / 27' },
-  { label: 'College of DIRs', href: '/college-of-dirs', note: 'Past district reps' },
+  { label: 'College of DIRs', href: '/archives/college-of-dirs', note: 'Past representatives' },
   { label: 'Media Crew', href: '/media-crew', note: 'Request coverage' },
 ] as const;

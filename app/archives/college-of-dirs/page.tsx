@@ -19,9 +19,9 @@ export default function CollegeOfDirsPage() {
   return (
     <main id="main">
       <PageHeader
-        crumbs={[{ label: 'About', href: '/about' }]}
+        crumbs={[{ label: 'Archives', href: '/archives' }]}
         title="College of DIRs."
-        lede={`A legacy of the past District Interact Representatives: the ${DIRS.length} people who have led Interact in the district since 1979, each with the Rotary theme of their year.`}
+        lede={`The ${DIRS.length} District Interact Representatives who have led Interact in the district since 1979, with the Rotary theme of each year.`}
       />
 
       <div className="container-page py-14 md:py-20">
@@ -91,7 +91,6 @@ function Term({ term }: { term: DirTerm }) {
               <span
                 data-placeholder
                 aria-hidden="true"
-                title="Portrait to come from the district"
                 className="absolute inset-0 flex items-center justify-center border border-dashed border-control-border font-display text-[1.4rem] font-semibold text-content-soft"
               >
                 {term.name

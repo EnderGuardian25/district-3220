@@ -11,7 +11,7 @@ import type { PeopleGroup } from './people';
  * They are shown as captured; HANDOFF.md lists this for the district.
  *
  * 2023/24 and 2021/22 never had council pages; those years live in the
- * archive as "records being compiled" (lib/archives.ts).
+ * archive as unrecorded years (lib/archives.ts).
  */
 
 export type Council = {

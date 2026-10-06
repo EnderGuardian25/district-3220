@@ -9,9 +9,12 @@
  * Three shapes, as the old site had them (CONTENT.md §11):
  *   journal    recent years, told as events
  *   roster     pre-2001 years, a council roster plus project summaries
- *   compiling  years the old site linked to but never built (decided
- *              2026-10-05: they appear, with what is known and a marked note)
+ *   unrecorded years with no surviving record beyond the DIR and theme
+ *              (decided 2026-10-06: they appear, with one formal line)
  */
+
+/** The one line an unrecorded year shows, as its lede and description. */
+export const UNRECORDED_NOTE = 'The district archive holds no further records for this year.';
 
 export type ArchiveItem = {
   title: string;
@@ -28,15 +31,13 @@ export type ArchiveYear = {
   dir?: string;
   /** Year header or RI theme artwork from the old archive page. */
   logo?: string;
-  shape: 'journal' | 'roster' | 'compiling';
+  shape: 'journal' | 'roster' | 'unrecorded';
   /** One line for the archive index. */
   summary: string;
   figures?: { value: string; label: string }[];
   council?: { role: string; names: string }[];
   sections: { title: string; items: ArchiveItem[] }[];
   tables?: { title: string; columns: string[]; rows: string[][] }[];
-  /** Shown as marked placeholders: what is missing or needs verifying. */
-  notes?: string[];
   /** A portrait council page exists for this year. */
   councilPage?: boolean;
 };
@@ -68,9 +69,6 @@ export const ARCHIVE_YEARS: ArchiveYear[] = [
           { title: '36th Interact District Assembly', body: 'Standard registrations reached capacity; late registrations were opened.' },
         ],
       },
-    ],
-    notes: [
-      'Captured mid-year from the old site’s home page. The full record of 2025/26 is being compiled; send dates, figures and photographs to the council.',
     ],
   },
   {
@@ -142,12 +140,9 @@ export const ARCHIVE_YEARS: ArchiveYear[] = [
     label: '2023/24',
     theme: 'Create Hope in the World',
     dir: 'Aamir Akram',
-    shape: 'compiling',
-    summary: 'Records being compiled.',
+    shape: 'unrecorded',
+    summary: UNRECORDED_NOTE,
     sections: [],
-    notes: [
-      'The old site linked to a 2023/24 archive page and a 2023/24 council page, but neither was ever built. If you hold records, photographs or the council roster for this year, send them to the council.',
-    ],
   },
   {
     slug: '2022-23',
@@ -203,13 +198,9 @@ export const ARCHIVE_YEARS: ArchiveYear[] = [
     label: '2021/22',
     theme: 'Serve to Change Lives',
     dir: 'Murthaaz Barry',
-    shape: 'compiling',
-    summary: 'Records being compiled.',
+    shape: 'unrecorded',
+    summary: UNRECORDED_NOTE,
     sections: [],
-    notes: [
-      'The old site linked to a 2021/22 archive page and a 2021/22 council page, but neither was ever built. If you hold records, photographs or the council roster for this year, send them to the council.',
-      'The old archive index named this year’s theme “Prosper Through Service”; the College of DIRs table and Rotary International give “Serve to Change Lives”, which is used here.',
-    ],
   },
   {
     slug: '2020-21',
@@ -240,9 +231,6 @@ export const ARCHIVE_YEARS: ArchiveYear[] = [
           { title: 'Live Light 2021', date: '17 Jul', body: 'Ultimate Studios, Piliyandala. A virtual talent showcase.' },
         ],
       },
-    ],
-    notes: [
-      'The old page also listed directors and coordinators for the Negombo, Kandy, Kurunegala and Galle zones, community service, international understanding, finance, PR, media and event management, without their names.',
     ],
   },
   {
@@ -316,9 +304,6 @@ export const ARCHIVE_YEARS: ArchiveYear[] = [
         title: 'Publications',
         items: [{ title: 'Newsletters, two bulletins and a 230-page “Interact Guide”' }],
       },
-    ],
-    notes: [
-      'The old page repeated the 1998/99 council roster word for word, almost certainly a copy-paste error, so no roster is shown. The College of DIRs lists Saif Ramzi (Wesley College) as this year’s DIR. If you hold the real 1999/2000 roster, send it to the council.',
     ],
   },
   {
@@ -622,12 +607,9 @@ export const ARCHIVE_YEARS: ArchiveYear[] = [
     label: '1991/92',
     theme: 'Look Beyond Yourself',
     dir: 'Sanjeewa Wickramasinghe',
-    shape: 'compiling',
-    summary: 'Records being compiled.',
+    shape: 'unrecorded',
+    summary: UNRECORDED_NOTE,
     sections: [],
-    notes: [
-      'The old site had no archive page for 1991/92 at all, between 1990/91 and 1992/93. The DIR and theme come from the College of DIRs. If you hold records for this year, send them to the council.',
-    ],
   },
   {
     slug: '1990-91',
@@ -700,7 +682,6 @@ export const ARCHIVE_YEARS: ArchiveYear[] = [
         ],
       },
     ],
-    notes: ['Schools cited on the old page: Stafford International School; Ladies College London A/L.'],
   },
 ];
 

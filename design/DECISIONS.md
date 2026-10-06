@@ -50,7 +50,7 @@ Rules:
 - **Navy-900 is the only blue surface.** Not a gradient, not signal. The rest
   of the navy ramp is structural only: `navy-800` at 30% for `DrawLine`
   hairlines and as the `draft-grid` rule colour, `navy-800` as an image
-  placeholder inside a navy band, `navy-900/8` as the dropdown menu shadow.
+  placeholder inside a navy band.
 - **Ink band is reserved.** It means "you're in the members' working tools".
   Don't use it as a general dark section; use navy-900 for that.
 
@@ -67,6 +67,20 @@ Rules:
 There is **no second accent colour.** No cyan, no orange, no gradients between
 hues. The official Interact cyan `#01B4E6` exists only inside the supplied logo
 artwork in the header and footer.
+
+**Revision 2026-10-06 (requested by the user): official marks.**
+- The header and footer logo is now the district lock-up (Interact,
+  District 3220, the Rotary wheel), cropped from the supplied primary logo
+  before its theme divider: `public/images/branding/interact-district-3220-logo.png`.
+  It replaces the generic Interact logo and the separate "District 3220" text
+  beside it. Over the hero photograph the header uses its white reverse
+  (`interact-district-3220-logo-white.png`, same shadow as the nav text) and
+  cross-fades to the cyan original with the bar; cyan with a dark halo read
+  muddy on the photographs.
+- The footer carries Rotary's 2026–27 theme mark, "Create Lasting Impact",
+  keyed out of RI's social graphic (`create-lasting-impact.png`). Its royal
+  blue `#006BB7` is part of the mark, like the Interact cyan: it never
+  becomes a UI colour.
 
 ### Avenue identity colours
 
@@ -113,9 +127,9 @@ Section headings are full sentences ending in a full stop
 - Page width: `container-page` (max 88rem; gutters 1.125 / 2 / 3.5rem).
 - Section rhythm: `py-16 md:py-24`.
 - Section header pattern: heading, muted lede, then a `DrawLine` hairline, then content.
-- Dividers are hairlines (`chalk-400`), not shadows. The one shadow on the
-  site is the floating nav dropdown (`shadow-xl shadow-navy-900/8`). No glass,
-  no blur, no film grain, no glow.
+- Dividers are hairlines (`chalk-400`), not shadows. There are no box
+  shadows on the site (the nav dropdown carried the only one, and it went with
+  the dropdowns on 2026-10-06). No glass, no blur, no film grain, no glow.
 - **Touch targets** (2026-10-06): every control is at least 24px (WCAG 2.5.8).
   Icon-only controls on the touch-first surfaces (the menu button, the hero's
   pause button) keep their 36px circle but carry an invisible 44px hit area.
@@ -176,8 +190,8 @@ design change (see the top of this file).
 
 - Hover 200ms (300ms for the header's colour change); press 120ms (below);
   enters 550–1150ms on `ease-out-expo`; clip moves on `ease-clip`. The softer
-  `ease-out-quint` (`cubic-bezier(0.22,1,0.36,1)`) is the header dropdown,
-  drawer and accordion curve, now a named token instead of inline values.
+  `ease-out-quint` (`cubic-bezier(0.22,1,0.36,1)`) is the mobile drawer
+  and accordion curve, now a named token instead of inline values.
 - Everything is reachable by `prefers-reduced-motion`, and the morph cursor is
   off on touch. The audience is mid-range Android, so this is a performance
   rule too. Under reduced motion: no autoplay, no smooth-scroll hijack, no
@@ -194,9 +208,9 @@ design change (see the top of this file).
   - **Press:** every pressable control scales to 0.97 in 120ms on
     `ease-out-expo` (the `press` utility in globals.css), replacing the 1px
     drop. Colours keep their 200ms. Off under reduced motion.
-  - **Nav dropdown** grows from its trigger: opacity plus scale 0.97 → 1 from
-    the top-left, 160ms in and 120ms out. It never scales from 0. The mobile
-    drawer opens with a clip-path reveal instead of animating height.
+  - **Nav dropdown** grew from its trigger (opacity plus scale 0.97 → 1).
+    Removed with the dropdowns on 2026-10-06 (§8). The mobile drawer opens
+    with a clip-path reveal instead of animating height.
   - **Accordions** wait about 80ms before opening on hover, so passing the
     pointer over them doesn't fire them. Click and focus are still instant.
   - **Forms:** the "your email is ready" confirmation rises in with
@@ -244,7 +258,7 @@ design change (see the top of this file).
 | Load fade-up | Every inner-page header | `rise-in-load`, CSS, from first paint |
 | Reveal fade-up + DrawLine | Section headings, rows, cards site-wide | Observer, once per element |
 | Morph Cursor | Sitewide, mouse only | Parks on `data-morph` pills and controls; grows into a 36px ring over every other link or button (logo included); white treatment over dark surfaces; releases on removal or scroll-away |
-| Header | Sitewide | Transparent over the hero, solid from the first scroll; spring underline on the active item; dropdown and drawer open on 160–280ms tweens |
+| Header | Sitewide | Transparent over the hero, solid from the first scroll; spring underline on the active item; the mobile drawer opens on a 280ms tween. No dropdowns |
 
 ## 7. Never (each of these has been tried or proposed and rejected)
 
@@ -271,7 +285,7 @@ design change (see the top of this file).
 |---|---|---|
 | About | `/about` | Clip Reveal photo band, Odometer stats |
 | Meet The Council 2026/27 | `/council/2026-27` | Expand Grid profiles; "To be announced" slots until the roster arrives |
-| College of DIRs | `/college-of-dirs` | Vertical Line Draw timeline down the years |
+| College of DIRs | `/archives/college-of-dirs` (moved from `/college-of-dirs`, which redirects) | Vertical Line Draw timeline down the years |
 | Calendar | `/calendar` | Reveal only; month switch on `ease-clip` |
 | Request a Date | `/calendar/request-a-date` | Reveal only |
 | Event pages | `/events/[slug]` (first: `dimun-2025`) | Expand Grid for committees and people |
@@ -302,6 +316,12 @@ Every old Wix path 301s to its new URL (`next.config.ts`).
 - **Archive gaps:** every year appears. 2023/24, 2021/22 and 1991/92 get pages with
   what is known plus a "records being compiled" note. 1999/2000 hides its
   duplicated council roster until verified.
+  **Revision 2026-10-06 (decided by the user): launch copy.** Those three
+  years are `unrecorded`: theme and DIR, plus one line, "The district archive
+  holds no further records for this year." Public pages carry no requests
+  to the district and no notes about the old site (HANDOFF keeps them).
+  Copy is formal and plain; gaps still waiting on district content keep
+  their `Placeholder` until it arrives.
 - **Council bios:** kept verbatim. The sharpest ones are listed in HANDOFF for the
   district to veto before launch.
 - **Council 2026/27:** structured placeholder grid of "To be announced" slots.
@@ -312,6 +332,11 @@ Every old Wix path 301s to its new URL (`next.config.ts`).
 - **Shared components live in `components/page`, `components/people` and
   `components/forms`.** `/kit` (development only) renders all of them; check it
   after any change to them.
+- **Revision 2026-10-06 (decided by the user): no dropdowns.** Every nav item
+  is a plain link. Meet the Council is reached from the About page card (and
+  the home officers band), the Newsletter from the pill on News, and the
+  College of DIRs from its section on Archives, under which it now lives.
+  About lights for `/council/*`, News for `/newsletter`.
 - **Branches:** `pages/foundation` first (shared components, shared data,
   redirects), then one branch and PR per page group. The user reviews and merges.
 
@@ -320,21 +345,23 @@ Every old Wix path 301s to its new URL (`next.config.ts`).
 ## 9. Still in force from before the redesign
 
 **Stack:** Next.js 16 (App Router, TypeScript), Tailwind CSS v4 (CSS-first
-`@theme`), Framer Motion 12 + Lenis. Hosting: Vercel (decided 2026-10-05, §8).
+`@theme`), Framer Motion 14 + Lenis (12 until 2026-10-06). Hosting: Vercel
+(decided 2026-10-05, §8).
 
-**Navigation:** labels and order identical to the Wix site. Clean URLs with 301s
-from every old path (`next.config.ts`).
+**Navigation:** top-level labels and order identical to the Wix site. Clean URLs
+with 301s from every old path (`next.config.ts`). Since 2026-10-06 there are no
+dropdowns; the "→" rows are reached from their parent page instead (§8).
 
 | Label | New URL | Old Wix URL |
 |---|---|---|
 | Home | `/` | `/` |
 | About | `/about` | `/about` |
-| → Meet The Council 2026/27 | `/council/2026-27` | `/meet-the-council-2025-26` |
-| → College of DIRs | `/college-of-dirs` | `/college-of-dirs` |
+| → Meet The Council 2026/27 (from About) | `/council/2026-27` | `/meet-the-council-2025-26` |
+| → College of DIRs (from Archives) | `/archives/college-of-dirs` | `/college-of-dirs` |
 | Calendar | `/calendar` | `/district-calendar` |
 | Admin Documents | `/admin-documents` | `/admin-documents` |
 | News | `/news` | `/blog` |
-| → Newsletter | `/newsletter` | `/newsletter` |
+| → Newsletter (from News) | `/newsletter` | `/newsletter` |
 | Archives | `/archives` | `/archives` |
 | Media Crew | `/media-crew` | `/media-crew` |
 | Contact | `/contact` | `/contact-8` |

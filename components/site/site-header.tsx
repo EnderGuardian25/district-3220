@@ -5,21 +5,18 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { NAV, SITE } from '@/lib/site';
+import { NAV, SITE, type NavItem } from '@/lib/site';
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const closeTimer = useRef<number | null>(null);
   const toggleRef = useRef<HTMLButtonElement | null>(null);
   const reduced = useReducedMotion();
 
-  // Close everything on navigation.
+  // Close the drawer on navigation.
   useEffect(() => {
     setDrawerOpen(false);
-    setOpenMenu(null);
   }, [pathname]);
 
   /**
@@ -53,14 +50,10 @@ export function SiteHeader() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
       // Closing unmounts the focused link, which would drop focus to <body>.
-      // Send it back to whatever opened the menu instead.
-      const active = document.activeElement as HTMLElement | null;
-      const inDrawer = active?.closest('#mobile-nav');
-      const submenuParent = active?.closest('li.relative')?.querySelector<HTMLElement>(':scope > a');
-      setOpenMenu(null);
+      // Send it back to the menu button instead.
+      const inDrawer = document.activeElement?.closest('#mobile-nav');
       setDrawerOpen(false);
       if (inDrawer) toggleRef.current?.focus();
-      else if (submenuParent && submenuParent !== active) submenuParent.focus();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
@@ -77,25 +70,14 @@ export function SiteHeader() {
   }, [drawerOpen]);
 
   /**
-   * An item is active on its own page, below it, or on any of its children's
-   * pages, so About lights on /council/2026-27 and /college-of-dirs. Matching
-   * on a segment boundary keeps /newsletter from lighting News by prefix.
+   * An item is active on its own page, below it, or on a page reached from it
+   * (`match`), so About lights on /council/2026-27 and Archives on the
+   * College of DIRs. Matching on a segment boundary keeps /newsletter from
+   * lighting News by prefix; News lists it in `match` instead.
    */
   const within = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
-  const isActive = (href: string) => {
-    if (href === '/') return pathname === '/';
-    const item = NAV.find((n) => n.href === href);
-    return within(href) || Boolean(item?.children?.some((c) => within(c.href)));
-  };
-
-  /** Small delay on close so the pointer can cross the gap into the submenu. */
-  const scheduleClose = () => {
-    if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setOpenMenu(null), 120);
-  };
-  const cancelClose = () => {
-    if (closeTimer.current) window.clearTimeout(closeTimer.current);
-  };
+  const isActive = (item: NavItem) =>
+    item.href === '/' ? pathname === '/' : within(item.href) || Boolean(item.match?.some(within));
 
   /**
    * Over the hero the bar itself is invisible so the photograph reads straight
@@ -126,34 +108,34 @@ export function SiteHeader() {
       <div className="container-page flex h-16 items-center justify-between gap-4 md:h-18">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2.5"
+          className="flex shrink-0 items-center"
           aria-label={`${SITE.name} — home`}
         >
-          {/* Official Interact wordmark + Rotary wheel. Logotypes are exempt
-              from contrast minimums, but over photography it still needs a
-              shadow to hold its edge. */}
-          <Image
-            src="/images/branding/interact-logo.png"
-            alt=""
-            width={633}
-            height={215}
-            preload
-            className={`h-6 w-auto transition-[filter] duration-300 md:h-7 ${
-              overHero ? 'drop-shadow-[0_1px_8px_rgba(10,12,14,0.7)]' : ''
-            }`}
-          />
-          <span
-            aria-hidden="true"
-            className={`h-5 w-px transition-colors duration-300 ${
-              overHero ? 'bg-white/45' : 'bg-hairline'
-            }`}
-          />
-          <span
-            className={`text-[13px] leading-tight font-medium tracking-tight transition-colors duration-300 ${
-              overHero ? 'text-white [text-shadow:0_1px_8px_rgba(10,12,14,0.7)]' : 'text-content-muted'
-            }`}
-          >
-            District 3220
+          {/* The official district lock-up: Interact, District 3220 and the
+              Rotary wheel, cropped from the primary logo before its theme
+              divider. Over the hero it is the white reverse, with the same
+              shadow as the nav text: the cyan with a dark halo read muddy on
+              the photographs. The two cross-fade with the bar, in the nav
+              text's 300ms. */}
+          <span className="relative block">
+            <Image
+              src="/images/branding/interact-district-3220-logo.png"
+              alt=""
+              width={1034}
+              height={380}
+              preload
+              className={`h-10 w-auto transition-opacity duration-300 md:h-12 ${overHero ? 'opacity-0' : 'opacity-100'}`}
+            />
+            <Image
+              src="/images/branding/interact-district-3220-logo-white.png"
+              alt=""
+              width={1034}
+              height={380}
+              preload
+              className={`absolute inset-0 h-10 w-auto drop-shadow-[0_1px_8px_rgba(10,12,14,0.7)] transition-opacity duration-300 md:h-12 ${
+                overHero ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
           </span>
         </Link>
 
@@ -161,35 +143,14 @@ export function SiteHeader() {
         <nav aria-label="Primary" className="hidden lg:block">
           <ul className="flex items-center gap-0.5">
             {NAV.map((item) => {
-              const active = isActive(item.href);
-              const hasChildren = Boolean(item.children?.length);
+              const active = isActive(item);
               return (
-                <li
-                  key={item.href}
-                  className="relative"
-                  // Always reassign on enter/focus — setting null for childless
-                  // items is what closes a sibling's open submenu. Previously
-                  // this only cancelled the pending close, so hovering
-                  // Calendar left About's dropdown hanging open.
-                  onMouseEnter={() => {
-                    cancelClose();
-                    setOpenMenu(hasChildren ? item.href : null);
-                  }}
-                  onMouseLeave={hasChildren ? scheduleClose : undefined}
-                  onFocus={() => {
-                    cancelClose();
-                    setOpenMenu(hasChildren ? item.href : null);
-                  }}
-                  onBlur={(e) => {
-                    if (!e.currentTarget.contains(e.relatedTarget as Node)) scheduleClose();
-                  }}
-                >
+                <li key={item.href}>
                   <Link
                     href={item.href}
                     aria-current={active ? 'page' : undefined}
-                    aria-expanded={hasChildren ? openMenu === item.href : undefined}
                     data-morph
-                    className={`press relative flex items-center gap-1 rounded-full px-3.5 py-2 text-[13.5px] font-medium [--press-dur:300ms] ${
+                    className={`press relative flex items-center rounded-full px-3.5 py-2 text-[13.5px] font-medium [--press-dur:300ms] ${
                       overHero
                         ? `[text-shadow:0_1px_8px_rgba(10,12,14,0.7)] ${
                             active ? 'text-white' : 'text-white/80 hover:text-white'
@@ -200,23 +161,6 @@ export function SiteHeader() {
                     }`}
                   >
                     {item.label}
-                    {hasChildren && (
-                      <svg
-                        viewBox="0 0 10 6"
-                        aria-hidden="true"
-                        className={`size-2 transition-transform duration-200 ${
-                          openMenu === item.href ? 'rotate-180' : ''
-                        }`}
-                      >
-                        <path
-                          d="M1 1l4 4 4-4"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.6"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    )}
                     {active && (
                       <motion.span
                         layoutId="nav-active"
@@ -227,45 +171,6 @@ export function SiteHeader() {
                       />
                     )}
                   </Link>
-
-                  {hasChildren && (
-                    <AnimatePresence>
-                      {openMenu === item.href && (
-                        // Grows from the corner under its trigger (origin-top-left):
-                        // 0.97 -> 1 with a fade, 160ms in, 120ms out, on
-                        // ease-out-expo. Full `transform` strings, not Framer's
-                        // `y`/`scale` shorthands, so it stays on the compositor.
-                        // Reduced motion: opacity only.
-                        <motion.ul
-                          initial={reduced ? { opacity: 0 } : { opacity: 0, transform: 'scale(0.97)' }}
-                          animate={
-                            reduced
-                              ? { opacity: 1, transition: { duration: 0.2, ease: 'easeOut' } }
-                              : { opacity: 1, transform: 'scale(1)', transition: { duration: 0.16, ease: [0.16, 1, 0.3, 1] } }
-                          }
-                          exit={
-                            reduced
-                              ? { opacity: 0, transition: { duration: 0.15, ease: 'easeOut' } }
-                              : { opacity: 0, transform: 'scale(0.97)', transition: { duration: 0.12, ease: [0.16, 1, 0.3, 1] } }
-                          }
-                          data-cursor="light"
-                          className="absolute top-full left-0 mt-1.5 min-w-60 origin-top-left overflow-hidden rounded-xl border border-hairline bg-surface p-1.5 shadow-xl shadow-navy-900/8"
-                        >
-                          {item.children!.map((child) => (
-                            <li key={child.href}>
-                              <Link
-                                href={child.href}
-                                aria-current={pathname === child.href ? 'page' : undefined}
-                                className="block rounded-lg px-3 py-2.5 text-[13.5px] text-content-muted transition-colors duration-200 hover:bg-bg hover:text-content"
-                              >
-                                {child.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </motion.ul>
-                      )}
-                    </AnimatePresence>
-                  )}
                 </li>
               );
             })}
@@ -328,30 +233,13 @@ export function SiteHeader() {
                   <li key={item.href} className="border-b border-hairline/70 last:border-0">
                     <Link
                       href={item.href}
-                      aria-current={isActive(item.href) ? 'page' : undefined}
+                      aria-current={isActive(item) ? 'page' : undefined}
                       className={`block py-3 text-[15px] font-medium ${
-                        isActive(item.href) ? 'text-accent-text' : 'text-content'
+                        isActive(item) ? 'text-accent-text' : 'text-content'
                       }`}
                     >
                       {item.label}
                     </Link>
-                    {item.children?.length ? (
-                      <ul className="mb-2 ml-3 flex flex-col gap-0.5 border-l border-hairline pl-4">
-                        {item.children.map((child) => (
-                          <li key={child.href}>
-                            <Link
-                              href={child.href}
-                              aria-current={pathname === child.href ? 'page' : undefined}
-                              className={`block py-2 text-[14px] ${
-                                pathname === child.href ? 'text-accent-text' : 'text-content-muted'
-                              }`}
-                            >
-                              {child.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
                   </li>
                 ))}
               </ul>

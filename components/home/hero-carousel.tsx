@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { HERO_SLIDES } from '@/lib/home';
 import { SITE } from '@/lib/site';
@@ -18,8 +18,15 @@ import { SITE } from '@/lib/site';
  * Only the first slide gets `preload`: it is the LCP element. The rest are
  * lazy, which is why the wipe is on clip-path (compositable) rather than on a
  * property that would force layout while an image is still decoding.
+ *
+ * The wipe is played on the incoming slide itself (Web Animations), not
+ * derived from each slide's place in the sequence. Position-based states
+ * ("past" slides drawn, "ahead" slides clipped) only ever wiped forwards:
+ * wrapping from the last slide to the first, or stepping back, flipped the
+ * stacking order and cut hard to the new photograph.
  */
 const INTERVAL = 6000;
+const WIPE_MS = 950;
 
 /**
  * The photo scrim: chalk-950 only (DECISIONS §2), two layers, at the minimum
@@ -50,16 +57,25 @@ export function HeroCarousel() {
    * non-priority image could win Largest Contentful Paint, which is both a
    * real regression and what Next was warning about.
    *
-   * A slide must exist (clipped, 'ahead') before it goes live, or it mounts
-   * straight into its final state and the wipe never plays: that is what
-   * happened on every slide's first visit. So the live slide's image load
-   * mounts the next one in the background (after LCP, so no competition),
-   * and a jump to a slide that still isn't mounted mounts it first and goes
-   * live two frames later.
+   * A slide should exist before it goes live, so its photograph is decoded
+   * by the time it wipes in. So the live slide's image load mounts the next
+   * one in the background (after LCP, so no competition), and a jump to a
+   * slide that still isn't mounted mounts it first and goes live two frames
+   * later.
    */
   const [maxSeen, setMaxSeen] = useState(0);
   const maxSeenRef = useRef(0);
   maxSeenRef.current = maxSeen;
+  /** The slide that was live before this one. It stays fully drawn directly
+   *  under the incoming slide for the whole wipe, whichever way the change
+   *  went, so the wipe always uncovers the previous photograph. */
+  const [prev, setPrev] = useState<number | null>(null);
+  const indexRef = useRef(0);
+  indexRef.current = index;
+  const slideEls = useRef<(HTMLDivElement | null)[]>([]);
+  /** Last slide the wipe played for. A ref, not "skip the first run", so
+   *  React's development double-run of effects can't wipe slide 1 on load. */
+  const wiped = useRef(0);
   /** Keyboard focus inside the carousel: a temporary hold. Not hover: the
    *  slideshow keeps running under the mouse, and the pause button stops it. */
   const [paused, setPaused] = useState(false);
@@ -82,15 +98,37 @@ export function HeroCarousel() {
   const go = useCallback(
     (next: number) => {
       const target = (next + count) % count;
-      if (target <= maxSeenRef.current) {
+      const show = () => {
+        if (target === indexRef.current) return;
+        setPrev(indexRef.current);
         setIndex(target);
+      };
+      if (target <= maxSeenRef.current) {
+        show();
         return;
       }
       setMaxSeen(target);
-      requestAnimationFrame(() => requestAnimationFrame(() => setIndex(target)));
+      requestAnimationFrame(() => requestAnimationFrame(show));
     },
     [count],
   );
+
+  // The Clip Reveal: the new live slide wipes in from the right over the one
+  // it replaces, on every change (forwards, backwards, and the wrap from the
+  // last slide to the first). Layout effect, so the slide is clipped before
+  // the frame that would show it uncovered. Interrupting a wipe is fine: that
+  // slide becomes `prev` and its own animation simply runs on to the end.
+  useLayoutEffect(() => {
+    if (index === wiped.current) return;
+    wiped.current = index;
+    const el = slideEls.current[index];
+    // Reduced motion: no wipe, the opacity crossfade below does the change.
+    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    el.animate([{ clipPath: 'inset(0 0 0 100%)' }, { clipPath: 'inset(0 0 0 0)' }], {
+      duration: WIPE_MS,
+      easing: getComputedStyle(el).getPropertyValue('--ease-clip').trim() || 'ease-in-out',
+    });
+  }, [index]);
 
   /** Mount the following slide: after slide 0's image loads (so after LCP),
    *  then each time a later slide goes live. One slide ahead, never more. */
@@ -160,22 +198,23 @@ export function HeroCarousel() {
     >
       {HERO_SLIDES.map((s, i) => {
         if (i > maxSeen) return null;
-        const state = i === index ? 'live' : i < index ? 'past' : 'ahead';
         return (
-          // Under reduced motion the wipe becomes a 200ms crossfade: no clip,
-          // only the live slide is opaque (the global rule limits the
-          // transition to opacity).
+          // Live on top, the outgoing slide under it, the rest underneath
+          // both. Under reduced motion the wipe becomes a 200ms crossfade:
+          // only the live slide is opaque (the global rule sets the timing).
           <div
             key={s.src}
+            ref={(el) => {
+              slideEls.current[i] = el;
+            }}
             role="group"
             aria-roledescription="slide"
             aria-label={`${i + 1} of ${count}`}
             aria-hidden={i !== index}
-            className="absolute inset-0 transition-[clip-path,opacity] duration-[950ms] ease-clip"
+            className="absolute inset-0 transition-opacity"
             style={{
-              clipPath: reduced || state !== 'ahead' ? 'inset(0 0 0 0)' : 'inset(0 0 0 100%)',
-              opacity: reduced && state !== 'live' ? 0 : 1,
-              zIndex: state === 'live' ? 3 : state === 'past' ? 2 : 1,
+              opacity: reduced && i !== index ? 0 : 1,
+              zIndex: i === index ? 3 : i === prev ? 2 : 1,
             }}
           >
             {/* Slide 0 is the LCP element, so it gets preload. Later slides

@@ -6,30 +6,22 @@
 export type NavItem = {
   label: string;
   href: string;
-  children?: { label: string; href: string }[];
+  /** Other sections this item lights up for: the pages reached from it. */
+  match?: string[];
 };
 
 /**
- * Labels and order are IDENTICAL to the previous Wix site — that was an explicit
- * requirement. Only the URLs are cleaned; next.config.ts 301s every old path.
+ * Top-level labels and order are the previous Wix site's (an explicit
+ * requirement). Only the URLs are cleaned; next.config.ts 301s every old path.
+ * No dropdowns (decided by the user 2026-10-06): the council page is reached
+ * from About, the newsletter from News, the College of DIRs from Archives.
  */
 export const NAV: NavItem[] = [
   { label: 'Home', href: '/' },
-  {
-    label: 'About',
-    href: '/about',
-    children: [
-      { label: 'Meet The Council 2026/27', href: '/council/2026-27' },
-      { label: 'College of DIRs', href: '/college-of-dirs' },
-    ],
-  },
+  { label: 'About', href: '/about', match: ['/council'] },
   { label: 'Calendar', href: '/calendar' },
   { label: 'Admin Documents', href: '/admin-documents' },
-  {
-    label: 'News',
-    href: '/news',
-    children: [{ label: 'Newsletter', href: '/newsletter' }],
-  },
+  { label: 'News', href: '/news', match: ['/newsletter'] },
   { label: 'Archives', href: '/archives' },
   { label: 'Media Crew', href: '/media-crew' },
   { label: 'Contact', href: '/contact' },
@@ -39,8 +31,8 @@ export const SITE = {
   name: 'Interact District 3220',
   shortName: 'Interact 3220',
   region: 'Sri Lanka & Maldives',
+  /** The only public contact: no phone number is published (2026-10-06). */
   email: 'interactdistrictcouncil3220@gmail.com',
-  phone: '+94 77 458 2006',
   url: 'https://www.interactdistrict3220.org',
   /**
    * Two DIFFERENT dates — don't conflate them.
@@ -63,7 +55,7 @@ export const STATS = [
   { value: 100, display: '100+', label: 'Clubs' },
   { value: 9, display: '9', label: 'Zones' },
   // The district's own start date, not the movement's — this is a district site.
-  { value: 1964, display: '1964', label: 'In District 3220 since' },
+  { value: 1964, display: '1964', label: 'Serving since' },
 ] as const;
 
 export const SOCIALS = [

@@ -33,16 +33,28 @@ names.
 ## Working
 
 - Install: `npm ci` (network and `ffmpeg-static` notes: HANDOFF "Dependencies").
-- Dev server: `npx next dev --port 3100` (3000 is taken on this machine).
+- Dev server: `npm run dev` → http://localhost:4100 (pinned in package.json;
+  `npm start` serves a production build on 4100 too).
 - Checks: `npx tsc --noEmit` and `npx next build`.
 - `/kit` (dev only) renders every shared inner-page component. New pages build
   from `components/page`, `components/people` and `components/forms`, not from
   one-off markup.
 - Every content gap goes through `<Placeholder>`; never invent facts, dates or
-  names to fill one.
+  names to fill one. Public copy is formal and plain: no requests to the
+  district and no notes about the old site on public pages (DECISIONS §8).
 - Dialogs use `useModal` (focus, Tab trap, Escape, scroll lock) and put
   `data-lenis-prevent` on the overlay. First-viewport content animates with
   the CSS load utilities (`rise-in-load`, `clip-in-load`), not `Reveal`.
   The motion map is in `design/DECISIONS.md` §6.
 - Hosting is Vercel. Forms send via pre-filled email until a back-end exists.
 - Verify UI in a real browser at 1440×900 and 390×844 before calling it done.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

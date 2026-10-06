@@ -48,6 +48,9 @@ const wixRedirects = [
   // Empty utility pages on the old site (CONTENT.md §16) — send to the nearest real page.
   { from: '/event-list', to: '/calendar' },
   { from: '/news-letter', to: '/newsletter' },
+
+  // Same path on the old site and at launch; moved under Archives 2026-10-06.
+  { from: '/college-of-dirs', to: '/archives/college-of-dirs' },
   { from: '/pricing-plans/list', to: '/' },
 ];
 

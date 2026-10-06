@@ -212,7 +212,7 @@ export function MailtoForm({
           <Button type="submit" tone="primary">
             {submitLabel}
           </Button>
-          <p className="text-[13px] text-content-soft">Opens your email app with the message written for you.</p>
+          <p className="text-[13px] text-content-soft">This opens your email app with the message ready to send.</p>
         </div>
       </form>
     </>
