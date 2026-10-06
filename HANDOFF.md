@@ -15,6 +15,32 @@ audited end to end (below). Every page in CONTENT.md exists on the locked
 design system (`design/DECISIONS.md`; §6 has the motion map, §8 the
 site-build decisions).
 
+### Brand, navigation and launch copy — 2026-10-06 (branch `polish/brand-nav-stack`)
+Requested by the user; every judgement call is listed in the PR. Checked in
+Chrome at 1440×900 and 390×844.
+- **Logos:** the header and footer use the district lock-up (Interact,
+  District 3220, the wheel) cropped from the supplied primary logo, with a
+  white reverse over the hero. The footer carries Rotary's 2026–27 "Create
+  Lasting Impact" mark. Both marks keep their own colours (DECISIONS §2).
+- **Hero:** every slide change wipes, including the last-to-first wrap and
+  stepping back (it used to cut).
+- **Contact:** the email address is the only published contact. The
+  district phone number is gone from the footer, Contact page and `SITE`.
+  Form phone fields (visitors' own numbers) are kept, as decided.
+- **Navigation:** no dropdowns. Meet the Council is reached from the About
+  page, the Newsletter from the pill on News. The College of DIRs moved to
+  `/archives/college-of-dirs` with a section on Archives; `/college-of-dirs`
+  301s there (DECISIONS §8).
+- **Launch copy:** a plain-language pass over all authored copy. Archive
+  years with no records show one formal line; "Being compiled", requests for
+  material and editorial notes about the old site are off the public pages
+  (the notes are kept below, under "Archive notes removed from the site").
+  The Calendar and News gap notes are gone.
+- **Fixes and stack:** `suppressHydrationWarning` on `<html>` (a Chrome
+  extension's attributes tripped the hydration check); Next 16.3.8 actually
+  installed (node_modules had drifted to 16.2.12), React 19.3, framer-motion
+  14; `npm run dev` and `npm start` serve on port 4100.
+
 ### Polish pass — 2026-10-06 (branch `polish/design-pass`)
 A second pass, checked in a real browser at 390, 768, 1024, 1440 and 1920px,
 with both normal and reduced motion. Every page was hovered, focused and
@@ -24,7 +50,7 @@ Guidelines. Every design change was approved by the user and is recorded in
 DECISIONS.md §2 and §6.
 - **Motion (approved):**
   - press scale 0.97 on every control (the `press` utility)
-  - the nav dropdown grows from its trigger; the drawer opens with a clip-path
+  - the nav dropdown grows from its trigger (dropdowns since removed); the drawer opens with a clip-path
     reveal
   - an 80ms hover-intent delay on both accordions
   - the form confirmation fades up, and Copy → Copied cross-fades
@@ -101,6 +127,13 @@ source-map-js patched. `package.json` floors raised to match, so a fresh
 install can't resolve the vulnerable versions. `npm audit` is clean; tsc,
 build and every route (plus `/_next/image`) checked on `next start`.
 
+**Update, 2026-10-06 (later):** `node_modules` had drifted back to Next
+16.2.12 although the lockfile said 16.3.8. Reinstalled, then took every
+minor: React 19.3.0, lenis 1.3.26, postcss 8.5.29, the @types packages, and
+framer-motion 14 (checked in the browser on every surface that uses it).
+TypeScript stays on 5.9: 7 is the native rewrite and Next's build type-check
+uses the 5.x JS API. `npm audit` is clean.
+
 - **Setup:** `npm ci`, then `npm run dev` (http://localhost:4100). If the network drops
   connections (`ECONNRESET`), add `--fetch-retries=5 --maxsockets=4`. `EPERM`
   means something (VS Code, a stray node) holds `node_modules` open.
@@ -112,7 +145,7 @@ build and every route (plus `/_next/image`) checked on `next start`.
 ### To switch on at launch
 - **Hosting is Vercel.** Set `DISTRICT_CALENDAR_ICS_URL` to the district
   Google Calendar's public iCal address (see `.env.example`). Until then the
-  calendar shows the recorded events with a "Live calendar to come" note.
+  calendar shows the recorded events.
 - Forms (Contact, Request a Date, Media Crew, DIMUN enquiries) open a
   pre-filled email to the district address. A real back-end later replaces
   only `send()` in `components/forms/mailto-form.tsx`.
@@ -122,13 +155,21 @@ Placeholders render through `<Placeholder>` or carry `data-placeholder`, so
 `document.querySelectorAll('[data-placeholder]')` on any page, or a search of
 the source for `Placeholder`, lists what is still missing.
 
+Since the launch-copy pass (2026-10-06) public pages carry no requests to the
+district and no notes about the old site. Four gaps still show a visible note,
+each waiting on content the user is sending: the IBTS and Intercede home
+tiles, the 2026/27 council roster, and the Admin Documents and Newsletter
+files (items 1, 4 and 8 below).
+
 ### Content to request from the district
-1. **2026/27 council**: names, positions, portraits, bios → `COUNCIL_2026_27`
-   in `lib/councils.ts` (every position is a "To be announced" slot today).
+1. **2026/27 council** (the user is sending it): names, positions, portraits,
+   bios → `COUNCIL_2026_27` in `lib/councils.ts` (every position is a "To be
+   announced" slot today).
 2. **Google Calendar** public iCal URL (and the calendar set to public).
 3. **2026/27 news posts**; the two posts on the site are from July 2025.
-4. **Files**: First Quarterly Newsletter PDF, District Directory 2025/26, and
-   any other admin documents (`lib/publications.ts`).
+4. **Files** (the user is sending a link to all of them): First Quarterly
+   Newsletter PDF, District Directory 2025/26, and any other admin documents
+   (`lib/publications.ts`).
 5. **Archive gaps**: records for 2023/24, 2021/22 and 1991/92; the real
    1999/2000 council roster (the old page duplicated 1998/99's); anything for
    2001/02–2019/20, which never had archive pages.
@@ -136,19 +177,22 @@ the source for `Placeholder`, lists what is still missing.
    mid-year. Dates, figures and photos to complete it.
 7. Portrait of **Chathula Fernando** (DIR 2016/17), blocked on the old CDN.
 8. Still open from before: Interflash and Race4Change photography; IBTS and
-   Intercede content; real photographs for the home collage; avenue photos.
+   Intercede content (the user is sending it); real photographs for the home collage; avenue photos.
 9. **Found in the 2026-10-06 polish pass:**
    - **Media Crew service names.** The tiles say "Live Streaming",
      "Designing" and "Photo Booths"; the request-form chips say "Livestream",
      "Graphic Designing" and "Photobooth". CONTENT.md carries both versions
      verbatim from the old site, so the district has to pick one.
-   - **Stat label.** "In District 3220 since" reads backwards.
+   - ~~**Stat label.** "In District 3220 since" reads backwards.~~ Now
+     "Serving since" (2026-10-06): the district only took the number 3220
+     in 1991.
    - **First archive year.** The timeline labels it "1988/89–1989/90"; its
      card says "1988/89".
    - **Archive-year dates.** The pages mix "28 Sep 2024" with bare
      months.
-   - **About ledes.** "What the district is for." and "The people who run
-     it." have no muted lede, unlike every other section.
+   - **About ledes.** "Vision, mission and goals." and "The council and its
+     history." (renamed 2026-10-06) have no muted lede, unlike every other
+     section.
    - **Photos too small.** Larger originals are needed for the 2024/25 council
      portraits (360×240 files), some College of DIRs thumbnails (196–256px)
      and the hero panorama (1600px wide). These stay soft on phones and large
@@ -327,9 +371,9 @@ under Current Status).
 ### Tech stack (decided)
 | | |
 |---|---|
-| Framework | Next.js 16 (App Router, TypeScript) |
+| Framework | Next.js 16.3 (App Router, TypeScript 5.9), React 19.3 |
 | Styling | Tailwind CSS v4 (CSS-first `@theme`) |
-| Motion | Framer Motion 12 + Lenis |
+| Motion | Framer Motion 14 + Lenis |
 | Media | sharp; ffmpeg-static, ffprobe-static (dev only, video re-encodes) |
 | Hosting | **Not decided** at the time — Vercel since 2026-10-05 (DECISIONS.md §8) |
 
@@ -508,7 +552,34 @@ Open `download-images.html` in any browser. Click **Download All** (saves to you
 - Should Facebook event albums be mirrored on-site or kept as outbound links?
 - CMS need: will council/DIR/events/newsletter data be edited by non-developers (suggests a CMS or structured data files)?
 
+## Archive notes removed from the site (2026-10-06)
+Editorial notes that used to show on archive pages, kept here so the
+reasoning is not lost. ARCHIVES.md has the source detail.
+- **2025/26:** built mid-year from the old site's home page; the full record
+  of the year is still to come.
+- **2023/24, 2021/22:** the old site linked to an archive page and a council
+  page for each, but neither was ever built.
+- **2021/22:** the old archive index named the theme "Prosper Through
+  Service"; the College of DIRs table and Rotary International give "Serve to
+  Change Lives", which the site uses.
+- **2020/21:** the old page also listed directors and coordinators for the
+  Negombo, Kandy, Kurunegala and Galle zones, community service,
+  international understanding, finance, PR, media and event management,
+  without names.
+- **1999/2000:** the old page repeated the 1998/99 council roster word for
+  word, so no roster is shown. The College of DIRs gives Saif Ramzi (Wesley
+  College) as DIR.
+- **1991/92:** the old site had no archive page at all; the DIR and theme
+  come from the College of DIRs.
+- **1988–90:** schools cited on the old page: Stafford International School;
+  Ladies College London A/L.
+
 ## Change log
+- **2026-10-06 (brand, nav, launch copy)** — Branch `polish/brand-nav-stack`:
+  district and theme logos, hero wrap wipe, email-only contact, no nav
+  dropdowns, College of DIRs under Archives, hydration fix, minor updates
+  plus framer-motion 14, port 4100, launch copy. See the first section under
+  Current Status.
 - **2026-10-06 (security)** — `npm audit fix`: Next 16.3.8 (critical RCE
   advisories), sharp 0.35.5, postcss 8.5.25, nanoid, source-map-js;
   `package.json` floors raised. See "Dependencies" under Current Status.

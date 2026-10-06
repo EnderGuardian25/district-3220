@@ -316,6 +316,12 @@ Every old Wix path 301s to its new URL (`next.config.ts`).
 - **Archive gaps:** every year appears. 2023/24, 2021/22 and 1991/92 get pages with
   what is known plus a "records being compiled" note. 1999/2000 hides its
   duplicated council roster until verified.
+  **Revision 2026-10-06 (decided by the user): launch copy.** Those three
+  years are `unrecorded`: theme and DIR, plus one line, "The district archive
+  holds no further records for this year." Public pages carry no requests
+  to the district and no notes about the old site (HANDOFF keeps them).
+  Copy is formal and plain; gaps still waiting on district content keep
+  their `Placeholder` until it arrives.
 - **Council bios:** kept verbatim. The sharpest ones are listed in HANDOFF for the
   district to veto before launch.
 - **Council 2026/27:** structured placeholder grid of "To be announced" slots.
@@ -339,21 +345,23 @@ Every old Wix path 301s to its new URL (`next.config.ts`).
 ## 9. Still in force from before the redesign
 
 **Stack:** Next.js 16 (App Router, TypeScript), Tailwind CSS v4 (CSS-first
-`@theme`), Framer Motion 12 + Lenis. Hosting: Vercel (decided 2026-10-05, §8).
+`@theme`), Framer Motion 14 + Lenis (12 until 2026-10-06). Hosting: Vercel
+(decided 2026-10-05, §8).
 
-**Navigation:** labels and order identical to the Wix site. Clean URLs with 301s
-from every old path (`next.config.ts`).
+**Navigation:** top-level labels and order identical to the Wix site. Clean URLs
+with 301s from every old path (`next.config.ts`). Since 2026-10-06 there are no
+dropdowns; the "→" rows are reached from their parent page instead (§8).
 
 | Label | New URL | Old Wix URL |
 |---|---|---|
 | Home | `/` | `/` |
 | About | `/about` | `/about` |
-| → Meet The Council 2026/27 | `/council/2026-27` | `/meet-the-council-2025-26` |
-| → College of DIRs | `/college-of-dirs` | `/college-of-dirs` |
+| → Meet The Council 2026/27 (from About) | `/council/2026-27` | `/meet-the-council-2025-26` |
+| → College of DIRs (from Archives) | `/archives/college-of-dirs` | `/college-of-dirs` |
 | Calendar | `/calendar` | `/district-calendar` |
 | Admin Documents | `/admin-documents` | `/admin-documents` |
 | News | `/news` | `/blog` |
-| → Newsletter | `/newsletter` | `/newsletter` |
+| → Newsletter (from News) | `/newsletter` | `/newsletter` |
 | Archives | `/archives` | `/archives` |
 | Media Crew | `/media-crew` | `/media-crew` |
 | Contact | `/contact` | `/contact-8` |
