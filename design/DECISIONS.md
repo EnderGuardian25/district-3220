@@ -225,6 +225,9 @@ design change (see the top of this file).
     comes from the nearest `data-cursor` marker, or
     else from the first opaque background behind the pointer. Styles are in
     `.morph-cursor` in `app/globals.css`.
+  - Parked on a tile inside a rounded, clipped container (the officers
+    grid), the blob takes the container's radius on any corner it shares
+    with it, so it never pokes a square corner past the curve (2026-10-06).
 
 ### Motion map: where each effect runs
 

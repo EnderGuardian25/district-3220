@@ -64,6 +64,39 @@ function toRgba(colour: string): [number, number, number, number] {
   return [r, g, b, a / 255];
 }
 
+const CORNERS = [
+  ['borderTopLeftRadius', 'left', 'top'],
+  ['borderTopRightRadius', 'right', 'top'],
+  ['borderBottomRightRadius', 'right', 'bottom'],
+  ['borderBottomLeftRadius', 'left', 'bottom'],
+] as const;
+
+/**
+ * The radius the parked blob should take. Tiles inside a rounded, clipped
+ * container (the officers grid's overflow-hidden rounded-panel) are square
+ * themselves and get their rounded corners from that clip. The blob sits on
+ * top of the page and isn't clipped, so copying the tile's own radius left a
+ * square corner sticking out past the container's curve. Each tile corner
+ * that meets a clipping ancestor's corner takes that ancestor's radius
+ * instead.
+ */
+function parkRadius(target: HTMLElement): string {
+  const own = getComputedStyle(target);
+  const r = target.getBoundingClientRect();
+  const radii: string[] = CORNERS.map(([prop]) => own[prop]);
+  for (let node = target.parentElement; node && node !== document.body; node = node.parentElement) {
+    const cs = getComputedStyle(node);
+    if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
+    const a = node.getBoundingClientRect();
+    CORNERS.forEach(([prop, x, y], i) => {
+      const clip = parseFloat(cs[prop]) || 0;
+      if (clip <= (parseFloat(radii[i]) || 0)) return;
+      if (Math.abs(r[x] - a[x]) <= 2 && Math.abs(r[y] - a[y]) <= 2) radii[i] = `${clip}px`;
+    });
+  }
+  return radii.join(' ');
+}
+
 /** True when the first opaque background behind `el` is dark. */
 function onDarkBackground(el: Element | null): boolean {
   for (let node = el; node && node !== document.documentElement; node = node.parentElement) {
@@ -114,7 +147,7 @@ export function MorphCursor() {
         const r = nextTarget.getBoundingClientRect();
         el.style.width = `${r.width}px`;
         el.style.height = `${r.height}px`;
-        el.style.borderRadius = getComputedStyle(nextTarget).borderRadius;
+        el.style.borderRadius = parkRadius(nextTarget);
       } else {
         const size = next === 'link' ? RING : DOT;
         el.style.width = `${size}px`;

@@ -50,6 +50,8 @@ DECISIONS.md §2 and §6.
   - doubled hairlines removed
   - the home photo band's Line Draw now connects the caption diamonds, as on
     Archives (its nodes sat 22px above them)
+  - the morph cursor no longer pokes a square corner out of the officers
+    grid's rounded corners
   - 24/44px tap targets
   - scroll padding under the sticky header
   - calendar state in the URL
