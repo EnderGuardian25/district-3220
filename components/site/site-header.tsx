@@ -113,18 +113,30 @@ export function SiteHeader() {
         >
           {/* The official district lock-up: Interact, District 3220 and the
               Rotary wheel, cropped from the primary logo before its theme
-              divider. Logotypes are exempt from contrast minimums, but over
-              photography it still needs a shadow to hold its edge. */}
-          <Image
-            src="/images/branding/interact-district-3220-logo.png"
-            alt=""
-            width={1034}
-            height={380}
-            preload
-            className={`h-10 w-auto transition-[filter] duration-300 md:h-12 ${
-              overHero ? 'drop-shadow-[0_1px_8px_rgba(10,12,14,0.7)]' : ''
-            }`}
-          />
+              divider. Over the hero it is the white reverse, with the same
+              shadow as the nav text: the cyan with a dark halo read muddy on
+              the photographs. The two cross-fade with the bar, in the nav
+              text's 300ms. */}
+          <span className="relative block">
+            <Image
+              src="/images/branding/interact-district-3220-logo.png"
+              alt=""
+              width={1034}
+              height={380}
+              preload
+              className={`h-10 w-auto transition-opacity duration-300 md:h-12 ${overHero ? 'opacity-0' : 'opacity-100'}`}
+            />
+            <Image
+              src="/images/branding/interact-district-3220-logo-white.png"
+              alt=""
+              width={1034}
+              height={380}
+              preload
+              className={`absolute inset-0 h-10 w-auto drop-shadow-[0_1px_8px_rgba(10,12,14,0.7)] transition-opacity duration-300 md:h-12 ${
+                overHero ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          </span>
         </Link>
 
         {/* ---------- desktop nav ---------- */}

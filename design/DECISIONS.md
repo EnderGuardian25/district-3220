@@ -73,7 +73,10 @@ artwork in the header and footer.
   District 3220, the Rotary wheel), cropped from the supplied primary logo
   before its theme divider: `public/images/branding/interact-district-3220-logo.png`.
   It replaces the generic Interact logo and the separate "District 3220" text
-  beside it.
+  beside it. Over the hero photograph the header uses its white reverse
+  (`interact-district-3220-logo-white.png`, same shadow as the nav text) and
+  cross-fades to the cyan original with the bar; cyan with a dark halo read
+  muddy on the photographs.
 - The footer carries Rotary's 2026–27 theme mark, "Create Lasting Impact",
   keyed out of RI's social graphic (`create-lasting-impact.png`). Its royal
   blue `#006BB7` is part of the mark, like the Interact cyan: it never
