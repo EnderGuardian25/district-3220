@@ -33,7 +33,8 @@ names.
 ## Working
 
 - Install: `npm ci` (network and `ffmpeg-static` notes: HANDOFF "Dependencies").
-- Dev server: `npx next dev --port 3100` (3000 is taken on this machine).
+- Dev server: `npm run dev` → http://localhost:4100 (pinned in package.json;
+  `npm start` serves a production build on 4100 too).
 - Checks: `npx tsc --noEmit` and `npx next build`.
 - `/kit` (dev only) renders every shared inner-page component. New pages build
   from `components/page`, `components/people` and `components/forms`, not from

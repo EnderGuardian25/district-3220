@@ -101,7 +101,7 @@ source-map-js patched. `package.json` floors raised to match, so a fresh
 install can't resolve the vulnerable versions. `npm audit` is clean; tsc,
 build and every route (plus `/_next/image`) checked on `next start`.
 
-- **Setup:** `npm ci`, then `npx next dev --port 3100`. If the network drops
+- **Setup:** `npm ci`, then `npm run dev` (http://localhost:4100). If the network drops
   connections (`ECONNRESET`), add `--fetch-retries=5 --maxsockets=4`. `EPERM`
   means something (VS Code, a stray node) holds `node_modules` open.
 - **`ffmpeg-static` install script is blocked** by npm's `allowScripts`
@@ -290,7 +290,7 @@ overflow at 390x844 across the full scroll. Morph cursor off on touch.
 under Current Status).
 
 ### Dev server
-`npx next dev --port 3100` (port 3000 is occupied on this machine).
+`npm run dev` (port 4100, pinned in package.json).
 
 ---
 
@@ -393,8 +393,7 @@ taken from the loop's first frame). Shipped from `~/Downloads/dark-mode.mp4` +
   pingpong loop, whose multi-second flow reversal would be far more visible than this.
 Both verified playing on the page (webm picked, readyState 4). Production build passes.
 
-**Dev server note:** port 3000 was occupied by something else on this machine — use
-`npx next dev --port 3100`.
+**Dev server note:** `npm run dev` serves on port 4100 (pinned in package.json).
 
 ### Facts corrected this session — do not regress
 - **Rotary theme 2026-27 is "Create Lasting Impact"** (RI President Olayinka "Yinka" H.
