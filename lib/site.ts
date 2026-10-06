@@ -55,7 +55,7 @@ export const STATS = [
   { value: 100, display: '100+', label: 'Clubs' },
   { value: 9, display: '9', label: 'Zones' },
   // The district's own start date, not the movement's — this is a district site.
-  { value: 1964, display: '1964', label: 'In District 3220 since' },
+  { value: 1964, display: '1964', label: 'Serving since' },
 ] as const;
 
 export const SOCIALS = [
