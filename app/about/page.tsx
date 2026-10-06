@@ -15,7 +15,6 @@ export const metadata: Metadata = {
 
 const PEOPLE_LINKS = [
   { href: '/council/2026-27', label: 'Meet the Council 2026/27', note: 'The students running the district this year' },
-  { href: '/college-of-dirs', label: 'College of DIRs', note: 'Every District Interact Representative since 1979' },
   { href: '/archives', label: 'Archives', note: 'Councils, projects and events, year by year' },
 ];
 
@@ -110,13 +109,13 @@ export default function AboutPage() {
       {/* ---------- the people ---------- */}
       <section aria-labelledby="people-heading" className="container-page py-16 md:py-24">
         <SectionHeader id="people-heading" title="The people who run it." />
-        <ul className="mt-8 grid gap-3 md:grid-cols-3">
+        <ul className="mt-8 grid gap-3 md:grid-cols-2">
           {PEOPLE_LINKS.map((l, i) => (
             <Reveal key={l.href} step={Math.min(i, 4)} as="li">
               <Link
                 href={l.href}
                 // Phone: one row, arrow beside the text. From md the cards sit
-                // three across and the arrow drops to the corner.
+                // side by side and the arrow drops to the corner.
                 className="group flex h-full items-center justify-between gap-6 rounded-panel border border-hairline bg-surface p-6 transition-colors duration-200 hover:border-accent-fill md:flex-col md:items-stretch md:gap-10 md:p-7"
               >
                 <span>

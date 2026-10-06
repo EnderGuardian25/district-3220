@@ -194,7 +194,7 @@ function YearPlate({ year }: { year: ArchiveYear }) {
 
 function SpanPlate() {
   return (
-    <Link href="/college-of-dirs" className="group block" data-placeholder>
+    <Link href="/archives/college-of-dirs" className="group block" data-placeholder>
       <Caption>
         <span className="label-micro bg-navy-900 text-white/80">
           {UNRECORDED_SPAN.from} – {UNRECORDED_SPAN.to}

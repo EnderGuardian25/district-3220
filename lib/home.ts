@@ -298,6 +298,6 @@ export const OFFICER_LINKS = [
   { label: 'Newsletter', href: '/newsletter', note: 'Every issue' },
   { label: 'Archives', href: '/archives', note: '1988 to today' },
   { label: 'Meet the Council', href: '/council/2026-27', note: '2026 / 27' },
-  { label: 'College of DIRs', href: '/college-of-dirs', note: 'Past district reps' },
+  { label: 'College of DIRs', href: '/archives/college-of-dirs', note: 'Past district reps' },
   { label: 'Media Crew', href: '/media-crew', note: 'Request coverage' },
 ] as const;

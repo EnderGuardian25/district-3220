@@ -19,7 +19,7 @@ export default function CollegeOfDirsPage() {
   return (
     <main id="main">
       <PageHeader
-        crumbs={[{ label: 'About', href: '/about' }]}
+        crumbs={[{ label: 'Archives', href: '/archives' }]}
         title="College of DIRs."
         lede={`A legacy of the past District Interact Representatives: the ${DIRS.length} people who have led Interact in the district since 1979, each with the Rotary theme of their year.`}
       />
