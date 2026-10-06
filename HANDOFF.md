@@ -8,24 +8,87 @@
 
 ---
 
-## Current Status — 2026-10-05
+## Current Status — 2026-10-06
 
-**Phase:** Home page done and merged to `main` (PR #1). Design direction
-**locked** at the user's request on 2026-10-05: the home page as built is the
-design system, written up in [`design/DECISIONS.md`](design/DECISIONS.md) with
-reference screenshots in `design/reference/` and a summary in `CLAUDE.md`.
-The superseded July/August decisions moved to `design/archive/`.
+**Phase:** The whole site is built, in seven stacked PRs awaiting review. Every
+page in CONTENT.md exists on the locked design system (`design/DECISIONS.md`,
+§8 records the site-build decisions).
 
-### Next
-1. Send the district the content request list (BLOCKING content gaps, below).
-2. Exercise `prefers-reduced-motion` in a browser (the one unverified item).
-3. Build the inner pages on the locked system: shared page template first, then
-   About, Meet the Council 2026/27, College of DIRs (content already in
-   CONTENT.md / ARCHIVES.md), then Archives (14 year pages), News, Calendar,
-   Admin Documents, Media Crew, Contact.
-4. Decide hosting before the form back-ends (Contact, Request a Date, Media Crew).
-5. Image pipeline over the ~150 council/archive/DIMUN assets; throttled-mobile
-   and Lighthouse pass.
+### Merge order
+1. **#2 `pages/foundation`**: shared components, shared data, every 301. First.
+2. **#3–#7**, in any order (each is stacked on #2 and independent of the rest):
+   #3 About / Council 2026/27 / College of DIRs · #4 Archives ·
+   #5 News / Newsletter / Admin Documents · #6 Calendar / Request a Date /
+   events (DIMUN '25) · #7 Media Crew / Contact.
+3. **`pages/finish`** (this branch): sitemap, robots.txt, this file. Last.
+
+All five page branches were merged together locally and checked: the combined
+site builds (42 pages), every internal link returns 200, and all 35 old Wix
+URLs 301 to a live page.
+
+### To switch on at launch
+- **Hosting is Vercel.** Set `DISTRICT_CALENDAR_ICS_URL` to the district
+  Google Calendar's public iCal address (see `.env.example`). Until then the
+  calendar shows the recorded events with a "Live calendar to come" note.
+- Forms (Contact, Request a Date, Media Crew, DIMUN enquiries) open a
+  pre-filled email to the district address. A real back-end later replaces
+  only `send()` in `components/forms/mailto-form.tsx`.
+
+### Every gap is marked
+Placeholders render through `<Placeholder>` or carry `data-placeholder`, so
+`document.querySelectorAll('[data-placeholder]')` on any page, or a search of
+the source for `Placeholder`, lists what is still missing.
+
+### Content to request from the district
+1. **2026/27 council**: names, positions, portraits, bios → `COUNCIL_2026_27`
+   in `lib/councils.ts` (every position is a "To be announced" slot today).
+2. **Google Calendar** public iCal URL (and the calendar set to public).
+3. **2026/27 news posts**; the two posts on the site are from July 2025.
+4. **Files**: First Quarterly Newsletter PDF, District Directory 2025/26, and
+   any other admin documents (`lib/publications.ts`).
+5. **Archive gaps**: records for 2023/24, 2021/22 and 1991/92; the real
+   1999/2000 council roster (the old page duplicated 1998/99's); anything for
+   2001/02–2019/20, which never had archive pages.
+6. **2025/26 record**: the year is built from the old home feed, captured
+   mid-year. Dates, figures and photos to complete it.
+7. Portrait of **Chathula Fernando** (DIR 2016/17), blocked on the old CDN.
+8. Still open from before: Interflash and Race4Change photography; IBTS and
+   Intercede content; real photographs for the home collage; avenue photos.
+
+### Human judgement calls (decide before launch)
+- **Council bios are verbatim, by decision.** The sharpest ones, for the
+  district to keep or veto: "The word clueless in human form" (Abishek
+  Maheshwaran), "the punching bag of council" (Chenura Pathirana), "A
+  controversial choice who I trust with positions" (Charith Ekanayake), "a
+  special talent for giving people mini heart attacks" (Veenu Ovinya), "works
+  hard to the point where his body shuts down" (Lakshin Fernando), "After
+  fumbles, she became final addition to council" (Wenuri Amarasinghe), "From
+  an unknown club" (Sameeha Nizamdeen, 2024/25), "presence that intimidates"
+  (Rezon David, 2022/23).
+- **2022/23 bios are crawl summaries**, not the original wording (only the
+  quoted fragments are original). Shown as captured.
+- **2021/22 theme**: the old archive index said "Prosper Through Service"; the
+  DIR table and Rotary International say "Serve to Change Lives", which is used.
+- **The "with" name beside each DIR** is the source's "Co-DIR" column, which
+  for recent years is plainly the Secretary; shown neutrally as "with".
+- **Name spellings that differ between sources** (the College of DIRs follows
+  the historical roster; archive pages follow their own page): Mohammed /
+  Mohommed Awoon, Iflikar / Ifthikar Mohammed, Atulathmudali / Athulathmudali.
+- **2001/02–2019/20** appear on the archive timeline as one marked span rather
+  than 19 empty pages.
+- **Misnamed branding files** from the crawl: `newsletter-footer.png` is the
+  colour Media Crew logo; `rotary-logo.png` is a Sri Lanka/Maldives flags image.
+- Community Service avenue band still fails AA (white by request; one-line fix
+  in DECISIONS.md §2).
+
+### Still to do (engineering)
+1. Exercise `prefers-reduced-motion` in a browser across the new pages (guards
+   are written everywhere; the DevTools tooling used here cannot emulate it).
+2. Image pipeline: the council portraits are 2–6MB originals (~290MB total).
+   `next/image` resizes them on Vercel, but pre-sizing them would cut build and
+   cold-cache cost.
+3. Throttled-mobile and Lighthouse pass.
+4. `CONTENT.md` still carries the 2025/26 theme throughout.
 
 ---
 
@@ -345,6 +408,11 @@ Open `download-images.html` in any browser. Click **Download All** (saves to you
 - CMS need: will council/DIR/events/newsletter data be edited by non-developers (suggests a CMS or structured data files)?
 
 ## Change log
+- **2026-10-06** — Whole site built in stacked PRs #2–#7 plus `pages/finish`:
+  foundation (shared components, data, 301s), About / Council 2026/27 /
+  College of DIRs, Archives (timeline, 18 years, 3 past councils), News /
+  Newsletter / Admin Documents, Calendar (Google Calendar feed) / Request a
+  Date / event pages (DIMUN '25), Media Crew / Contact, sitemap and robots.
 - **2026-10-05** — Design direction locked at the user's request. `design/DECISIONS.md`
   rewritten from the code and a browser walk-through of the home page; old
   decisions archived to `design/archive/`; reference screenshots in
