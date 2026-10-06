@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { FLAGSHIPS } from '@/lib/home';
@@ -122,14 +123,25 @@ export function ProjectGrid() {
                     Placeholder. This project still needs its details from the district.
                   </p>
                 )}
-                <button
-                  type="button"
-                  data-morph
-                  onClick={() => setOpenSlug(null)}
-                  className="mt-7 rounded-control border border-white/45 px-5 py-2.5 text-sm font-semibold transition-colors duration-200 hover:border-white hover:bg-white/15"
-                >
-                  Close
-                </button>
+                <div className="mt-7 flex flex-wrap gap-3">
+                  {open.href && (
+                    <Link
+                      href={open.href}
+                      data-morph
+                      className="rounded-control border border-on-ink bg-on-ink px-5 py-2.5 text-sm font-semibold text-ink-panel transition-colors duration-200 hover:border-accent hover:bg-accent hover:text-white"
+                    >
+                      Open the {open.name} page
+                    </Link>
+                  )}
+                  <button
+                    type="button"
+                    data-morph
+                    onClick={() => setOpenSlug(null)}
+                    className="rounded-control border border-white/45 px-5 py-2.5 text-sm font-semibold transition-colors duration-200 hover:border-white hover:bg-white/15"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </motion.div>
           </motion.div>

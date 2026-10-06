@@ -455,6 +455,24 @@
   animation: clip-in 950ms var(--ease-clip) 120ms both;
 }
 
+/* Calendar month changes: the new month wipes in from the side it came
+   from, on the same curve as the hero's slide change, a little quicker
+   because it is a control response rather than a set piece. */
+@keyframes clip-in-reverse {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@utility clip-in-next {
+  animation: clip-in 650ms var(--ease-clip) both;
+}
+@utility clip-in-prev {
+  animation: clip-in-reverse 650ms var(--ease-clip) both;
+}
+
 /* ==========================================================================
    MOTION
    Everything animated must be reachable by this switch. The audience is
