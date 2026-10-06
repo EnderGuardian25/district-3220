@@ -31,18 +31,25 @@ export function PageHeader({
           through Reveal: Reveal server-renders at opacity 0 until JavaScript
           hydrates, which held back the page's h1, its largest text. */}
       <div className="rise-in-load">
+        {/* A real list, so screen readers announce "list, 2 items". Inline
+            throughout, so it looks exactly as the plain spans did. The
+            current page isn't repeated: it is the h1 directly below. */}
         <nav aria-label="Breadcrumb" className="label-micro text-content-soft">
-          <Link href="/" className="transition-colors duration-200 hover:text-accent-text">
-            Home
-          </Link>
-          {crumbs.map((c) => (
-            <span key={c.href}>
-              <span aria-hidden="true"> / </span>
-              <Link href={c.href} className="transition-colors duration-200 hover:text-accent-text">
-                {c.label}
+          <ol className="inline">
+            <li className="inline">
+              <Link href="/" className="transition-colors duration-200 hover:text-accent-text">
+                Home
               </Link>
-            </span>
-          ))}
+            </li>
+            {crumbs.map((c) => (
+              <li key={c.href} className="inline">
+                <span aria-hidden="true"> / </span>
+                <Link href={c.href} className="transition-colors duration-200 hover:text-accent-text">
+                  {c.label}
+                </Link>
+              </li>
+            ))}
+          </ol>
         </nav>
       </div>
       <h1 className="rise-in-load mt-5 max-w-[18ch] text-display" style={{ ['--step' as string]: 1 }}>

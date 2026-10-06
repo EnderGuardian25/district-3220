@@ -22,7 +22,8 @@ export default function AdminDocumentsPage() {
         </Button>
       </PageHeader>
 
-      <section aria-label="Documents" className="container-page py-14 md:py-20">
+      {/* No top padding: the page header's rule is the list's first hairline. */}
+      <section aria-label="Documents" className="container-page pb-14 md:pb-20">
         <DocumentList items={DOCUMENTS} />
         <Placeholder className="mt-8 max-w-3xl">
           The old site served its files through a widget whose download links could not be recovered.

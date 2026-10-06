@@ -55,6 +55,17 @@ function layout(items: WallItem[]) {
   return { placed, trackWidth: cursor + PAD_X };
 }
 
+/**
+ * The plate is drawn object-cover, so a photo wider than its plate is scaled
+ * to the plate's height and needs `aspect / plateAspect` times the plate's
+ * width. Asking for the plate width alone served a 420px file into a tall
+ * 420x463 plate (2.7x upscaled). Below md the plate is the stack's 92vw.
+ */
+function plateSizes(p: Placed) {
+  const k = Math.max(1, p.aspect / (p.w / p.h));
+  return `(max-width: 767px) ${Math.ceil(92 * k)}vw, ${Math.ceil(p.w * k)}px`;
+}
+
 /** Smooth cubic through the nodes, so the line reads as drawn, not plotted. */
 function pathThrough(points: { nodeX: number; nodeY: number }[]) {
   if (points.length < 2) return '';
@@ -84,8 +95,15 @@ export function PhotoWall() {
       rail.style.setProperty('--pan', `${pan}px`);
     };
     measure();
+    // offsetLeft and scrollWidth can change without a window resize (fonts
+    // loading, the scrollbar appearing), so watch the rail itself too.
+    const ro = new ResizeObserver(measure);
+    ro.observe(rail);
     window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
   }, []);
 
   return (
@@ -161,10 +179,12 @@ export function PhotoWall() {
                       aria-hidden="true"
                       className="hidden size-1.5 shrink-0 rotate-45 bg-white/70 md:block"
                     />
-                    <span className="label-micro text-white/55">
+                    {/* Labels sit on the band colour: each curve leaves its
+                        node horizontally, and ran through the caption text. */}
+                    <span className="label-micro bg-navy-900 text-white/55">
                       {String(i + 1).padStart(2, '0')}
                     </span>
-                    <span className="label-micro text-white/80">
+                    <span className="label-micro bg-navy-900 text-white/80">
                       {p.caption}
                       {p.year ? `, ${p.year}` : ''}
                     </span>
@@ -177,7 +197,7 @@ export function PhotoWall() {
                       src={p.src}
                       alt={p.alt}
                       fill
-                      sizes="(max-width: 768px) 92vw, 420px"
+                      sizes={plateSizes(p)}
                       className="object-cover"
                     />
                   </div>
@@ -186,11 +206,14 @@ export function PhotoWall() {
             </div>
           </div>
 
-          <div
-            aria-hidden="true"
-            className="hscroll-prog absolute inset-x-8 bottom-10 hidden h-px bg-white/20 md:block xl:inset-x-14"
-          >
-            <i className="block h-full origin-left bg-white/70" />
+          {/* Inside container-page so the track starts and ends on the same
+              gutters as the heading above it. */}
+          <div aria-hidden="true" className="absolute inset-x-0 bottom-10 hidden md:block">
+            <div className="container-page">
+              <div className="hscroll-prog h-px bg-white/20">
+                <i className="block h-full origin-left bg-white/70" />
+              </div>
+            </div>
           </div>
         </div>
       </div>

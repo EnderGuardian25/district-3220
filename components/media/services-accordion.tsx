@@ -1,8 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MEDIA_SERVICES } from '@/lib/media-crew';
+
+/** Hover-intent delay, as on the home avenues (approved 2026-10-06). */
+const HOVER_INTENT_MS = 80;
 
 /**
  * Accordion Gallery (lab.damiandc.com/accordion-gallery), the photographic
@@ -15,34 +18,55 @@ import { MEDIA_SERVICES } from '@/lib/media-crew';
  *
  * Below md it becomes a list of photo rows, as the avenues do.
  */
-const EASE = 'ease-[cubic-bezier(0.22,1,0.36,1)]';
+const EASE = 'ease-out-quint';
 
 export function ServicesAccordion({ formId }: { formId: string }) {
   const [hovered, setHovered] = useState<number | null>(null);
   const [locked, setLocked] = useState<number | null>(null);
   const open = locked ?? hovered;
+  const intent = useRef<number | null>(null);
+  const cancelIntent = () => {
+    if (intent.current !== null) window.clearTimeout(intent.current);
+    intent.current = null;
+  };
+  useEffect(() => cancelIntent, []);
 
   const request = (option: string) => {
-    const box = document.querySelector<HTMLInputElement>(`#${formId} input[type="checkbox"][value="${option}"]`);
+    const box = document.querySelector<HTMLInputElement>(
+      `#${CSS.escape(formId)} input[type="checkbox"][value="${CSS.escape(option)}"]`,
+    );
     if (box && !box.checked) {
       box.checked = true;
       // MailtoForm clears a group's error on input, so tell it.
       box.dispatchEvent(new Event('input', { bubbles: true }));
     }
-    document.getElementById(formId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // JS 'smooth' overrides the CSS reduced-motion switch, so ask here too.
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.getElementById(formId)?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
     // Take keyboard and screen-reader users along: focus the service just
     // ticked, without letting focus fight the smooth scroll.
     box?.focus({ preventScroll: true });
   };
 
   return (
-    <div className="mt-8 flex flex-col gap-2.5 md:h-[clamp(340px,40vw,500px)] md:flex-row md:gap-2" onMouseLeave={() => setHovered(null)}>
+    <div className="mt-8 flex flex-col gap-2.5 md:h-[clamp(340px,40vw,500px)] md:flex-row md:gap-2"
+      onMouseLeave={() => {
+        cancelIntent();
+        setHovered(null);
+      }}
+    >
       {MEDIA_SERVICES.map((s, i) => {
         const isOpen = open === i;
+        const requestId = `service-${i}-request`;
         return (
           <div
             key={s.name}
-            onMouseEnter={() => locked === null && setHovered(i)}
+            onMouseEnter={() => {
+              if (locked !== null) return;
+              cancelIntent();
+              intent.current = window.setTimeout(() => setHovered(i), HOVER_INTENT_MS);
+            }}
+            onMouseLeave={cancelIntent}
             style={{ flexGrow: isOpen ? 4 : 1 }}
             // basis-0 from md up: the grow factors then divide the whole row.
             // With basis auto each panel starts at its content width (the
@@ -62,6 +86,7 @@ export function ServicesAccordion({ formId }: { formId: string }) {
             <button
               type="button"
               aria-expanded={isOpen}
+              aria-controls={requestId}
               onFocus={() => locked === null && setHovered(i)}
               onClick={() => setLocked((l) => (l === i ? null : i))}
               // Close on leaving the panel, but not when focus moves on to the
@@ -81,7 +106,10 @@ export function ServicesAccordion({ formId }: { formId: string }) {
               {locked === i && <span className="opacity-70"> locked</span>}
             </span>
 
-            <div className="pointer-events-none relative z-20 flex h-full flex-col justify-end p-4 text-white md:p-5">
+            {/* min-h matches the tile: below md the tile has no definite
+                height, so h-full alone resolved to auto and the title rose to
+                the top, printing over the index label. */}
+            <div className="pointer-events-none relative z-20 flex h-full min-h-[96px] flex-col justify-end p-4 text-white md:min-h-0 md:p-5">
               <p
                 className={`font-display font-semibold tracking-[-0.015em] [overflow-wrap:anywhere] ${
                   isOpen ? 'text-[1.35rem] md:text-[clamp(1.2rem,1.8vw,1.6rem)]' : 'text-[1.1rem] md:text-[0.9rem] md:leading-snug'
@@ -90,13 +118,15 @@ export function ServicesAccordion({ formId }: { formId: string }) {
                 {s.name}
               </p>
               <div className={`grid transition-[grid-template-rows,opacity,margin-top] duration-[750ms] ${EASE} ${isOpen ? 'mt-3 grid-rows-[1fr] opacity-100' : 'mt-0 grid-rows-[0fr] opacity-0'}`}>
-                <div className="overflow-hidden">
+                {/* inert while collapsed: tabIndex -1 kept it out of the Tab
+                    order, but screen readers still found five invisible
+                    buttons. */}
+                <div id={requestId} className="overflow-hidden" inert={!isOpen}>
                   <button
                     type="button"
-                    tabIndex={isOpen ? 0 : -1}
                     data-morph
                     onClick={() => request(s.formOption)}
-                    className="pointer-events-auto rounded-control border border-white bg-white px-4 py-2 text-sm font-semibold text-chalk-950 transition-colors duration-200 hover:border-accent-fill hover:bg-accent-fill hover:text-accent-on"
+                    className="pointer-events-auto rounded-control border border-white bg-white px-4 py-2 text-sm font-semibold text-chalk-950 press hover:border-accent-fill hover:bg-accent-fill hover:text-accent-on"
                   >
                     Request {s.name.toLowerCase()}
                   </button>

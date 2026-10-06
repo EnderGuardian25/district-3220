@@ -10,6 +10,7 @@ import { CommitteeGrid } from '@/components/events/committee-grid';
 import { MailtoForm } from '@/components/forms/mailto-form';
 import { TextArea, TextField } from '@/components/forms/fields';
 import { Button } from '@/components/ui/button';
+import { keepDatesTogether } from '@/components/people/keep-together';
 import { EVENT_PAGES, getEventPage } from '@/lib/event-pages';
 
 export const dynamicParams = false;
@@ -22,6 +23,47 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const e = getEventPage((await params).slug);
   if (!e) return {};
   return { title: e.shortName, description: e.standfirst };
+}
+
+/**
+ * Where the artwork actually sits inside each wordmark file, in source pixels.
+ * The DIMUN file is a 1366x1280 canvas with a 919x388 strip of artwork in the
+ * middle (measured with sharp's trim). Drawn whole with object-contain, the
+ * box was mostly transparent, so the masthead centred on empty space and the
+ * logos sat ~80px left of the panel's centre. Cropping to the art fixes both.
+ */
+const WORDMARK_ART: Record<string, { w: number; h: number; x: number; y: number; artW: number; artH: number }> = {
+  '/images/dimun/dimun-logo-main.png': { w: 1366, h: 1280, x: 195, y: 446, artW: 919, artH: 388 },
+};
+
+function Wordmark({ src, alt }: { src: string; alt: string }) {
+  const art = WORDMARK_ART[src];
+  if (!art) {
+    return (
+      <div className="relative aspect-[16/9] w-72 md:w-[30rem]">
+        <Image src={src} alt={alt} fill preload sizes="480px" className="object-contain" />
+      </div>
+    );
+  }
+  // Same visible size as before (116px / 196px of artwork), now centred.
+  return (
+    <div className="relative w-[7.25rem] overflow-hidden md:w-[12.25rem]" style={{ aspectRatio: `${art.artW} / ${art.artH}` }}>
+      <Image
+        src={src}
+        alt={alt}
+        width={art.w}
+        height={art.h}
+        preload
+        sizes="(max-width: 768px) 173px, 292px"
+        className="absolute h-auto max-w-none"
+        style={{
+          width: `${(art.w / art.artW) * 100}%`,
+          left: `${(-art.x / art.artW) * 100}%`,
+          top: `${(-art.y / art.artH) * 100}%`,
+        }}
+      />
+    </div>
+  );
 }
 
 export default async function EventPageRoute({ params }: { params: Promise<{ slug: string }> }) {
@@ -47,12 +89,7 @@ export default async function EventPageRoute({ params }: { params: Promise<{ slu
                   <Image src={e.emblem} alt="" fill preload sizes="176px" className="object-contain" />
                 </div>
               )}
-              {e.wordmark && (
-                <div className="relative aspect-[16/9] w-72 md:w-[30rem]">
-                  {/* The wordmark file carries wide transparent margins, hence the large box. */}
-                  <Image src={e.wordmark} alt={e.shortName} fill preload sizes="480px" className="object-contain" />
-                </div>
-              )}
+              {e.wordmark && <Wordmark src={e.wordmark} alt={e.shortName} />}
             </div>
           </ClipReveal>
         </div>
@@ -63,7 +100,7 @@ export default async function EventPageRoute({ params }: { params: Promise<{ slu
         <div className="mt-8 grid gap-5 md:grid-cols-2 md:gap-10">
           {e.about.body.map((p, i) => (
             <Reveal key={i} step={i} as="p" className={i === 0 ? 'font-display text-[1.3rem] leading-[1.5]' : 'text-[1.05rem] text-content-muted'}>
-              {p}
+              {keepDatesTogether(p)}
             </Reveal>
           ))}
         </div>
@@ -94,7 +131,7 @@ export default async function EventPageRoute({ params }: { params: Promise<{ slu
               <h2 id="registration-heading" className="text-[1.45rem] leading-tight tracking-[-0.015em]">
                 {e.registration.title}
               </h2>
-              <p className="mt-2 max-w-[56ch] text-content-muted">{e.registration.detail}</p>
+              <p className="mt-2 max-w-[56ch] text-content-muted">{keepDatesTogether(e.registration.detail)}</p>
             </div>
             {e.registration.status === 'open' && e.registration.href ? (
               <Button href={e.registration.href} target="_blank" rel="noreferrer" className="shrink-0">
@@ -119,8 +156,8 @@ export default async function EventPageRoute({ params }: { params: Promise<{ slu
               <div className="grid gap-6 sm:grid-cols-2">
                 <TextField name="firstName" label="First name" required autoComplete="given-name" />
                 <TextField name="lastName" label="Last name" required autoComplete="family-name" />
-                <TextField name="club" label="Interact or MUN club" required />
-                <TextField name="position" label="Position" required />
+                <TextField name="club" label="Interact or MUN club" required autoComplete="organization" />
+                <TextField name="position" label="Position" required autoComplete="organization-title" />
                 <TextField name="email" label="Email" type="email" required autoComplete="email" />
                 <TextField name="phone" label="Phone" type="tel" required autoComplete="tel" />
               </div>

@@ -7,6 +7,10 @@ import type { ComponentProps, ReactNode } from 'react';
  *
  * `onPhoto` is a separate tone rather than a colour override because the hero
  * sits over photography, where the chalk-on-navy pair has no reliable contrast.
+ *
+ * With `href` it renders a Link; without one it renders a native `<button>`
+ * (default `type="button"`), so hand-built pills can move onto this component.
+ * Press feedback is the `press` utility (globals.css): 0.97 in 120ms.
  */
 type Tone = 'primary' | 'ghost' | 'onPhoto' | 'onPhotoGhost' | 'onInk' | 'onInkGhost';
 
@@ -24,28 +28,34 @@ const TONES: Record<Tone, string> = {
 };
 
 const BASE =
-  'inline-flex items-center justify-center whitespace-nowrap rounded-control border px-6 py-3.5 text-sm font-semibold transition-[background-color,border-color,color,translate] duration-200 active:translate-y-px';
+  'press inline-flex items-center justify-center whitespace-nowrap rounded-control border px-6 py-3.5 text-sm font-semibold';
 
-export function Button({
-  href,
-  tone = 'primary',
-  className = '',
-  children,
-  ...rest
-}: {
-  href: string;
+type Common = {
   tone?: Tone;
   className?: string;
   children: ReactNode;
-} & Omit<ComponentProps<typeof Link>, 'href' | 'className' | 'children'>) {
+};
+
+type LinkButtonProps = Common & { href: string } & Omit<ComponentProps<typeof Link>, 'href' | 'className' | 'children'>;
+type NativeButtonProps = Common & { href?: undefined } & Omit<ComponentProps<'button'>, 'className' | 'children'>;
+
+export function Button(props: LinkButtonProps | NativeButtonProps) {
+  const { tone = 'primary', className = '', children } = props;
+  const cls = `${BASE} ${TONES[tone]} ${className}`;
+
+  if (props.href !== undefined) {
+    const { href, tone: _t, className: _c, children: _ch, ...rest } = props;
+    return (
+      <Link href={href} data-morph className={cls} {...rest}>
+        {children}
+      </Link>
+    );
+  }
+
+  const { tone: _t, className: _c, children: _ch, href: _h, type = 'button', ...rest } = props;
   return (
-    <Link
-      href={href}
-      data-morph
-      className={`${BASE} ${TONES[tone]} ${className}`}
-      {...rest}
-    >
+    <button type={type} data-morph className={cls} {...rest}>
       {children}
-    </Link>
+    </button>
   );
 }

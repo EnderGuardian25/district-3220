@@ -1,8 +1,14 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AVENUE_PANELS } from '@/lib/home';
+
+/**
+ * Hover-intent delay (approved 2026-10-06): a pointer crossing the row on its
+ * way somewhere else shouldn't fling panels open. Click and focus stay instant.
+ */
+const HOVER_INTENT_MS = 80;
 
 /**
  * Accordion Gallery (lab.damiandc.com/accordion-gallery).
@@ -18,9 +24,10 @@ import { AVENUE_PANELS } from '@/lib/home';
  *    colour on the left edge and the description revealed on open.
  *
  * `onSolid` picks the band's text colour. All five are 'light' (white) by
- * request, including Community Service, where white measures about 2.6:1 and
- * fails AA; the accepted trade-off and its one-line fix are in
- * design/DECISIONS.md §2. The 'dark' branch is kept for that fix.
+ * request. Community Service's amber can't carry white at AA, so its band uses
+ * the darker `solid` colour (lib/home.ts CONTRAST NOTE, 2026-10-06). The blurb
+ * is white at 90%: 85% measured 4.26:1 on Club Service and 4.33:1 on Green
+ * Life. The 'dark' branch is kept in case a future colour needs it.
  *
  * Deliberately NOT a morph-cursor target: a collapsed panel is roughly
  * 140x520, so the cursor would inflate into a slab and fight the hover.
@@ -29,11 +36,20 @@ export function AvenuesAccordion() {
   const [hovered, setHovered] = useState<number | null>(null);
   const [locked, setLocked] = useState<number | null>(null);
   const open = locked ?? hovered;
+  const intent = useRef<number | null>(null);
+  const cancelIntent = () => {
+    if (intent.current !== null) window.clearTimeout(intent.current);
+    intent.current = null;
+  };
+  useEffect(() => cancelIntent, []);
 
   return (
     <div
       className="mt-8 flex flex-col gap-2.5 md:h-[clamp(320px,42vw,520px)] md:flex-row md:gap-2"
-      onMouseLeave={() => setHovered(null)}
+      onMouseLeave={() => {
+        cancelIntent();
+        setHovered(null);
+      }}
     >
       {AVENUE_PANELS.map((a, i) => {
         const isOpen = open === i;
@@ -41,14 +57,31 @@ export function AvenuesAccordion() {
           <button
             key={a.slug}
             type="button"
-            aria-expanded={isOpen}
-            onMouseEnter={() => locked === null && setHovered(i)}
+            // The name alone is the accessible name; the blurb is its
+            // description while open, rather than the whole paragraph being
+            // read out as the button's name. Expanded tracks the click-lock,
+            // the user's own disclosure: hover and focus only preview, so
+            // tabbing along the row doesn't announce "expanded" at every stop.
+            aria-labelledby={`avenue-${a.slug}-name`}
+            aria-describedby={isOpen ? `avenue-${a.slug}-blurb` : undefined}
+            aria-controls={`avenue-${a.slug}-blurb`}
+            aria-expanded={locked === i}
+            data-open={isOpen}
+            onMouseEnter={() => {
+              if (locked !== null) return;
+              cancelIntent();
+              intent.current = window.setTimeout(() => setHovered(i), HOVER_INTENT_MS);
+            }}
+            onMouseLeave={cancelIntent}
             onFocus={() => locked === null && setHovered(i)}
             // Tabbing out must close what tabbing in opened.
             onBlur={() => locked === null && setHovered(null)}
             onClick={() => setLocked((l) => (l === i ? null : i))}
             style={{
               ['--k' as string]: a.colour,
+              // The band behind the white name: `solid` where the brand
+              // colour can't carry white at AA (Community Service).
+              ['--k-solid' as string]: a.solid ?? a.colour,
               backgroundColor: `color-mix(in srgb, ${a.colour} ${isOpen ? 15 : 9}%, #FFFFFF)`,
               flexGrow: isOpen ? 4.4 : 1,
             }}
@@ -56,7 +89,7 @@ export function AvenuesAccordion() {
             // longer, gentler curve than the default. The description used to
             // animate max-height alongside it, which is never linear with the
             // real content height and was most of the roughness.
-            className="group relative grid min-h-[92px] grid-cols-[92px_1fr] items-center overflow-hidden rounded-media border-l-4 border-l-[var(--k)] text-left transition-[flex-grow,background-color] duration-[750ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:block md:min-h-0 md:min-w-0 md:border-l-0"
+            className="group relative grid min-h-[92px] grid-cols-[92px_1fr] items-center overflow-hidden rounded-media border-l-4 border-l-[var(--k)] text-left transition-[flex-grow,background-color] duration-[750ms] ease-out-quint md:block md:min-h-0 md:min-w-0 md:border-l-0"
           >
             {/* Logo. Centred in the plate above the band on desktop; a fixed
                 column on mobile. */}
@@ -66,7 +99,7 @@ export function AvenuesAccordion() {
                 alt=""
                 width={160}
                 height={160}
-                className="max-h-[54px] w-auto object-contain transition-transform duration-[600ms] ease-out-expo md:max-h-[74%] md:max-w-[74%] group-aria-expanded:md:scale-105"
+                className="max-h-[54px] w-auto object-contain transition-transform duration-[600ms] ease-out-expo md:max-h-[74%] md:max-w-[74%] group-data-[open=true]:md:scale-105 motion-reduce:group-data-[open=true]:md:scale-100"
               />
             </span>
 
@@ -83,11 +116,12 @@ export function AvenuesAccordion() {
             {/* Band. Transparent on mobile (the left edge carries the colour),
                 solid from md up. */}
             <span
-              className={`relative z-10 block py-3.5 pr-4 md:absolute md:inset-x-0 md:bottom-0 md:flex md:min-h-24 md:flex-col md:justify-end md:bg-[var(--k)] md:p-4 md:pb-[18px] ${
+              className={`relative z-10 block py-3.5 pr-4 md:absolute md:inset-x-0 md:bottom-0 md:flex md:min-h-24 md:flex-col md:justify-end md:bg-[var(--k-solid)] md:p-4 md:pb-[18px] ${
                 a.onSolid === 'dark' ? 'md:text-chalk-950' : 'md:text-white'
               }`}
             >
               <span
+                id={`avenue-${a.slug}-name`}
                 className={`block font-display font-semibold tracking-[-0.015em] ${
                   isOpen ? 'md:text-[clamp(1rem,1.5vw,1.2rem)]' : 'md:text-[0.78rem] md:leading-snug'
                 } [overflow-wrap:anywhere]`}
@@ -98,12 +132,13 @@ export function AvenuesAccordion() {
                   the content's real height, so the reveal finishes exactly when
                   the text does instead of easing toward a guessed ceiling. */}
               <span
-                className={`grid transition-[grid-template-rows,opacity,margin-top] duration-[750ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`grid transition-[grid-template-rows,opacity,margin-top] duration-[750ms] ease-out-quint ${
                   isOpen ? 'mt-2 grid-rows-[1fr] opacity-100' : 'mt-0 grid-rows-[0fr] opacity-0'
                 }`}
               >
                 <span
-                  className={`block max-w-[38ch] overflow-hidden text-[0.93rem] text-content-muted md:text-white/85 ${
+                  id={`avenue-${a.slug}-blurb`}
+                  className={`block max-w-[38ch] overflow-hidden text-[0.93rem] text-content-muted md:text-white/90 ${
                     a.onSolid === 'dark' ? 'md:text-chalk-950/80' : ''
                   }`}
                 >

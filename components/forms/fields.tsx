@@ -36,7 +36,10 @@ function Shell({ name, label, hint, required, className = '', children }: Base &
         </p>
       )}
       <div className="mt-2">{children}</div>
-      <p id={`${name}-error`} role="alert" className="mt-1.5 text-[13px] text-danger empty:hidden" />
+      {/* No role="alert": on a submit with several errors every slot would
+          interrupt at once. Focus moves to the first invalid field, whose
+          aria-describedby reads its error. */}
+      <p id={`${name}-error`} className="mt-1.5 text-[13px] text-danger empty:hidden" />
     </div>
   );
 }
@@ -48,8 +51,15 @@ export function TextField({
   required,
   className,
   type = 'text',
+  minToday,
   ...rest
-}: Base & Omit<InputHTMLAttributes<HTMLInputElement>, 'name' | 'className'>) {
+}: Base & {
+  /**
+   * Date fields only: refuse past dates. Set on the client by MailtoForm
+   * (the visitor's own "today"), so the page itself stays static.
+   */
+  minToday?: boolean;
+} & Omit<InputHTMLAttributes<HTMLInputElement>, 'name' | 'className'>) {
   return (
     <Shell name={name} label={label} hint={hint} required={required} className={className}>
       <input
@@ -60,13 +70,25 @@ export function TextField({
         // Spellcheck underlines every email address as a misspelling.
         spellCheck={type === 'email' ? false : undefined}
         data-label={label}
+        data-min-today={minToday ? '' : undefined}
         aria-describedby={`${hint ? `${name}-hint ` : ''}${name}-error`}
-        className={`${CONTROL} h-12 rounded-control px-5`}
+        className={`${CONTROL} h-12 rounded-control px-5 ${type === 'date' || type === 'time' ? DATE_TIME : ''}`}
         {...rest}
       />
     </Shell>
   );
 }
+
+/**
+ * Native date and time inputs draw their empty "mm/dd/yyyy" and "--:-- --"
+ * masks in ink, with a black picker icon, so an empty one looked filled in
+ * next to the soft placeholders of the other fields. CSS can't see "empty"
+ * on these inputs, but a required empty one is :invalid, so that state takes
+ * the placeholder colour (the district's date/time fields are all required).
+ * The icon is softened to match the select's chevron.
+ */
+const DATE_TIME =
+  'invalid:not-focus:text-content-soft [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-55';
 
 export function TextArea({
   name,
@@ -86,7 +108,13 @@ export function TextArea({
         required={required}
         data-label={label}
         aria-describedby={`${hint ? `${name}-hint ` : ''}${name}-error`}
-        className={`${CONTROL} block rounded-media px-5 py-3.5`}
+        // Where field-sizing is supported the box grows with its text, so
+        // the native resize grip (which sat in the rounded corner) goes.
+        // Elsewhere the grip stays so long text can still be opened up. The
+        // cap keeps a long paste from pushing the submit button off-screen;
+        // past it the box scrolls.
+        className={`${CONTROL} block max-h-[60svh] rounded-media px-5 py-3.5 leading-[1.5] resize-y supports-[field-sizing:content]:resize-none supports-[field-sizing:content]:[field-sizing:content]`}
+        style={{ minHeight: `calc(${rows} * 1.5em + 1.75rem + 2px)` }}
         {...rest}
       />
     </Shell>
@@ -163,14 +191,21 @@ export function ChoiceChips({
       <div className="mt-3 flex flex-wrap gap-2">
         {options.map((o) => (
           <label key={o} className="cursor-pointer">
-            <input type="checkbox" name={name} value={o} className="peer sr-only" />
-            <span className="inline-flex items-center gap-2 rounded-control border border-control-border bg-surface px-4 py-2 text-sm transition-colors duration-200 peer-checked:border-accent-fill peer-checked:bg-accent-fill peer-checked:text-accent-on peer-focus-visible:outline-2 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-focus hover:border-content-soft">
+            <input
+              type="checkbox"
+              name={name}
+              value={o}
+              aria-required={required || undefined}
+              aria-describedby={`${name}-error`}
+              className="peer sr-only"
+            />
+            <span className="press inline-flex items-center gap-2 rounded-control border border-control-border bg-surface px-4 py-2 text-sm peer-checked:border-accent-fill peer-checked:bg-accent-fill peer-checked:text-accent-on peer-focus-visible:outline-2 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-focus hover:border-content-soft">
               {o}
             </span>
           </label>
         ))}
       </div>
-      <p id={`${name}-error`} role="alert" className="mt-1.5 text-[13px] text-danger empty:hidden" />
+      <p id={`${name}-error`} className="mt-1.5 text-[13px] text-danger empty:hidden" />
     </fieldset>
   );
 }

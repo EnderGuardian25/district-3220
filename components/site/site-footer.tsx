@@ -42,7 +42,7 @@ export function SiteFooter() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-sm text-content-muted transition-colors hover:text-content"
+                    className="text-sm text-content-muted transition-colors duration-200 hover:text-content"
                   >
                     {item.label}
                   </Link>
@@ -60,15 +60,17 @@ export function SiteFooter() {
               <li>
                 <a
                   href={`mailto:${SITE.email}`}
-                  className="break-all text-content-muted transition-colors hover:text-content"
+                  className="text-content-muted transition-colors duration-200 hover:text-content"
                 >
-                  {SITE.email}
+                  {SITE.email.split('@')[0]}
+                  {/* Breaks only before the @, never mid-word. */}
+                  <wbr />@{SITE.email.split('@')[1]}
                 </a>
               </li>
               <li>
                 <a
                   href={`tel:${SITE.phone.replace(/\s/g, '')}`}
-                  className="text-content-muted transition-colors hover:text-content"
+                  className="text-content-muted transition-colors duration-200 hover:text-content"
                 >
                   {SITE.phone}
                 </a>
@@ -78,7 +80,9 @@ export function SiteFooter() {
             <h2 className="mt-7 text-[11px] font-semibold tracking-[0.12em] text-content-muted uppercase">
               Social media
             </h2>
-            <ul className="mt-4 flex flex-wrap gap-2.5">
+            {/* Pulled left by the icon's inset in its 40px target ((40 - 17) / 2),
+                so the first glyph lines up with the heading above it. */}
+            <ul className="mt-4 -ml-[11.5px] flex flex-wrap gap-2.5">
               {SOCIALS.map((s) => (
                 <li key={s.href}>
                   <a
@@ -87,7 +91,7 @@ export function SiteFooter() {
                     rel="noreferrer noopener"
                     // 40px hit target — icon-only links are easy to make too
                     // small to tap reliably.
-                    className="inline-flex size-10 items-center justify-center rounded-control text-content-muted transition-colors hover:bg-surface hover:text-accent-text"
+                    className="press inline-flex size-10 items-center justify-center rounded-control text-content-muted hover:bg-surface hover:text-accent-text"
                   >
                     <SocialIcon name={s.label} className="size-[17px]" />
                     {/* The glyph alone gives the link no accessible name. */}

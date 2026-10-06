@@ -41,7 +41,7 @@ export default function AboutPage() {
         <SectionHeader id="purpose-heading" title="What the district is for." />
         <ol className="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
           {PURPOSE.map((p, i) => (
-            <Reveal key={p.title} step={i} as="li">
+            <Reveal key={p.title} step={Math.min(i, 4)} as="li">
               <p className="label-micro text-content-soft">{String(i + 1).padStart(2, '0')}</p>
               <h3 className="mt-3 text-[1.45rem] leading-tight tracking-[-0.015em]">{p.title}</h3>
               <p className="mt-3 max-w-[40ch] text-content-muted">{p.body}</p>
@@ -88,18 +88,22 @@ export default function AboutPage() {
             title="Nine zones, two countries."
             lede="Clubs are organised into zones, each with its own representative on the district council."
           />
-          <ul className="mt-10 flex flex-wrap gap-x-3 gap-y-2 font-display text-[clamp(1.6rem,3.6vw,2.8rem)] leading-[1.2] font-semibold tracking-[-0.02em]">
-            {ZONES.map((z, i) => (
-              <Reveal key={z} step={Math.min(i, 6)} as="li" className="flex items-baseline gap-3">
-                <span className={z === 'Maldives region' ? 'text-signal-400' : ''}>{z}</span>
-                {i < ZONES.length - 1 && (
-                  <span aria-hidden="true" className="text-white/25">
+          {/* Every zone carries a leading separator in a 32px slot, and the list
+              is pulled 32px left inside a horizontal clip. Whichever zones start
+              a line have their dot clipped away, so no line starts or ends on
+              a dot at any width. overflow-x-clip leaves the rise-in visible. */}
+          <div className="mt-10 overflow-x-clip">
+            <ul className="-ml-8 flex flex-wrap gap-y-2 font-display text-[clamp(1.6rem,3.6vw,2.8rem)] leading-[1.2] font-semibold tracking-[-0.02em]">
+              {ZONES.map((z, i) => (
+                <Reveal key={z} step={Math.min(i, 6)} as="li" className="flex items-baseline">
+                  <span aria-hidden="true" className="w-8 shrink-0 text-center text-white/25">
                     ·
                   </span>
-                )}
-              </Reveal>
-            ))}
-          </ul>
+                  <span className={z === 'Maldives region' ? 'text-signal-400' : ''}>{z}</span>
+                </Reveal>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
@@ -108,10 +112,12 @@ export default function AboutPage() {
         <SectionHeader id="people-heading" title="The people who run it." />
         <ul className="mt-8 grid gap-3 md:grid-cols-3">
           {PEOPLE_LINKS.map((l, i) => (
-            <Reveal key={l.href} step={i} as="li">
+            <Reveal key={l.href} step={Math.min(i, 4)} as="li">
               <Link
                 href={l.href}
-                className="group flex h-full flex-col justify-between gap-10 rounded-panel border border-hairline bg-surface p-6 transition-colors duration-200 hover:border-accent-fill md:p-7"
+                // Phone: one row, arrow beside the text. From md the cards sit
+                // three across and the arrow drops to the corner.
+                className="group flex h-full items-center justify-between gap-6 rounded-panel border border-hairline bg-surface p-6 transition-colors duration-200 hover:border-accent-fill md:flex-col md:items-stretch md:gap-10 md:p-7"
               >
                 <span>
                   <span className="block font-display text-[1.35rem] leading-tight font-semibold tracking-[-0.015em]">
@@ -121,7 +127,7 @@ export default function AboutPage() {
                 </span>
                 <span
                   aria-hidden="true"
-                  className="inline-flex size-10 items-center justify-center self-end rounded-control border border-control-border transition-[background-color,border-color,color,translate] duration-200 group-hover:translate-x-0.5 group-hover:border-accent-fill group-hover:bg-accent-fill group-hover:text-accent-on"
+                  className="inline-flex size-10 shrink-0 items-center justify-center rounded-control md:self-end border border-control-border transition-[background-color,border-color,color,translate] duration-200 group-hover:translate-x-0.5 motion-reduce:group-hover:translate-x-0 group-hover:border-accent-fill group-hover:bg-accent-fill group-hover:text-accent-on"
                 >
                   <svg viewBox="0 0 20 20" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 10h12M11 5l5 5-5 5" />

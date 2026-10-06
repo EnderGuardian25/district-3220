@@ -56,8 +56,8 @@ export default function MediaCrewPage() {
               <fieldset className="grid gap-6 sm:grid-cols-2">
                 <legend className="label-micro mb-5 text-content-soft">About you</legend>
                 <TextField name="name" label="Interactor’s name" required autoComplete="name" />
-                <TextField name="club" label="Interact club" required />
-                <TextField name="designation" label="Designation" required placeholder="e.g. Club Secretary" />
+                <TextField name="club" label="Interact club" required autoComplete="organization" />
+                <TextField name="designation" label="Designation" required autoComplete="organization-title" placeholder="e.g. Club Secretary" />
                 <TextField name="phone" label="Phone" type="tel" required autoComplete="tel" />
                 <TextField name="email" label="Email" type="email" required autoComplete="email" className="sm:col-span-2" />
               </fieldset>

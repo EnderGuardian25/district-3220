@@ -81,7 +81,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
           <div className="mt-10 flex flex-col gap-5 text-[1.075rem] leading-[1.75]">
             {p.body.map((para, i) => (
-              <p key={i} className={i === 0 ? 'font-display text-[1.3rem] leading-[1.55] text-content' : 'text-content/90'}>
+              // The lead opts out of the global `text-wrap: pretty`: at this
+              // size in a narrow column it left very ragged lines.
+              <p key={i} className={i === 0 ? 'font-display text-[1.3rem] leading-[1.55] text-content [text-wrap:wrap]' : 'text-content/90'}>
                 {para}
               </p>
             ))}
@@ -90,25 +92,29 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       </article>
 
       {others.length > 0 && (
-        <nav aria-label="More news" className="container-page mt-20 border-t border-hairline pt-10">
-          <p className="label-micro text-content-soft">More news</p>
-          <ul className="mt-4 flex flex-col">
-            {others.map((o) => (
-              <li key={o.slug}>
-                <Link
-                  href={`/news/${o.slug}`}
-                  className="group flex flex-col gap-1 border-b border-hairline py-5 md:flex-row md:items-baseline md:justify-between"
-                >
-                  <span className="font-display text-[1.3rem] leading-tight font-semibold tracking-[-0.015em] transition-colors duration-200 group-hover:text-accent-text">
-                    {o.shortTitle ?? o.title}
-                  </span>
-                  <time dateTime={o.date} className="label-micro text-content-soft">
-                    {formatDate(o.date)}
-                  </time>
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <nav aria-label="More news" className="container-page mt-20">
+          {/* The rule goes on an inner box: on container-page itself it ran
+              through the gutters, wider than every other rule on the page. */}
+          <div className="border-t border-hairline pt-10">
+            <p className="label-micro text-content-soft">More news</p>
+            <ul className="mt-4 flex flex-col">
+              {others.map((o) => (
+                <li key={o.slug}>
+                  <Link
+                    href={`/news/${o.slug}`}
+                    className="group flex flex-col gap-1 border-b border-hairline py-5 md:flex-row md:items-baseline md:justify-between"
+                  >
+                    <span className="font-display text-[1.3rem] leading-tight font-semibold tracking-[-0.015em] transition-colors duration-200 group-hover:text-accent-text">
+                      {o.shortTitle ?? o.title}
+                    </span>
+                    <time dateTime={o.date} className="label-micro text-content-soft">
+                      {formatDate(o.date)}
+                    </time>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </nav>
       )}
     </main>

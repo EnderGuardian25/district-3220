@@ -58,11 +58,11 @@ Rules:
 
 | Role | Token | Value | Use |
 |---|---|---|---|
-| Mark | `accent` | `#2E7DF6` (signal-500) | Nav active underline, morph cursor, small graphic marks, meta labels on dark photo scrims. **Never a button fill with white text (3.90, fails).** |
+| Mark | `accent` | `#2E7DF6` (signal-500) | Nav active underline, morph cursor, small graphic marks. **Never a button fill with white text (3.90, fails).** Not for small text over photography: it measured 3.5–4.1:1 on the project tiles, so meta labels on photo scrims use `signal-400` (revised 2026-10-06). |
 | Fill | `accent-fill` | `#155FD9` (signal-600) | Primary button background; officers tile hover fill. White label 5.78. |
 | Text | `accent-text` | `#124AAD` (signal-700) | Links and inline accents on chalk (7.30). Also the focus ring. |
 | Soft | `accent-soft` | `#EFF5FF` (signal-50) | Tinted backgrounds, sparingly |
-| On photo | `signal-400` | `#5B90F8` | The highlighted phrase in the hero headline over photography |
+| On photo | `signal-400` | `#5B90F8` | The highlighted phrase in the hero headline over photography; meta labels on photo scrims (project tiles) |
 
 There is **no second accent colour.** No cyan, no orange, no gradients between
 hues. The official Interact cyan `#01B4E6` exists only inside the supplied logo
@@ -79,8 +79,18 @@ Green Life `#187777` · Finance `#1B244A`.
 - Button fill is signal-**600**, not 500 (white on 500 = 3.90, fails AA).
 - Micro-labels use chalk-**700** `#6E695E` (5.02); chalk-600 is 2.92 and fails.
 - Control borders are chalk-500 `#D6D1C4` (3.02, clears 3:1).
-- Community Service band: white on `#D8951C` ≈ 2.6, **fails AA, white by
-  explicit request.** If it must pass: darken that band only to `#A86F12`.
+- Community Service band: the solid band behind the white name and blurb is
+  `#906413` (white name 5.23, blurb at 90% white 4.58), darker than the logo's
+  `#D8951C`, which the tint and the phone edge keep (`solid` in lib/home.ts).
+  **Revision 2026-10-06 (approved by the user):** this was white on
+  `#D8951C` (≈ 2.6, failing AA) by an earlier request; the user asked for
+  contrast to pass everywhere and chose the documented fix. The fix this file
+  used to name, `#A86F12`, measures 4.24 with white and still fails, so the
+  band uses the lightest step of the same hue that passes.
+- Photo scrims are `chalk-950` gradients set to the minimum that keeps every
+  piece of hero copy and the see-through nav at AA on every slide, measured on
+  the worst 10% of pixels behind the text, text-shadow ignored (2026-10-06).
+  Swapping a hero photo means re-measuring.
 
 ## 3. Typography
 
@@ -106,12 +116,32 @@ Section headings are full sentences ending in a full stop
 - Dividers are hairlines (`chalk-400`), not shadows. The one shadow on the
   site is the floating nav dropdown (`shadow-xl shadow-navy-900/8`). No glass,
   no blur, no film grain, no glow.
+- **Touch targets** (2026-10-06): every control is at least 24px (WCAG 2.5.8).
+  Icon-only controls on the touch-first surfaces (the menu button, the hero's
+  pause button) keep their 36px circle but carry an invisible 44px hit area.
+  Controls get `touch-action: manipulation` and no tap highlight
+  (globals.css), since each has its own press state.
+- The sticky header is offset by `scroll-padding-top: 5rem`, so anchor jumps
+  and keyboard focus never land under it.
+- **Names and dates don't break** inside a surname ("De Cruz"), after an
+  initial, or inside a date ("21 November 2025"): render them through
+  `keepTogether` / `keepDatesTogether` (`components/people/keep-together.ts`),
+  never by editing the data.
 
 ## 5. Components (reuse, don't re-invent)
 
 - **`Button`** (`components/ui/button.tsx`) is the only button. Tones:
   `primary` / `ghost` on chalk, `onPhoto` / `onPhotoGhost` over photography,
   `onInk` / `onInkGhost` on dark bands. Pick a tone; never override colours.
+  With `href` it renders a link, without one a native `<button>`
+  (`type="button"` by default).
+- **`press`** (globals.css utility) goes on every pressable control that
+  isn't a `Button`: pills, chips, arrows, toggles, icon buttons. It owns
+  `transition-property` (colours at 200ms, scale at 120ms), so it replaces a
+  `transition-*` utility rather than sitting beside one. Use `--press-extra`
+  for one extra transitioned property and `--press-dur` for a longer colour
+  change (the header's 300ms). It never transitions `outline-color`: focus
+  rings appear instantly. Large cards and tiles don't get it.
 - **`Reveal`** / **`DrawLine`** (`components/motion/reveal.tsx`) for enter
   motion below the fold: 550ms, `ease-out-expo`, 18px rise, 70ms stagger
   steps. Content in the first viewport uses the CSS load animations instead
@@ -138,17 +168,57 @@ with a shared-element handoff (projects), **Accordion Gallery** (avenues),
 (sitewide, fine pointer only). Inner pages reuse these. A new effect is a
 design change (see the top of this file).
 
-- Hover/press 200ms (300ms for the header's colour change); enters
-  550–1150ms on `ease-out-expo`; clip moves on `ease-clip`.
+- Hover 200ms (300ms for the header's colour change); press 120ms (below);
+  enters 550–1150ms on `ease-out-expo`; clip moves on `ease-clip`. The softer
+  `ease-out-quint` (`cubic-bezier(0.22,1,0.36,1)`) is the header dropdown,
+  drawer and accordion curve, now a named token instead of inline values.
 - Everything is reachable by `prefers-reduced-motion`, and the morph cursor is
   off on touch. The audience is mid-range Android, so this is a performance
   rule too. Under reduced motion: no autoplay, no smooth-scroll hijack, no
   custom cursor, pinned rails become ordinary layouts, the DIR line is simply
-  drawn, and every reveal lands on its final frame with no delay (verified
-  in Chrome with `--force-prefers-reduced-motion`, 2026-10-06).
+  drawn. **Revised 2026-10-06 (approved by the user): reduced means gentler,
+  not none.** Nothing moves (no rise, slide, scale, clip wipe, zoom, press
+  scale, delay or stagger); what remains is a 200ms opacity fade, plus
+  colour changes, so content still arrives rather than popping. Reveals,
+  clip reveals, the hero's slide change and dialogs all fade. (Before this it
+  jumped every animation to its final frame.)
+- **Revision 2026-10-06 (approved by the user): interaction refinements**,
+  after an audit against Emil Kowalski's design-engineering principles. None
+  is a new effect; each refines an existing one:
+  - **Press:** every pressable control scales to 0.97 in 120ms on
+    `ease-out-expo` (the `press` utility in globals.css), replacing the 1px
+    drop. Colours keep their 200ms. Off under reduced motion.
+  - **Nav dropdown** grows from its trigger: opacity plus scale 0.97 → 1 from
+    the top-left, 160ms in and 120ms out. It never scales from 0. The mobile
+    drawer opens with a clip-path reveal instead of animating height.
+  - **Accordions** wait about 80ms before opening on hover, so passing the
+    pointer over them doesn't fire them. Click and focus are still instant.
+  - **Forms:** the "your email is ready" confirmation rises in with
+    `rise-in`, and Copy → Copied cross-fades in 150ms.
+  - **Exits are faster than enters:** dialog scrims 220ms in, 150ms out.
+  - **Calendar month wipe** 650 → 400ms: people click through months
+    repeatedly, so it is a control response, not a set piece.
+  - Blur-masked cross-fades, toasts, page transitions and animated focus
+    rings were considered and rejected: §7 bans blur and glow, and the others
+    are new effects.
 - **Autoplay must be stoppable.** The hero slideshow has a pause button (touch
   has no hover), and the progress bar's own `animationend` advances the slide,
   so pausing freezes bar and countdown together.
+- **Revision 2026-10-06 (approved by the user): Morph Cursor states.**
+  - It follows faster, and the speed is time-based, so it doesn't lag on
+    slow or high-refresh screens.
+  - The hero no longer pauses on hover, only on keyboard focus and the pause
+    button.
+  - A link or button without `data-morph` (the logo, text links, cards too
+    big to park on) grows the dot into a 36px Signal ring with a 10% fill.
+  - Over dark surfaces (the hero, navy bands, ink panel, photo cards, and the
+    header while it is see-through) the parked tint and the ring switch to
+    white: 18% fill with a 60% ring when parked, 12% with 70% as a ring. Both
+    use a `screen` blend, the mirror of multiply on chalk, so the white text
+    under a parked pill stays pure white rather than being washed over. Tone
+    comes from the nearest `data-cursor` marker, or
+    else from the first opaque background behind the pointer. Styles are in
+    `.morph-cursor` in `app/globals.css`.
 
 ### Motion map: where each effect runs
 
@@ -156,15 +226,15 @@ design change (see the top of this file).
 |---|---|---|
 | Clip Reveal (slides) | Home hero | 950ms `ease-clip` wipe between photographs; 6s autoplay with pause |
 | Clip Reveal (single image) | Lead photo on About; post images (News, articles); archive-year artwork; DIMUN and Media Crew mastheads | On load (CSS) in the first viewport; on scroll (observer) below it |
-| Clip wipe (control) | Calendar month changes | 650ms, from the side the new month came from |
+| Clip wipe (control) | Calendar month changes | 400ms (650ms until 2026-10-06), from the side the new month came from |
 | Odometer Roll | Home and About stats | Digits roll to the figure on entering view |
 | Expand Grid (shared element) | Home projects; every council and profile grid; DIMUN committees and executive committee | The image moves from card into the dialog via `layoutId` |
-| Accordion Gallery | Home avenues; Media Crew services | Hover opens, click locks; 750ms `flex-grow` |
+| Accordion Gallery | Home avenues; Media Crew services | Hover opens after ~80ms intent, click locks; 750ms `flex-grow` |
 | Pinned horizontal scroll + Line Draw | Home photo band; Archives timeline | CSS scroll-driven; progress bar along the bottom |
 | Vertical Line Draw | College of DIRs | Line fills to mid-screen; each year lights as it crosses |
 | Load fade-up | Every inner-page header | `rise-in-load`, CSS, from first paint |
 | Reveal fade-up + DrawLine | Section headings, rows, cards site-wide | Observer, once per element |
-| Morph Cursor | Sitewide, mouse only | Parks on pills and controls; releases on removal or scroll-away |
+| Morph Cursor | Sitewide, mouse only | Parks on `data-morph` pills and controls; grows into a 36px ring over every other link or button (logo included); white treatment over dark surfaces; releases on removal or scroll-away |
 | Header | Sitewide | Transparent over the hero, solid from the first scroll; spring underline on the active item; dropdown and drawer open on 160–280ms tweens |
 
 ## 7. Never (each of these has been tried or proposed and rejected)
@@ -178,7 +248,10 @@ design change (see the top of this file).
 - Square buttons; Fraunces above 600.
 - Referencing ramp colours (`navy-*`, `signal-*`, `chalk-*`) in new components
   when a semantic token exists. Known exceptions already on the home page:
-  `bg-navy-900` for dark bands, `text-signal-400` in the hero, `chalk-950` scrims.
+  `bg-navy-900` for dark bands (and as the opaque backing behind captions
+  and placeholder tiles inside them, so the Line Draw passes behind text),
+  `text-signal-400` over photography (hero headline, project-tile labels),
+  `chalk-950` scrims.
 
 ---
 

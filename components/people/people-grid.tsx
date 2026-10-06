@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { useModal } from '@/components/motion/use-modal';
 import { DEFAULT_FOCUS, type Person } from '@/lib/people';
+import { keepTogether } from '@/components/people/keep-together';
 
 /**
  * Expand Grid (lab.damiandc.com/expand-grid) for people, the same mechanic as
@@ -17,6 +18,9 @@ import { DEFAULT_FOCUS, type Person } from '@/lib/people';
  * `scope` keeps layoutIds unique when two grids share a page, e.g. one per
  * council group.
  */
+/** A card is three subgrid rows with no gap inside it (the mt-* space them). */
+const CARD = 'row-span-3 grid grid-rows-subgrid gap-y-0';
+
 export function PeopleGrid({ people, scope }: { people: Person[]; scope: string }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const reduced = useReducedMotion();
@@ -37,9 +41,12 @@ export function PeopleGrid({ people, scope }: { people: Person[]; scope: string 
 
   return (
     <>
+      {/* Each card spans three rows (portrait, position, name) of a subgrid,
+          so a position that wraps to two or three lines pushes the whole row's
+          names down together instead of leaving them at ragged heights. */}
       <ul className="grid grid-cols-2 gap-x-4 gap-y-9 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {people.map((person, i) => (
-          <li key={`${person.name}-${i}`}>
+          <li key={`${person.name}-${i}`} className={CARD}>
             {person.tba ? (
               <TbaCard person={person} />
             ) : (
@@ -50,19 +57,19 @@ export function PeopleGrid({ people, scope }: { people: Person[]; scope: string 
                 type="button"
                 onClick={() => setOpenIndex(i)}
                 aria-haspopup="dialog"
-                className="group block w-full text-left"
+                className={`group w-full text-left ${CARD}`}
               >
                 <motion.span
                   layoutId={layoutKey(i)}
-                  className="relative block aspect-[4/5] overflow-hidden rounded-media bg-sunk"
+                  className="relative block aspect-[4/5] self-start overflow-hidden rounded-media bg-sunk"
                 >
                   {/* alt="" in the card: the button already reads the name and
                       position, so a portrait alt would say the name twice. */}
                   <Portrait person={person} decorative sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, (max-width: 1280px) 22vw, 270px" />
                 </motion.span>
-                <span className="label-micro mt-3.5 block text-content-soft">{person.position}</span>
-                <span className="mt-1.5 block font-display text-[1.05rem] leading-snug font-semibold tracking-[-0.01em] transition-colors duration-200 group-hover:text-accent-text">
-                  {person.name}
+                <span className="label-micro mt-3.5 block self-start text-content-soft">{person.position}</span>
+                <span className="mt-1.5 block self-start font-display text-[1.05rem] leading-snug font-semibold tracking-[-0.01em] transition-colors duration-200 group-hover:text-accent-text">
+                  {keepTogether(person.name)}
                 </span>
               </button>
             )}
@@ -77,8 +84,9 @@ export function PeopleGrid({ people, scope }: { people: Person[]; scope: string 
             className="fixed inset-0 z-80 flex items-center justify-center p-4 md:p-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.22 }}
+            // Exit quicker than enter; under reduced motion a 200ms fade, no move.
+            exit={{ opacity: 0, transition: { duration: reduced ? 0.2 : 0.15, ease: [0.16, 1, 0.3, 1] } }}
+            transition={{ duration: reduced ? 0.2 : 0.22, ease: [0.16, 1, 0.3, 1] }}
           >
             <button
               type="button"
@@ -106,7 +114,7 @@ export function PeopleGrid({ people, scope }: { people: Person[]; scope: string 
                   id={`person-${scope}-name`}
                   className="mt-4 text-[clamp(1.5rem,3vw,2.1rem)] leading-[1.08] tracking-[-0.02em]"
                 >
-                  {open.name}
+                  {keepTogether(open.name)}
                 </h3>
                 {open.bio && <p className="mt-4 max-w-[44ch] text-white/80">{open.bio}</p>}
                 <div className="mt-auto pt-8">
@@ -115,7 +123,7 @@ export function PeopleGrid({ people, scope }: { people: Person[]; scope: string 
                     type="button"
                     data-morph
                     onClick={() => setOpenIndex(null)}
-                    className="rounded-control border border-white/45 px-5 py-2.5 text-sm font-semibold transition-colors duration-200 hover:border-white hover:bg-white/15"
+                    className="rounded-control border border-white/45 px-5 py-2.5 text-sm font-semibold press hover:border-white hover:bg-white/15"
                   >
                     Close
                   </button>
@@ -167,7 +175,7 @@ function Portrait({
       alt={decorative ? '' : `Portrait of ${person.name}`}
       fill
       sizes={sizes}
-      className="object-cover transition-[scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04]"
+      className="object-cover transition-[scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04] motion-reduce:group-hover:scale-100"
       style={{ objectPosition: person.focus ?? DEFAULT_FOCUS }}
     />
   );
@@ -176,15 +184,15 @@ function Portrait({
 /** An unfilled position. Same footprint as a profile so the grid stays true. */
 function TbaCard({ person }: { person: Person }) {
   return (
-    <div data-placeholder>
-      <div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-media border border-dashed border-control-border bg-surface">
+    <div data-placeholder className={CARD}>
+      <div className="relative flex aspect-[4/5] self-start items-center justify-center overflow-hidden rounded-media border border-dashed border-control-border bg-surface">
         <svg viewBox="0 0 40 48" aria-hidden="true" className="w-[34%] text-chalk-400">
           <circle cx="20" cy="15" r="9" fill="currentColor" />
           <path d="M2 48c0-11 8-19 18-19s18 8 18 19z" fill="currentColor" />
         </svg>
       </div>
-      <p className="label-micro mt-3.5 text-content-soft">{person.position}</p>
-      <p className="mt-1.5 font-display text-[1.05rem] leading-snug font-semibold text-content-soft">To be announced</p>
+      <p className="label-micro mt-3.5 self-start text-content-soft">{person.position}</p>
+      <p className="mt-1.5 self-start font-display text-[1.05rem] leading-snug font-semibold text-content-soft">To be announced</p>
     </div>
   );
 }

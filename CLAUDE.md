@@ -18,7 +18,8 @@ The short version, so nobody drifts:
   `#155FD9` buttons, `accent-text` `#124AAD` links). No cyan, no orange, no
   second accent. Interact cyan lives only inside the logo.
 - Fraunces 600 headings, Instrument Sans body, monospace `label-micro` labels.
-- Pill buttons via `components/ui/button.tsx`; 18–20px radii; nothing square.
+- Pill buttons via `components/ui/button.tsx`; any other pressable control
+  gets the `press` utility (DECISIONS §5); 18–20px radii; nothing square.
 - Motion vocabulary is the home page's effects; no new effects, video, glass,
   grain or glow.
 

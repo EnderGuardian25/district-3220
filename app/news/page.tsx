@@ -36,7 +36,11 @@ export default function NewsPage() {
         <ul className="grid gap-x-6 gap-y-14 md:grid-cols-2">
           {POSTS.map((p, i) => (
             <li key={p.slug}>
-              <Link href={`/news/${p.slug}`} className="group block">
+              {/* The whole card is the link, but its accessible name is the title
+                  alone: wrapping date, title and standfirst made the name a
+                  paragraph. (A stretched link from the h2 can't work here: the
+                  Reveal wrapper is transformed, so it would contain the overlay.) */}
+              <Link href={`/news/${p.slug}`} aria-labelledby={`post-${p.slug}-title`} className="group block">
                 {/* Clip Reveal as each post scrolls in: the same wipe as the hero. */}
                 <ClipReveal className="relative aspect-[4/3] overflow-hidden rounded-panel bg-sunk">
                   {/* alt="" in the card: the link already reads the title and
@@ -47,7 +51,7 @@ export default function NewsPage() {
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
                     preload={i === 0}
-                    className="object-cover transition-[scale] duration-[600ms] ease-out-expo group-hover:scale-[1.03]"
+                    className="object-cover transition-[scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04] motion-reduce:group-hover:scale-100"
                     style={{ objectPosition: '50% 25%' }}
                   />
                 </ClipReveal>
@@ -55,7 +59,7 @@ export default function NewsPage() {
                   <p className="label-micro mt-5 text-content-soft">
                     <time dateTime={p.date}>{formatDate(p.date)}</time> · {p.readMinutes} min read
                   </p>
-                  <h2 className="mt-3 max-w-[28ch] text-[clamp(1.4rem,2.4vw,1.85rem)] leading-[1.12] tracking-[-0.018em] transition-colors duration-200 group-hover:text-accent-text">
+                  <h2 id={`post-${p.slug}-title`} className="mt-3 max-w-[28ch] text-[clamp(1.4rem,2.4vw,1.85rem)] leading-[1.12] tracking-[-0.018em] transition-colors duration-200 group-hover:text-accent-text">
                     {p.shortTitle ?? p.title}
                   </h2>
                   <p className="mt-3 max-w-[54ch] text-content-muted">{p.standfirst}</p>

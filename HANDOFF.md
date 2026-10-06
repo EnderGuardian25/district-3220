@@ -15,6 +15,49 @@ audited end to end (below). Every page in CONTENT.md exists on the locked
 design system (`design/DECISIONS.md`; §6 has the motion map, §8 the
 site-build decisions).
 
+### Polish pass — 2026-10-06 (branch `polish/design-pass`)
+A second pass, checked in a real browser at 390, 768, 1024, 1440 and 1920px,
+with both normal and reduced motion. Every page was hovered, focused and
+measured for contrast, including text over photos (measured on actual pixels).
+It followed Emil Kowalski's motion principles and the Vercel Web Interface
+Guidelines. Every design change was approved by the user and is recorded in
+DECISIONS.md §2 and §6.
+- **Motion (approved):**
+  - press scale 0.97 on every control (the `press` utility)
+  - the nav dropdown grows from its trigger; the drawer opens with a clip-path
+    reveal
+  - an 80ms hover-intent delay on both accordions
+  - the form confirmation fades up, and Copy → Copied cross-fades
+  - the calendar wipe takes 400ms
+  - reduced motion is now "gentle fades", not "final frame"
+  - morph cursor: faster; rings over links; white on dark surfaces
+  - the hero no longer pauses on hover
+- **Contrast (approved):**
+  - hero scrims raised to the minimum that passes on every slide
+  - Community Service band `#906413` (the old note's `#A86F12` measured 4.24
+    and failed)
+  - project-tile labels use `signal-400`, numbers `white/70`
+  - stronger avenue blurbs
+- **Fixes:**
+  - hero and photo-wall image `sizes` (were up to 4× upscaled on phones)
+  - the Clip Reveal now plays on each slide's first visit
+  - phone layouts: Media Crew tiles, calendar rows, email wrapping, About
+    cards
+  - aligned names in council grids (subgrid)
+  - College of DIRs column system and rail end
+  - names and dates kept on one line (`keepTogether`)
+  - centred DIMUN logos
+  - doubled hairlines removed
+  - 24/44px tap targets
+  - scroll padding under the sticky header
+  - calendar state in the URL
+  - form `autoComplete` values, date `min`, no per-field `role="alert"`
+  - carousel slide semantics and a live region
+  - `inert` collapsed panels
+  - focus rings appear instantly (they no longer fade in)
+- **Still open (needs the district):** see "Content to request" item 9.
+- Two photo-band "Decorative" stock plates were dropped (user's call).
+
 ### Site audit — 2026-10-06 (branch `fix/site-audit`)
 Interface-guidelines review of every UI file, a motion audit, Lighthouse on
 every page type, and a real-browser check of each animation. All fixes
@@ -90,6 +133,22 @@ the source for `Placeholder`, lists what is still missing.
 7. Portrait of **Chathula Fernando** (DIR 2016/17), blocked on the old CDN.
 8. Still open from before: Interflash and Race4Change photography; IBTS and
    Intercede content; real photographs for the home collage; avenue photos.
+9. **Found in the 2026-10-06 polish pass:**
+   - **Media Crew service names.** The tiles say "Live Streaming",
+     "Designing" and "Photo Booths"; the request-form chips say "Livestream",
+     "Graphic Designing" and "Photobooth". CONTENT.md carries both versions
+     verbatim from the old site, so the district has to pick one.
+   - **Stat label.** "In District 3220 since" reads backwards.
+   - **First archive year.** The timeline labels it "1988/89–1989/90"; its
+     card says "1988/89".
+   - **Archive-year dates.** The pages mix "28 Sep 2024" with bare
+     months.
+   - **About ledes.** "What the district is for." and "The people who run
+     it." have no muted lede, unlike every other section.
+   - **Photos too small.** Larger originals are needed for the 2024/25 council
+     portraits (360×240 files), some College of DIRs thumbnails (196–256px)
+     and the hero panorama (1600px wide). These stay soft on phones and large
+     screens until replaced.
 
 ### Human judgement calls (decide before launch)
 - **Council bios are verbatim, by decision.** The sharpest ones, for the
@@ -154,10 +213,10 @@ not estimated. Three are deliberately non-obvious and should not be "tidied":
 - `signal-500` as a button fill gives white text only **3.90** and fails AA, so
   the fill is `signal-600` (**5.78**). `signal-500` survives as a graphic mark.
 - Micro-labels use `chalk-700` (**5.02**); `chalk-600` measures 2.92 and fails.
-- Community Service avenue: white on `#D8951C` measures about **2.6** and
-  **fails AA**. It is white by explicit request. The one-line fix if it must
-  pass is to darken only that band to `#A86F12` (white reaches 4.6) while the
-  logo plate keeps the true brand amber.
+- Community Service avenue: the solid band is `#906413` (white 5.23), not the
+  logo's `#D8951C` (white ≈ 2.6, failed AA), changed 2026-10-06 at the user's
+  request. `#A86F12`, the fix this note used to suggest, measures 4.24 and also
+  fails. The logo tint keeps the true brand amber.
 
 ### Home page sections
 1. **Hero** — Clip Reveal carousel, four district photographs, exactly `100svh`
@@ -198,14 +257,15 @@ and to a vertical stack below `md`.
 2. **IBTS and Intercede have no content at all.** Not in CONTENT.md, ARCHIVES.md
    or lib/. Each needs a figure, headline, blurb and photo. Flagged
    `needsContent`.
-3. **The photo collage is 80% stock.** Only `hero/assembly.webp` and
-   `blog/blog-35th-district-assembly.jpg` are photographs of this district. The
-   six `media-*.jpg` are Media Crew *service category* images (CONTENT.md §12)
-   and the two `decor-*.jpg` are listed as "decorative imagery" (§3). Their
-   captions name the service rather than claiming an event, and they carry no
-   year, but a section headed "A year of the district, in photographs" needs
-   real photography before launch. Each item carries `provenance` in
-   `lib/home.ts`.
+3. **The photo collage is 75% stock.** It has eight plates. Only
+   `hero/assembly.webp` and `blog/blog-35th-district-assembly.jpg` are
+   photographs of this district. The six `media-*.jpg` are Media Crew *service
+   category* images (CONTENT.md §12). The two `decor-*.jpg` plates, captioned
+   "Decorative", were dropped on 2026-10-06 at the user's request. The
+   remaining captions name the service rather than claiming an event, and
+   carry no year, but a section headed "A year of the district, in
+   photographs" needs real photography before launch. Each item carries
+   `provenance` in `lib/home.ts`.
 4. **Years.** Only the 35th District Assembly is dated in the repo (29 June
    2025, Wave & Lake, the collaring of Int. PP. Jezon Fernando — CONTENT.md §9).
    Every other image is undated. Years are omitted rather than guessed.

@@ -106,7 +106,9 @@ export function SiteHeader() {
   const overHero = !scrolled;
 
   return (
-    <header className="sticky top-0 z-50">
+    // data-cursor: the bar is see-through over the hero, so the morph cursor
+    // can't read a background colour here and is told the tone instead.
+    <header className="sticky top-0 z-50" data-cursor={overHero ? 'dark' : 'light'}>
       {/* The bar is its own layer, cross-faded by opacity so nothing about the
           header snaps as it arrives.
 
@@ -124,7 +126,6 @@ export function SiteHeader() {
       <div className="container-page flex h-16 items-center justify-between gap-4 md:h-18">
         <Link
           href="/"
-          data-morph
           className="flex shrink-0 items-center gap-2.5"
           aria-label={`${SITE.name} — home`}
         >
@@ -188,7 +189,7 @@ export function SiteHeader() {
                     aria-current={active ? 'page' : undefined}
                     aria-expanded={hasChildren ? openMenu === item.href : undefined}
                     data-morph
-                    className={`relative flex items-center gap-1 rounded-full px-3.5 py-2 text-[13.5px] font-medium transition-colors duration-300 ${
+                    className={`press relative flex items-center gap-1 rounded-full px-3.5 py-2 text-[13.5px] font-medium [--press-dur:300ms] ${
                       overHero
                         ? `[text-shadow:0_1px_8px_rgba(10,12,14,0.7)] ${
                             active ? 'text-white' : 'text-white/80 hover:text-white'
@@ -230,19 +231,32 @@ export function SiteHeader() {
                   {hasChildren && (
                     <AnimatePresence>
                       {openMenu === item.href && (
+                        // Grows from the corner under its trigger (origin-top-left):
+                        // 0.97 -> 1 with a fade, 160ms in, 120ms out, on
+                        // ease-out-expo. Full `transform` strings, not Framer's
+                        // `y`/`scale` shorthands, so it stays on the compositor.
+                        // Reduced motion: opacity only.
                         <motion.ul
-                          initial={reduced ? undefined : { opacity: 0, y: -6 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={reduced ? undefined : { opacity: 0, y: -6 }}
-                          transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
-                          className="absolute top-full left-0 mt-1.5 min-w-60 overflow-hidden rounded-xl border border-hairline bg-surface p-1.5 shadow-xl shadow-navy-900/8"
+                          initial={reduced ? { opacity: 0 } : { opacity: 0, transform: 'scale(0.97)' }}
+                          animate={
+                            reduced
+                              ? { opacity: 1, transition: { duration: 0.2, ease: 'easeOut' } }
+                              : { opacity: 1, transform: 'scale(1)', transition: { duration: 0.16, ease: [0.16, 1, 0.3, 1] } }
+                          }
+                          exit={
+                            reduced
+                              ? { opacity: 0, transition: { duration: 0.15, ease: 'easeOut' } }
+                              : { opacity: 0, transform: 'scale(0.97)', transition: { duration: 0.12, ease: [0.16, 1, 0.3, 1] } }
+                          }
+                          data-cursor="light"
+                          className="absolute top-full left-0 mt-1.5 min-w-60 origin-top-left overflow-hidden rounded-xl border border-hairline bg-surface p-1.5 shadow-xl shadow-navy-900/8"
                         >
                           {item.children!.map((child) => (
                             <li key={child.href}>
                               <Link
                                 href={child.href}
                                 aria-current={pathname === child.href ? 'page' : undefined}
-                                className="block rounded-lg px-3 py-2.5 text-[13.5px] text-content-muted transition-colors hover:bg-bg hover:text-content"
+                                className="block rounded-lg px-3 py-2.5 text-[13.5px] text-content-muted transition-colors duration-200 hover:bg-bg hover:text-content"
                               >
                                 {child.label}
                               </Link>
@@ -267,7 +281,9 @@ export function SiteHeader() {
             aria-controls="mobile-nav"
             aria-label={drawerOpen ? 'Close menu' : 'Open menu'}
             data-morph
-            className={`inline-flex size-9 items-center justify-center rounded-full border transition-colors duration-300 lg:hidden ${
+            // Visible circle stays 36px; the after: ring extends the tap
+            // target to 44px for a touch-first audience.
+            className={`press relative inline-flex size-9 items-center justify-center rounded-full border [--press-dur:300ms] after:absolute after:-inset-1 after:content-[''] lg:hidden ${
               overHero ? 'border-white/50 text-white' : 'border-hairline text-content'
             }`}
           >
@@ -283,10 +299,25 @@ export function SiteHeader() {
         {drawerOpen && (
           <motion.div
             id="mobile-nav"
-            initial={reduced ? undefined : { height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={reduced ? undefined : { height: 0, opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            data-cursor="light"
+            // Lenis would otherwise eat wheel input meant for the drawer's
+            // own overflow scroll (body scroll is locked while it is open).
+            data-lenis-prevent
+            // Opens as a clip wipe from the top rather than animating height:
+            // height re-runs layout every frame on mid-range Android, and the
+            // clip is already in the vocabulary. 280ms in, 200ms out.
+            // Reduced motion: opacity only.
+            initial={reduced ? { opacity: 0 } : { opacity: 0, clipPath: 'inset(0 0 100% 0)' }}
+            animate={
+              reduced
+                ? { opacity: 1, transition: { duration: 0.2, ease: 'easeOut' } }
+                : { opacity: 1, clipPath: 'inset(0 0 0% 0)', transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] } }
+            }
+            exit={
+              reduced
+                ? { opacity: 0, transition: { duration: 0.15, ease: 'easeOut' } }
+                : { opacity: 0, clipPath: 'inset(0 0 100% 0)', transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] } }
+            }
             // Capped and scrollable: the full nav is taller than a landscape
             // phone, and body scroll is locked while the drawer is open.
             className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-hairline bg-bg lg:hidden"

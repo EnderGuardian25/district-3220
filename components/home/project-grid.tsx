@@ -57,20 +57,22 @@ export function ProjectGrid() {
                 alt=""
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 40vw"
-                className="object-cover opacity-55 transition-[opacity,scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04] group-hover:opacity-70"
+                className="object-cover opacity-55 transition-[opacity,scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04] group-hover:opacity-70 motion-reduce:group-hover:scale-100"
               />
               <span
                 aria-hidden="true"
-                className="absolute inset-0 bg-gradient-to-t from-chalk-950/92 via-chalk-950/35 to-transparent"
+                className="absolute inset-0 bg-gradient-to-t from-chalk-950/95 via-chalk-950/35 to-transparent"
               />
               <span className="relative flex h-full flex-col justify-end p-5 md:p-6">
-                <span className="label-micro text-white/55">
+                {/* white/70 and signal-400 (the over-photography step, §2):
+                    white/55 and `accent` measured 3.5–4.3:1 on the scrim. */}
+                <span className="label-micro text-white/70">
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <span className="mt-2 font-display text-[1.35rem] leading-tight font-semibold tracking-[-0.02em]">
                   {f.name}
                 </span>
-                <span className="label-micro mt-2 text-accent">
+                <span className="label-micro mt-2 text-signal-400">
                   {f.needsContent ? 'Content to come' : `${f.figure} · ${f.figureLabel}`}
                 </span>
               </span>
@@ -86,8 +88,10 @@ export function ProjectGrid() {
             className="fixed inset-0 z-80 flex items-center justify-center p-4 md:p-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.22 }}
+            // Exit quicker than enter: closing answers the user, opening is
+            // the reveal. Under reduced motion the same fade at 200ms, no move.
+            exit={{ opacity: 0, transition: { duration: reduced ? 0.2 : 0.15, ease: [0.16, 1, 0.3, 1] } }}
+            transition={{ duration: reduced ? 0.2 : 0.22, ease: [0.16, 1, 0.3, 1] }}
           >
             <button
               type="button"
@@ -134,7 +138,7 @@ export function ProjectGrid() {
                     <Link
                       href={open.href}
                       data-morph
-                      className="rounded-control border border-on-ink bg-on-ink px-5 py-2.5 text-sm font-semibold text-ink-panel transition-colors duration-200 hover:border-accent-fill hover:bg-accent-fill hover:text-accent-on"
+                      className="rounded-control border border-on-ink bg-on-ink px-5 py-2.5 text-sm font-semibold text-ink-panel press hover:border-accent-fill hover:bg-accent-fill hover:text-accent-on"
                     >
                       Open the {open.name} page
                     </Link>
@@ -144,7 +148,7 @@ export function ProjectGrid() {
                     type="button"
                     data-morph
                     onClick={() => setOpenSlug(null)}
-                    className="rounded-control border border-white/45 px-5 py-2.5 text-sm font-semibold transition-colors duration-200 hover:border-white hover:bg-white/15"
+                    className="rounded-control border border-white/45 px-5 py-2.5 text-sm font-semibold press hover:border-white hover:bg-white/15"
                   >
                     Close
                   </button>

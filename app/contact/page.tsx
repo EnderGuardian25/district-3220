@@ -25,8 +25,10 @@ export default function ContactPage() {
             <div>
               <dt className="label-micro text-content-soft">Email</dt>
               <dd className="mt-2">
-                <a href={`mailto:${SITE.email}`} className="font-display text-[1.15rem] font-semibold break-all text-accent-text underline-offset-4 hover:underline">
-                  {SITE.email}
+                <a href={`mailto:${SITE.email}`} className="font-display text-[1.15rem] font-semibold text-accent-text underline-offset-4 hover:underline">
+                  {SITE.email.split('@')[0]}
+                  {/* Breaks only before the @, never mid-word. */}
+                  <wbr />@{SITE.email.split('@')[1]}
                 </a>
               </dd>
             </div>
@@ -49,7 +51,7 @@ export default function ContactPage() {
                     rel="noreferrer"
                     data-morph
                     aria-label={`${s.label} (opens in a new tab)`}
-                    className="inline-flex size-11 items-center justify-center rounded-control border border-control-border text-content-muted transition-colors duration-200 hover:border-accent-fill hover:bg-accent-fill hover:text-accent-on"
+                    className="press inline-flex size-11 items-center justify-center rounded-control border border-control-border text-content-muted hover:border-accent-fill hover:bg-accent-fill hover:text-accent-on"
                   >
                     <SocialIcon name={s.label} className="size-4" />
                   </a>
@@ -66,8 +68,13 @@ export default function ContactPage() {
               <TextField name="firstName" label="First name" required autoComplete="given-name" />
               <TextField name="email" label="Email" type="email" required autoComplete="email" />
               <TextField name="phone" label="Phone" type="tel" required autoComplete="tel" />
-              <SelectField name="country" label="Country" options={COUNTRIES} />
-              <TextField name="club" label="Interact club or company" className="sm:col-span-2" />
+              <SelectField name="country" label="Country" options={COUNTRIES} autoComplete="country-name" />
+              <TextField
+                name="club"
+                label="Interact club or company"
+                className="sm:col-span-2"
+                autoComplete="organization"
+              />
             </div>
             <TextArea name="inquiry" label="Your message" required rows={6} />
           </MailtoForm>

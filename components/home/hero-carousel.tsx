@@ -10,7 +10,8 @@ import { SITE } from '@/lib/site';
  * Clip Reveal carousel (lab.damiandc.com/clip-reveal-carousel).
  *
  * Full-bleed photography, the incoming slide wiping in from the right via
- * clip-path. Advances itself every 6s, pauses on hover and on focus, and is
+ * clip-path. Advances itself every 6s, holds while it has keyboard focus, stops
+ * with the pause button, and is
  * fully driveable by arrow keys, the two buttons, the progress segments, or a
  * swipe.
  *
@@ -20,6 +21,27 @@ import { SITE } from '@/lib/site';
  */
 const INTERVAL = 6000;
 
+/**
+ * The photo scrim: chalk-950 only (DECISIONS §2), two layers, at the minimum
+ * opacity that gets every piece of hero text to WCAG AA on all four slides at
+ * 1440×900, 1024×768 and 390×844, measured against the real pixels behind
+ * each text box (worst 10%, text-shadow ignored). Tuned 2026-10-06.
+ *
+ * - Top band (to 112px, gone by 176px): the transparent header's nav, the
+ *   logo text and the slide counter. Nav was 2.2–3.1:1; now ≥4.6.
+ * - Main gradient: the approved bottom (90% → 64% at 20%) and top (35%) are
+ *   unchanged; only the headline zone is stronger (35% from the bottom:
+ *   44.5 → 80%; 50%: 25 → 57%). "100+ clubs." in signal-400 was 1.2–1.7:1
+ *   on the brightest slides; now ≥3.1 (large text).
+ *
+ * Swapping a photo can break these numbers: re-measure before shipping one.
+ */
+const scrim = (pct: number, at: string) => `color-mix(in srgb, var(--color-chalk-950) ${pct}%, transparent) ${at}`;
+const HERO_SCRIM = [
+  `linear-gradient(to bottom, ${scrim(44, '0px')}, ${scrim(46, '112px')}, ${scrim(0, '176px')})`,
+  `linear-gradient(to top, ${scrim(90, '0%')}, ${scrim(64, '20%')}, ${scrim(80, '35%')}, ${scrim(57, '50%')}, ${scrim(28, '65%')}, ${scrim(35, '100%')})`,
+].join(', ');
+
 export function HeroCarousel() {
   const [index, setIndex] = useState(0);
   /**
@@ -27,9 +49,19 @@ export function HeroCarousel() {
    * first paint only slide 0 exists. Mounting all four up front meant a
    * non-priority image could win Largest Contentful Paint, which is both a
    * real regression and what Next was warning about.
+   *
+   * A slide must exist (clipped, 'ahead') before it goes live, or it mounts
+   * straight into its final state and the wipe never plays: that is what
+   * happened on every slide's first visit. So the live slide's image load
+   * mounts the next one in the background (after LCP, so no competition),
+   * and a jump to a slide that still isn't mounted mounts it first and goes
+   * live two frames later.
    */
   const [maxSeen, setMaxSeen] = useState(0);
-  /** Hover or keyboard focus inside the carousel: a temporary hold. */
+  const maxSeenRef = useRef(0);
+  maxSeenRef.current = maxSeen;
+  /** Keyboard focus inside the carousel: a temporary hold. Not hover: the
+   *  slideshow keeps running under the mouse, and the pause button stops it. */
   const [paused, setPaused] = useState(false);
   /** The pause button: holds until pressed again. Touch has no hover, so this
    *  is the only way a phone user can stop a slideshow that never ends
@@ -50,11 +82,25 @@ export function HeroCarousel() {
   const go = useCallback(
     (next: number) => {
       const target = (next + count) % count;
-      setIndex(target);
-      setMaxSeen((m) => Math.max(m, target));
+      if (target <= maxSeenRef.current) {
+        setIndex(target);
+        return;
+      }
+      setMaxSeen(target);
+      requestAnimationFrame(() => requestAnimationFrame(() => setIndex(target)));
     },
     [count],
   );
+
+  /** Mount the following slide: after slide 0's image loads (so after LCP),
+   *  then each time a later slide goes live. One slide ahead, never more. */
+  const prefetchNext = useCallback(
+    (i: number) => setMaxSeen((m) => Math.max(m, Math.min(i + 1, count - 1))),
+    [count],
+  );
+  useEffect(() => {
+    if (index > 0) prefetchNext(index);
+  }, [index, prefetchNext]);
 
   // No timer: the live progress bar's own animationend advances the slide
   // (see the segment buttons below), so pausing freezes the bar and the
@@ -82,12 +128,15 @@ export function HeroCarousel() {
       aria-label="Interact District 3220 in action"
       tabIndex={0}
       onKeyDown={onKeyDown}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
+      // Keyboard focus only. A mouse click also focuses the section or a
+      // control, and pausing on that held the slideshow until the user
+      // clicked somewhere else; mouse users have the pause button.
+      onFocus={(e) => setPaused(e.target.matches(':focus-visible'))}
       onBlur={() => setPaused(false)}
+      // Touch and pen only: a mouse drag is someone selecting or just
+      // clicking, and used to change the slide.
       onPointerDown={(e) => {
-        dragStart.current = e.clientX;
+        dragStart.current = e.pointerType === 'mouse' ? null : e.clientX;
       }}
       // Without this Android claims the horizontal pan for itself, sends
       // pointercancel instead of pointerup, and the swipe never lands.
@@ -107,18 +156,25 @@ export function HeroCarousel() {
       // resizes the hero mid-scroll and shifts the copy under the reader's
       // thumb. svh is stable and guarantees the CTAs are reachable on first
       // paint. min-h keeps it usable in a short landscape window.
-      className="relative isolate -mt-16 h-[100svh] min-h-[520px] touch-pan-y overflow-hidden bg-chalk-950 md:-mt-18"
+      className="relative isolate -mt-16 h-[100svh] min-h-[520px] touch-pan-y overflow-hidden bg-chalk-950 select-none md:-mt-18"
     >
       {HERO_SLIDES.map((s, i) => {
         if (i > maxSeen) return null;
         const state = i === index ? 'live' : i < index ? 'past' : 'ahead';
         return (
+          // Under reduced motion the wipe becomes a 200ms crossfade: no clip,
+          // only the live slide is opaque (the global rule limits the
+          // transition to opacity).
           <div
             key={s.src}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${i + 1} of ${count}`}
             aria-hidden={i !== index}
-            className="absolute inset-0 transition-[clip-path] duration-[950ms] ease-clip motion-reduce:transition-none"
+            className="absolute inset-0 transition-[clip-path,opacity] duration-[950ms] ease-clip"
             style={{
-              clipPath: state === 'ahead' ? 'inset(0 0 0 100%)' : 'inset(0 0 0 0)',
+              clipPath: reduced || state !== 'ahead' ? 'inset(0 0 0 0)' : 'inset(0 0 0 100%)',
+              opacity: reduced && state !== 'live' ? 0 : 1,
               zIndex: state === 'live' ? 3 : state === 'past' ? 2 : 1,
             }}
           >
@@ -131,14 +187,15 @@ export function HeroCarousel() {
               src={s.src}
               alt={s.alt}
               fill
-              sizes="100vw"
+              // object-cover in a box at least 100vw x max(100svh, 520px):
+              // a landscape photo in a portrait box is drawn at its height,
+              // so it needs this much width, not 100vw.
+              sizes={`max(100vw, ${Math.ceil(s.aspect * 100)}svh, ${Math.ceil(s.aspect * 520)}px)`}
               {...(i === 0 ? { preload: true } : { loading: 'eager' as const })}
+              onLoad={i === 0 ? () => prefetchNext(0) : undefined}
               className="object-cover"
             />
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 bg-gradient-to-t from-chalk-950/90 via-chalk-950/25 to-chalk-950/35"
-            />
+            <div aria-hidden="true" className="absolute inset-0" style={{ backgroundImage: HERO_SCRIM }} />
           </div>
         );
       })}
@@ -149,7 +206,8 @@ export function HeroCarousel() {
           <span className="text-lg font-medium tabular-nums">
             {String(index + 1).padStart(2, '0')}
           </span>
-          <span className="text-white/55"> / {String(count).padStart(2, '0')}</span>
+          {/* white/70, not /55: /55 measured 3.4–3.7:1 over the photos. */}
+          <span className="text-white/70"> / {String(count).padStart(2, '0')}</span>
         </p>
 
         <div className="pointer-events-auto absolute top-[86px] right-[--spacing(4.5)] hidden gap-2 md:right-8 md:flex xl:right-14">
@@ -184,6 +242,12 @@ export function HeroCarousel() {
 
         <div className="container-page mt-10 flex flex-col gap-4 pb-7 md:flex-row md:items-end md:justify-between">
           <p className="label-micro text-white/80">{slide.caption}</p>
+          {/* Announces slide changes only when the user is in control: silent
+              while it auto-advances (a change every 6s would talk over
+              everything), polite once paused, stopped or under reduced motion. */}
+          <p className="sr-only" aria-live={holding || reduced ? 'polite' : 'off'} aria-atomic="true">
+            {`Slide ${index + 1} of ${count}: ${slide.caption}`}
+          </p>
           <div className="pointer-events-auto flex w-full items-center gap-3 md:w-[min(46%,400px)]">
             <button
               type="button"
@@ -192,7 +256,8 @@ export function HeroCarousel() {
               // The label states the action; no aria-pressed as well, or a
               // screen reader announces the state twice.
               aria-label={stopped ? 'Play slideshow' : 'Pause slideshow'}
-              className="inline-flex size-9 shrink-0 items-center justify-center rounded-control border border-white/45 text-white transition-[background-color,border-color] duration-200 hover:border-white hover:bg-white/15"
+              // 36px visible, 44px to tap (the after: ring), for a touch-first audience.
+              className="press relative inline-flex size-9 shrink-0 items-center justify-center rounded-control border border-white/45 text-white after:absolute after:-inset-1 after:content-[''] hover:border-white hover:bg-white/15"
             >
               <svg viewBox="0 0 16 16" aria-hidden="true" className="size-3.5" fill="currentColor">
                 {stopped ? <path d="M4.5 2.8v10.4L13 8z" /> : <path d="M4 3h3v10H4zM9 3h3v10H9z" />}
@@ -267,7 +332,7 @@ function CarouselArrow({
       data-morph
       onClick={onClick}
       aria-label={label}
-      className="inline-flex h-10 w-11 items-center justify-center rounded-control border border-white/45 text-white transition-[background-color,border-color,translate] duration-200 hover:border-white hover:bg-white/15 active:translate-y-px"
+      className="press inline-flex h-10 w-11 items-center justify-center rounded-control border border-white/45 text-white hover:border-white hover:bg-white/15"
     >
       <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4">
         <path d={d} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />

@@ -24,10 +24,16 @@ export default function RequestADatePage() {
             <fieldset className="grid gap-6 sm:grid-cols-2">
               <legend className="label-micro mb-5 text-content-soft">About you</legend>
               <TextField name="name" label="Interactor’s name" required autoComplete="name" />
-              <TextField name="designation" label="Designation" required placeholder="e.g. Club President" />
-              <TextField name="club" label="Interact club" required />
+              <TextField
+                name="designation"
+                label="Designation"
+                required
+                placeholder="e.g. Club President"
+                autoComplete="organization-title"
+              />
+              <TextField name="club" label="Interact club" required autoComplete="organization" />
               <TextField name="phone" label="Phone" type="tel" required autoComplete="tel" />
-              <SelectField name="country" label="Country" options={COUNTRIES} />
+              <SelectField name="country" label="Country" options={COUNTRIES} autoComplete="country-name" />
               <TextField name="email" label="Email" type="email" required autoComplete="email" />
             </fieldset>
 
@@ -35,7 +41,7 @@ export default function RequestADatePage() {
               <legend className="label-micro mb-5 text-content-soft">The event</legend>
               <TextField name="event" label="Event or project name" required className="sm:col-span-2" />
               <TextField name="location" label="Event location" required className="sm:col-span-2" />
-              <TextField name="date" label="Date" type="date" required />
+              <TextField name="date" label="Date" type="date" required minToday />
               <TextField name="time" label="Time" type="time" required />
               <TextArea name="other" label="Other information" className="sm:col-span-2" />
             </fieldset>
