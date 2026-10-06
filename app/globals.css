@@ -92,6 +92,9 @@
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-clip: cubic-bezier(0.72, 0, 0.18, 1);
+  /* Softer ease-out already used by the header dropdown/drawer and both
+     accordions; named here rather than repeated inline (2026-10-06). */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ==========================================================================
@@ -177,6 +180,21 @@
     /* Dialogs lock body scroll, which removes the scrollbar on Windows; a
        reserved gutter stops the page shifting sideways under the scrim. */
     scrollbar-gutter: stable;
+    /* The sticky header is 64px (72px from md). Without this, anchor jumps
+       (#join, #projects, the skip link's #main) and Shift+Tab focus land
+       under it (WCAG 2.4.11). */
+    scroll-padding-top: 5rem;
+  }
+
+  /* Controls answer the tap at once (no double-tap-zoom wait) and without
+     Android's grey flash; every control already has its own press state. */
+  a,
+  button,
+  summary,
+  label,
+  [role='button'] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* Lenis owns the scroll while it is active. */
@@ -458,8 +476,8 @@
 
 /* Clip Reveal for media that is already in view on load (an inner page's
    lead image). A CSS animation rather than an observer, so it starts with the
-   first paint and needs no hydration; the reduced-motion switch below collapses
-   it to the final frame. Below-the-fold media uses the observer version in
+   first paint and needs no hydration; under reduced motion the switch below
+   turns it into a plain 200ms fade. Below-the-fold media uses the observer version in
    components/motion/clip-reveal.tsx instead. */
 @keyframes clip-in {
   from {
@@ -474,8 +492,9 @@
 }
 
 /* Calendar month changes: the new month wipes in from the side it came
-   from, on the same curve as the hero's slide change, a little quicker
-   because it is a control response rather than a set piece. */
+   from, on the same curve as the hero's slide change, quicker because it is a
+   control response people repeat, not a set piece (650ms → 400ms, approved
+   2026-10-06). */
 @keyframes clip-in-reverse {
   from {
     clip-path: inset(0 100% 0 0);
@@ -485,10 +504,27 @@
   }
 }
 @utility clip-in-next {
-  animation: clip-in 650ms var(--ease-clip) both;
+  animation: clip-in 400ms var(--ease-clip) both;
 }
 @utility clip-in-prev {
-  animation: clip-in-reverse 650ms var(--ease-clip) both;
+  animation: clip-in-reverse 400ms var(--ease-clip) both;
+}
+
+/* Press feedback for every pressable control (approved 2026-10-06): a 3%
+   press-down in 120ms, while colour changes keep the 200ms hover timing.
+   Use it INSTEAD of a transition-* utility on the same element, because it
+   owns transition-property. Elements with an extra transitioned property
+   (e.g. a carousel arrow's translate) list it via --press-extra. */
+@utility press {
+  /* No outline-color: the focus ring must appear at once, never fade in. */
+  transition-property: color, background-color, border-color, box-shadow, opacity, scale, var(--press-extra, color);
+  /* --press-dur: colour timing, 200ms by default; the header passes 300ms
+     (its approved colour change over the hero). */
+  transition-duration: var(--press-dur, 200ms), var(--press-dur, 200ms), var(--press-dur, 200ms), var(--press-dur, 200ms), var(--press-dur, 200ms), 120ms, var(--press-dur, 200ms);
+  transition-timing-function: ease, ease, ease, ease, ease, var(--ease-out-expo), ease;
+  &:active {
+    scale: 0.97;
+  }
 }
 
 /* The inner-page header's fade-up, run as a CSS animation from first paint.
@@ -526,9 +562,24 @@
    MOTION
    Everything animated must be reachable by this switch. The audience is
    largely on mid-range Android, so this is a performance lever as much as an
-   accessibility one. Delays are zeroed too: a reveal waiting out its stagger
-   or a clip holding its first frame for 120ms is still motion.
+   accessibility one.
+
+   Reduced motion means gentler, not none (revised 2026-10-06; it used to jump
+   every animation to its final frame). Nothing moves: no rise, slide, scale,
+   clip wipe, pan or zoom, and no delays or staggers. What remains is a short
+   200ms fade, plus colour changes, so things still arrive rather than pop.
+   - Transitions: only opacity and colour properties animate; transform,
+     translate, scale, clip-path, size and flex-grow snap.
+   - Keyframes: every animation is cut to its final frame, except the two
+     load animations (rise-in-load, clip-in-load), which become a plain fade.
+   - Observer reveals (Reveal, ClipReveal) and Framer dialogs fade via the
+     same rule / their own useReducedMotion branches.
    ========================================================================== */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -539,9 +590,21 @@
     animation-duration: 0.01ms !important;
     animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-property: opacity, color, background-color, border-color, text-decoration-color, fill, stroke !important;
+    transition-duration: 200ms !important;
+    transition-timing-function: ease-out !important;
     transition-delay: 0s !important;
     scroll-behavior: auto !important;
+  }
+  .rise-in-load,
+  .clip-in-load {
+    animation: fade-in 200ms ease-out both !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+  /* Press feedback and hover zooms are movement. */
+  .press:active {
+    scale: none;
   }
 }
 
@@ -558,4 +621,40 @@
   body.cursor-morph * {
     cursor: auto;
   }
+}
+
+/* Morph cursor states (components/motion/morph-cursor.tsx).
+   dot: follows the pointer. park: wraps a data-morph control. link: grows into
+   a ring over any other link or button. The light tint multiplies into chalk;
+   over dark surfaces multiply makes it vanish, so dark tone uses white with
+   `screen`, the mirror of multiply: it lifts the dark background but leaves
+   white text pure white, so the cursor never washes over the label. */
+.morph-cursor {
+  background-color: var(--color-accent);
+  opacity: 0.9;
+  transition-property: width, height, border-radius, background-color, box-shadow, opacity;
+  transition-duration: 300ms;
+  transition-timing-function: var(--ease-out-expo);
+}
+.morph-cursor[data-mode='park'] {
+  opacity: 1;
+  background-color: color-mix(in oklab, var(--color-accent) 25%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-accent) 55%, transparent);
+  mix-blend-mode: multiply;
+}
+.morph-cursor[data-mode='link'] {
+  opacity: 1;
+  background-color: color-mix(in oklab, var(--color-accent) 10%, transparent);
+  box-shadow: inset 0 0 0 1.5px var(--color-accent);
+  mix-blend-mode: multiply;
+}
+.morph-cursor[data-tone='dark'][data-mode='park'] {
+  background-color: rgb(255 255 255 / 0.18);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.6);
+  mix-blend-mode: screen;
+}
+.morph-cursor[data-tone='dark'][data-mode='link'] {
+  background-color: rgb(255 255 255 / 0.12);
+  box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.7);
+  mix-blend-mode: screen;
 }

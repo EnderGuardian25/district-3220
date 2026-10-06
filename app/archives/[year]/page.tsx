@@ -125,7 +125,9 @@ export default async function ArchiveYearPage({ params }: { params: Promise<{ ye
                   {item.link && (
                     <Link
                       href={item.link.href}
-                      className="mt-2.5 inline-block text-sm font-medium text-accent-text underline-offset-3 hover:underline"
+                      // min-h-6 for a 24px tap target (WCAG 2.5.8); mt-2 rather
+                      // than mt-2.5 so the text sits where it did.
+                      className="mt-2 inline-flex min-h-6 items-center text-sm font-medium text-accent-text underline-offset-3 hover:underline"
                       {...(item.link.href.startsWith('http') ? { target: '_blank', rel: 'noreferrer' } : {})}
                     >
                       {item.link.label}
@@ -185,9 +187,21 @@ export default async function ArchiveYearPage({ params }: { params: Promise<{ ye
                 dir === 'Newer' ? 'md:items-end md:text-right' : ''
               }`}
             >
-              <span className="label-micro text-content-soft">{dir === 'Older' ? '← Older' : 'Newer →'}</span>
+              {/* Arrows are decoration: read as "Older" / "Newer", not "left arrow Older". */}
+              <span className="label-micro text-content-soft">
+                {dir === 'Older' ? (
+                  <>
+                    <span aria-hidden="true">← </span>Older
+                  </>
+                ) : (
+                  <>
+                    Newer<span aria-hidden="true"> →</span>
+                  </>
+                )}
+              </span>
               <span className="font-display text-[1.4rem] leading-tight font-semibold tracking-[-0.015em]">{other.label}</span>
-              {other.theme && <span className="text-sm text-content-muted italic">“{other.theme}”</span>}
+              {/* Fraunces italic, as themes are set in the archives rail. */}
+              {other.theme && <span className="font-display text-[1rem] leading-snug text-content-muted italic">“{other.theme}”</span>}
             </Link>
           ) : (
             <span key={dir} aria-hidden="true" className="hidden md:block" />

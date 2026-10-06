@@ -38,3 +38,7 @@ yarn-error.log*
 # .claude/skills holds junctions into .agents, so both are excluded.
 /.agents/
 /.claude/skills/
+
+# specclaw eval journal: a per-machine log a local hook writes on every
+# subagent run; not project source.
+.specclaw/**/eval-journal.md

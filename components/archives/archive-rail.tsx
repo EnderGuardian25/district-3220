@@ -2,8 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
+import { useHscrollPan } from '@/components/motion/use-hscroll-pan';
 import { UNRECORDED_SPAN, type ArchiveYear } from '@/lib/archives';
+import { keepTogether } from '@/components/people/keep-together';
 
 /**
  * The archive as a pinned horizontal timeline, oldest on the left, threaded by
@@ -79,17 +81,7 @@ export function ArchiveRail({ years }: { years: ArchiveYear[] }) {
     window.scrollTo({ top: sectionTop + progress * range, behavior: 'instant' });
   };
 
-  useEffect(() => {
-    const rail = railRef.current;
-    if (!rail) return;
-    const measure = () => {
-      const pan = Math.max(0, rail.offsetLeft + rail.scrollWidth - window.innerWidth);
-      rail.style.setProperty('--pan', `${pan}px`);
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, []);
+  useHscrollPan(railRef);
 
   return (
     // Scroll distance scales with the plate count so the pan runs at about one
@@ -134,14 +126,24 @@ export function ArchiveRail({ years }: { years: ArchiveYear[] }) {
           </div>
         </div>
 
-        <div aria-hidden="true" className="hscroll-prog absolute inset-x-8 bottom-10 h-px bg-white/20 xl:inset-x-14">
-          <i className="block h-full origin-left bg-white/70" />
+        {/* Inside container-page so the track starts and ends on the same
+            gutters as the heading and hairlines above it. */}
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-10">
+          <div className="container-page">
+            <div className="hscroll-prog h-px bg-white/20">
+              <i className="block h-full origin-left bg-white/70" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
+/**
+ * Each label carries the band colour behind it: every curve leaves its node
+ * horizontally, so without this the line ran straight through the year text.
+ */
 function Caption({ children }: { children: React.ReactNode }) {
   return (
     <p className="mb-2.5 flex items-center gap-2 whitespace-nowrap">
@@ -156,17 +158,21 @@ function YearPlate({ year }: { year: ArchiveYear }) {
   return (
     <Link href={`/archives/${year.slug}`} className="group block">
       <Caption>
-        <span className="label-micro text-white/80">{year.label}</span>
-        {compiling && <span className="label-micro text-white/60">· Being compiled</span>}
+        {/* One backing for both parts, so the line can't show through the
+            gap between the year and "Being compiled". */}
+        <span className="label-micro bg-navy-900 text-white/80">
+          {year.label}
+          {compiling && <span className="pl-2 text-white/60">· Being compiled</span>}
+        </span>
       </Caption>
       {/* Year artwork sits on a near-white plate: these are logos and RI
           theme marks in their own colours, never placed straight on navy. */}
       <div
-        className={`relative aspect-[4/3] overflow-hidden rounded-media transition-[translate] duration-[600ms] ease-out-expo group-hover:-translate-y-1 ${
+        className={`relative aspect-[4/3] overflow-hidden rounded-media transition-[translate] duration-[600ms] ease-out-expo group-hover:-translate-y-1 motion-reduce:group-hover:translate-y-0 ${
           year.logo
             ? 'bg-chalk-50'
             : compiling
-              ? 'border border-dashed border-white/30'
+              ? 'border border-dashed border-white/30 bg-navy-900'
               : 'bg-navy-800'
         }`}
       >
@@ -181,7 +187,7 @@ function YearPlate({ year }: { year: ArchiveYear }) {
       {year.theme && (
         <p className="mt-3.5 font-display text-[1.05rem] leading-snug text-white italic">“{year.theme}”</p>
       )}
-      {year.dir && <p className="label-micro mt-2 text-white/55">DIR {year.dir}</p>}
+      {year.dir && <p className="label-micro mt-2 text-white/55">DIR {keepTogether(year.dir)}</p>}
     </Link>
   );
 }
@@ -190,11 +196,11 @@ function SpanPlate() {
   return (
     <Link href="/college-of-dirs" className="group block" data-placeholder>
       <Caption>
-        <span className="label-micro text-white/80">
+        <span className="label-micro bg-navy-900 text-white/80">
           {UNRECORDED_SPAN.from} – {UNRECORDED_SPAN.to}
         </span>
       </Caption>
-      <div className="flex aspect-[4/3] flex-col justify-end rounded-media border border-dashed border-white/30 p-5 transition-[translate] duration-[600ms] ease-out-expo group-hover:-translate-y-1">
+      <div className="flex aspect-[4/3] flex-col justify-end rounded-media border border-dashed border-white/30 bg-navy-900 p-5 transition-[translate] duration-[600ms] ease-out-expo group-hover:-translate-y-1 motion-reduce:group-hover:translate-y-0">
         <span className="font-display text-[2.4rem] leading-none font-semibold tracking-[-0.03em] text-white/85">
           {UNRECORDED_SPAN.count} years
         </span>

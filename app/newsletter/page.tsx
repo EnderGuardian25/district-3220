@@ -29,8 +29,8 @@ export default function NewsletterPage() {
             </Reveal>
             <ul className="mt-6 border-t border-white/15">
               {NEWSLETTER.covers.map((c, i) => (
-                <Reveal key={c} step={i + 1} as="li" className="flex items-baseline gap-4 border-b border-white/15 py-4">
-                  <span className="label-micro text-white/55">{String(i + 1).padStart(2, '0')}</span>
+                <Reveal key={c} step={Math.min(i + 1, 4)} as="li" className="flex items-baseline gap-4 border-b border-white/15 py-4">
+                  <span className="label-micro shrink-0 text-white/55">{String(i + 1).padStart(2, '0')}</span>
                   <span className="text-[1.05rem]">{c}</span>
                 </Reveal>
               ))}
@@ -41,9 +41,8 @@ export default function NewsletterPage() {
 
       <section aria-labelledby="editions-heading" className="container-page py-16 md:py-24">
         <SectionHeader id="editions-heading" title="Editions." lede="Newest first." />
-        <div className="mt-8">
-          <DocumentList items={NEWSLETTER_EDITIONS} />
-        </div>
+        {/* Straight under the section rule, which is the list's first hairline. */}
+        <DocumentList items={NEWSLETTER_EDITIONS} />
         <Placeholder className="mt-8 max-w-3xl">
           Only the third edition’s link survived from the old site. The other editions will be added as
           the council supplies the files.

@@ -10,6 +10,10 @@ import { useEffect, useRef, useState, type ElementType, type ReactNode } from 'r
  * transitions on static content, and a CSS transition costs no JS at all on
  * the sections that only need to fade up. Framer stays for the pieces that
  * genuinely need interruptible or gesture-driven motion.
+ *
+ * Reduced motion still uses the observer: the global rule in globals.css
+ * limits the transition to a 200ms opacity fade with no delay, so content
+ * fades in as it arrives instead of rising (no translate, no stagger).
  */
 export function useEnterOnce<T extends Element>(rootMargin = '0px 0px -8% 0px') {
   const ref = useRef<T | null>(null);
@@ -18,10 +22,6 @@ export function useEnterOnce<T extends Element>(rootMargin = '0px 0px -8% 0px') 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setShown(true);
-      return;
-    }
     const io = new IntersectionObserver(
       ([entry], obs) => {
         if (!entry.isIntersecting) return;

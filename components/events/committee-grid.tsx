@@ -47,7 +47,7 @@ export function CommitteeGrid({ items, scope }: { items: Committee[]; scope: str
               className="group flex h-full w-full flex-col rounded-panel border border-hairline bg-surface p-4 text-left transition-colors duration-200 hover:border-accent-fill md:p-5"
             >
               <motion.span layoutId={layoutKey(i)} className="relative block aspect-[4/3] w-full overflow-hidden rounded-media bg-chalk-50">
-                <Image src={c.logo} alt="" fill sizes="(max-width: 768px) 44vw, (max-width: 1024px) 30vw, 200px" className="object-contain p-5 transition-[scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04]" />
+                <Image src={c.logo} alt="" fill sizes="(max-width: 768px) 44vw, (max-width: 1024px) 30vw, 200px" className="object-contain p-5 transition-[scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04] motion-reduce:group-hover:scale-100" />
               </motion.span>
               <span className="label-micro mt-4 block text-content-soft">{String(i + 1).padStart(2, '0')}</span>
               <span className="mt-1.5 block font-display text-[1.25rem] leading-tight font-semibold tracking-[-0.015em]">{c.code}</span>
@@ -64,8 +64,9 @@ export function CommitteeGrid({ items, scope }: { items: Committee[]; scope: str
             className="fixed inset-0 z-80 flex items-center justify-center p-4 md:p-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.22 }}
+            // Exit quicker than enter; under reduced motion a 200ms fade, no move.
+            exit={{ opacity: 0, transition: { duration: reduced ? 0.2 : 0.15, ease: [0.16, 1, 0.3, 1] } }}
+            transition={{ duration: reduced ? 0.2 : 0.22, ease: [0.16, 1, 0.3, 1] }}
           >
             <button type="button" aria-label="Close committee" tabIndex={-1} onClick={() => setOpenIndex(null)} className="absolute inset-0 bg-chalk-950/70" />
             <div
@@ -94,7 +95,7 @@ export function CommitteeGrid({ items, scope }: { items: Committee[]; scope: str
                       target="_blank"
                       rel="noreferrer"
                       data-morph
-                      className="rounded-control border border-on-ink bg-on-ink px-5 py-2.5 text-sm font-semibold text-ink-panel transition-colors duration-200 hover:border-accent-fill hover:bg-accent-fill hover:text-accent-on"
+                      className="rounded-control border border-on-ink bg-on-ink px-5 py-2.5 text-sm font-semibold text-ink-panel press hover:border-accent-fill hover:bg-accent-fill hover:text-accent-on"
                     >
                       Study guide
                       <span className="sr-only"> (opens in a new tab)</span>
@@ -105,7 +106,7 @@ export function CommitteeGrid({ items, scope }: { items: Committee[]; scope: str
                     type="button"
                     data-morph
                     onClick={() => setOpenIndex(null)}
-                    className="rounded-control border border-white/45 px-5 py-2.5 text-sm font-semibold transition-colors duration-200 hover:border-white hover:bg-white/15"
+                    className="rounded-control border border-white/45 px-5 py-2.5 text-sm font-semibold press hover:border-white hover:bg-white/15"
                   >
                     Close
                   </button>

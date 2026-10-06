@@ -35,7 +35,11 @@ function ClipRevealOnEnter({ children, className }: { children: ReactNode; class
   return (
     <div ref={ref} className={className}>
       <div
-        className="relative h-full w-full transition-[clip-path] duration-[950ms] ease-clip"
+        // Under reduced motion the global rule snaps the clip, so the frame
+        // fades in instead (opacity, 200ms) rather than popping.
+        className={`relative h-full w-full transition-[clip-path,opacity] duration-[950ms] ease-clip ${
+          shown ? '' : 'motion-reduce:opacity-0'
+        }`}
         style={{ clipPath: shown ? 'inset(0 0 0 0)' : 'inset(0 0 0 100%)' }}
       >
         {children}

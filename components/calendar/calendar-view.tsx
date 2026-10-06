@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CalendarEvent } from '@/lib/ics';
 import { colomboDayKey, fromDayKey as fromKey, shiftDayKey } from '@/lib/colombo';
 
@@ -32,7 +32,23 @@ function endKey(e: CalendarEvent) {
   return colomboDayKey(new Date(new Date(e.end).getTime() - 1));
 }
 
-const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-GB', { timeZone: TZ, ...opts });
+/**
+ * Formatters are cached by their options. Building an Intl.DateTimeFormat is
+ * expensive, and the month grid and agenda call this 40+ times per render.
+ */
+const formatters = new Map<string, Intl.DateTimeFormat>();
+const fmt = (opts: Intl.DateTimeFormatOptions) => {
+  const key = JSON.stringify(opts);
+  let f = formatters.get(key);
+  if (!f) {
+    f = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, ...opts });
+    formatters.set(key, f);
+  }
+  return f;
+};
+
+const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
+const DAY_RE = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 
 function timeLabel(e: CalendarEvent) {
   if (e.timeUnknown) return null;
@@ -60,6 +76,8 @@ export function CalendarView({ events, today }: { events: CalendarEvent[]; today
   // "Today" is the server's render date until the browser confirms its own.
   const [now, setNow] = useState(today);
   useEffect(() => setNow(colomboDayKey(new Date())), []);
+  /** Set once the URL has been read, so the first write can't wipe it. */
+  const [restored, setRestored] = useState(false);
 
   const byDay = useMemo(() => {
     const m = new Map<string, CalendarEvent[]>();
@@ -72,6 +90,44 @@ export function CalendarView({ events, today }: { events: CalendarEvent[]; today
     }
     return m;
   }, [events]);
+
+  /**
+   * View, month and chosen day live in the query string
+   * (?view=month&month=2026-03&day=2026-03-14) so a month can be linked and
+   * Back returns to it. Read after mount rather than through useSearchParams,
+   * which would need a Suspense boundary and drop the events from the static
+   * HTML. Written with history.replaceState, which Next's router observes: no
+   * history entry per click, and no refetch.
+   */
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    if (q.get('view') === 'month') {
+      setView('month');
+      const day = q.get('day');
+      const qMonth = q.get('month');
+      if (day && DAY_RE.test(day) && byDay.has(day)) {
+        setMonth(day.slice(0, 7));
+        setSelected(day);
+      } else if (qMonth && MONTH_RE.test(qMonth)) {
+        setMonth(qMonth);
+      }
+    }
+    setRestored(true);
+    // Mount only: later changes flow the other way, state → URL.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!restored) return;
+    const url = new URL(window.location.href);
+    for (const k of ['view', 'month', 'day']) url.searchParams.delete(k);
+    if (view === 'month') {
+      url.searchParams.set('view', 'month');
+      url.searchParams.set('month', month);
+      if (selected) url.searchParams.set('day', selected);
+    }
+    if (url.href !== window.location.href) window.history.replaceState(window.history.state, '', url);
+  }, [restored, view, month, selected]);
 
   // An event under way (started yesterday, ends tomorrow) is still coming up.
   const upcoming = events.filter((e) => endKey(e) >= now);
@@ -97,8 +153,12 @@ export function CalendarView({ events, today }: { events: CalendarEvent[]; today
               data-morph
               aria-pressed={view === v}
               onClick={() => setView(v)}
-              className={`rounded-control px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
-                view === v ? 'bg-accent-fill text-accent-on' : 'text-content-muted hover:text-content'
+              // Focus ring drawn INSIDE the segment. The global 3px offset put
+              // it over the neighbouring segment's Signal fill (1.09:1). Inside,
+              // it is Signal on chalk for the idle segment and chalk on the
+              // Signal fill for the active one (both well over 3:1).
+              className={`press rounded-control px-4 py-2 text-sm font-semibold focus-visible:outline-offset-[-4px] ${
+                view === v ? 'bg-accent-fill text-accent-on focus-visible:outline-bg' : 'text-content-muted hover:text-content'
               }`}
             >
               {v === 'list' ? 'Agenda' : 'Month'}
@@ -119,7 +179,7 @@ export function CalendarView({ events, today }: { events: CalendarEvent[]; today
                   type="button"
                   data-morph
                   onClick={() => setShowAll(true)}
-                  className="mt-6 rounded-control border border-control-border px-5 py-2.5 text-sm font-semibold transition-colors duration-200 hover:border-content"
+                  className="press mt-6 rounded-control border border-control-border px-5 py-2.5 text-sm font-semibold hover:border-content"
                 >
                   Show all {upcoming.length} upcoming events
                 </button>
@@ -167,12 +227,15 @@ function EventList({ events, muted = false }: { events: CalendarEvent[]; muted?:
       {events.map((e) => {
         const d = fromKey(dayKey(e));
         return (
-          <li key={e.id} className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-5 border-b border-hairline py-6 md:grid-cols-[6rem_minmax(0,1fr)] md:gap-8">
-            <p className={muted ? 'text-content-soft' : ''}>
-              <span className="block font-display text-[2rem] leading-none font-semibold tracking-[-0.03em] tabular-nums md:text-[2.4rem]">
+          // Phones stack the date above the event as one baseline row: a
+          // 72px date column left titles and venues ~260px and broke labels
+          // mid-phrase. From sm up the date gets its own column again.
+          <li key={e.id} className="grid gap-3 border-b border-hairline py-6 sm:grid-cols-[4.5rem_minmax(0,1fr)] sm:gap-5 md:grid-cols-[6rem_minmax(0,1fr)] md:gap-8">
+            <p className={`flex items-baseline gap-2.5 sm:block ${muted ? 'text-content-soft' : ''}`}>
+              <span className="font-display text-[2rem] leading-none font-semibold tracking-[-0.03em] tabular-nums sm:block md:text-[2.4rem]">
                 {fmt({ day: 'numeric' }).format(d)}
               </span>
-              <span className="label-micro mt-2 block text-content-soft">{fmt({ month: 'short', year: 'numeric' }).format(d)}</span>
+              <span className="label-micro text-content-soft sm:mt-2 sm:block">{fmt({ month: 'short', year: 'numeric' }).format(d)}</span>
             </p>
             <div className="min-w-0">
               {/* Feed text is unbounded; long words and bare URLs must wrap. */}
@@ -232,6 +295,22 @@ function MonthGrid({
   const selectedEvents = selected ? byDay.get(selected) ?? [] : [];
   const monthCount = cells.reduce((n, k) => n + (k ? byDay.get(k)?.length ?? 0 : 0), 0);
 
+  // A chosen day's events render under a six-row grid, below the fold on a
+  // phone, so picking a day looked like nothing happened. Bring the panel
+  // into view (focus stays on the day, so keyboard users keep their place),
+  // and the live region below announces it.
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const lastSelected = useRef(selected);
+  useEffect(() => {
+    if (selected === lastSelected.current) return;
+    lastSelected.current = selected;
+    const panel = panelRef.current;
+    if (!selected || !panel) return;
+    if (panel.getBoundingClientRect().bottom <= window.innerHeight) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    panel.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+  }, [selected]);
+
   return (
     <div className="mt-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -239,7 +318,7 @@ function MonthGrid({
           {fmt({ month: 'long', year: 'numeric' }).format(fromKey(`${month}-15`))}
         </h2>
         <div className="flex gap-2">
-          <button type="button" data-morph onClick={onToday} className="rounded-control border border-control-border px-4 text-sm font-semibold transition-colors duration-200 hover:border-content">
+          <button type="button" data-morph onClick={onToday} className="press rounded-control border border-control-border px-4 text-sm font-semibold hover:border-content">
             Today
           </button>
           <MonthArrow label="Previous month" d="M12.5 4l-6 6 6 6" onClick={() => onShift(-1)} />
@@ -311,16 +390,20 @@ function MonthGrid({
         </div>
       </div>
 
-      {selected ? (
-        <div className="mt-8">
-          <h3 className="label-micro text-content-soft">{fmt({ weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(fromKey(selected))}</h3>
-          <EventList events={selectedEvents} />
-        </div>
-      ) : (
-        <p className="mt-6 text-sm text-content-soft">
-          {monthCount ? 'Choose a highlighted day to see its events.' : 'No events published for this month.'}
-        </p>
-      )}
+      {/* Always mounted, so a new day's events are announced. scroll-mt
+          clears the sticky header when scrolled into view. */}
+      <div ref={panelRef} aria-live="polite" className="scroll-mt-24 scroll-mb-6">
+        {selected ? (
+          <div className="mt-8">
+            <h3 className="label-micro text-content-soft">{fmt({ weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(fromKey(selected))}</h3>
+            <EventList events={selectedEvents} />
+          </div>
+        ) : (
+          <p className="mt-6 text-sm text-content-soft">
+            {monthCount ? 'Choose a highlighted day to see its events.' : 'No events published for this month.'}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
@@ -332,7 +415,7 @@ function MonthArrow({ label, d, onClick }: { label: string; d: string; onClick: 
       data-morph
       onClick={onClick}
       aria-label={label}
-      className="inline-flex h-10 w-11 items-center justify-center rounded-control border border-control-border transition-[background-color,border-color,translate] duration-200 hover:border-content active:translate-y-px"
+      className="press inline-flex h-10 w-11 items-center justify-center rounded-control border border-control-border hover:border-content"
     >
       <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4">
         <path d={d} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />

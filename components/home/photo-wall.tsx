@@ -1,7 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
+import { useHscrollPan } from '@/components/motion/use-hscroll-pan';
 import { WALL_ITEMS, type WallItem } from '@/lib/home';
 
 /**
@@ -47,12 +48,27 @@ function layout(items: WallItem[]) {
     const y = TOP[item.drop];
     const x = cursor;
     cursor += w + GAP;
-    // The node is the diamond in the caption row. Captions are forced to a
-    // single line (whitespace-nowrap) precisely so this stays deterministic:
-    // a wrapped caption would move its own diamond and the line would miss it.
-    return { ...item, x, y, w, h, nodeX: x + 3, nodeY: y - 16 };
+    // The node is the diamond in the caption row: 3px in, and on the
+    // caption's centre line (the caption is the figure's first row, so its
+    // centre is ~6px below the figure's top), the same geometry as the
+    // Archives rail. This used to be `y - 16`, which ran the line ~22px above
+    // every diamond so it never touched them. Captions are forced to a single
+    // line (whitespace-nowrap) precisely so this stays deterministic: a
+    // wrapped caption would move its own diamond and the line would miss it.
+    return { ...item, x, y, w, h, nodeX: x + 3, nodeY: y + 6 };
   });
   return { placed, trackWidth: cursor + PAD_X };
+}
+
+/**
+ * The plate is drawn object-cover, so a photo wider than its plate is scaled
+ * to the plate's height and needs `aspect / plateAspect` times the plate's
+ * width. Asking for the plate width alone served a 420px file into a tall
+ * 420x463 plate (2.7x upscaled). Below md the plate is the stack's 92vw.
+ */
+function plateSizes(p: Placed) {
+  const k = Math.max(1, p.aspect / (p.w / p.h));
+  return `(max-width: 767px) ${Math.ceil(92 * k)}vw, ${Math.ceil(p.w * k)}px`;
 }
 
 /** Smooth cubic through the nodes, so the line reads as drawn, not plotted. */
@@ -73,20 +89,7 @@ export function PhotoWall() {
   const { placed, trackWidth } = layout(WALL_ITEMS);
   const d = pathThrough(placed);
 
-  useEffect(() => {
-    const rail = railRef.current;
-    if (!rail) return;
-    const measure = () => {
-      // The rail is container-page: centred with a max width, so on screens
-      // wider than 88rem it starts offsetLeft in from the edge. That offset
-      // has to be panned too, or the last plate stops short, clipped.
-      const pan = Math.max(0, rail.offsetLeft + rail.scrollWidth - window.innerWidth);
-      rail.style.setProperty('--pan', `${pan}px`);
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, []);
+  useHscrollPan(railRef);
 
   return (
     <section id="work" aria-labelledby="work-heading" className="bg-navy-900 text-white">
@@ -161,12 +164,17 @@ export function PhotoWall() {
                       aria-hidden="true"
                       className="hidden size-1.5 shrink-0 rotate-45 bg-white/70 md:block"
                     />
-                    <span className="label-micro text-white/55">
+                    {/* The label sits on the band colour: each curve leaves
+                        its node horizontally, and ran through the caption
+                        text. One backing for number and caption, with the
+                        space between them as padding inside it, so the line
+                        can't show through the gap either. */}
+                    <span className="label-micro bg-navy-900 text-white/55">
                       {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <span className="label-micro text-white/80">
-                      {p.caption}
-                      {p.year ? `, ${p.year}` : ''}
+                      <span className="pl-2 text-white/80">
+                        {p.caption}
+                        {p.year ? `, ${p.year}` : ''}
+                      </span>
                     </span>
                   </figcaption>
                   <div
@@ -177,7 +185,7 @@ export function PhotoWall() {
                       src={p.src}
                       alt={p.alt}
                       fill
-                      sizes="(max-width: 768px) 92vw, 420px"
+                      sizes={plateSizes(p)}
                       className="object-cover"
                     />
                   </div>
@@ -186,11 +194,14 @@ export function PhotoWall() {
             </div>
           </div>
 
-          <div
-            aria-hidden="true"
-            className="hscroll-prog absolute inset-x-8 bottom-10 hidden h-px bg-white/20 md:block xl:inset-x-14"
-          >
-            <i className="block h-full origin-left bg-white/70" />
+          {/* Inside container-page so the track starts and ends on the same
+              gutters as the heading above it. */}
+          <div aria-hidden="true" className="absolute inset-x-0 bottom-10 hidden md:block">
+            <div className="container-page">
+              <div className="hscroll-prog h-px bg-white/20">
+                <i className="block h-full origin-left bg-white/70" />
+              </div>
+            </div>
           </div>
         </div>
       </div>

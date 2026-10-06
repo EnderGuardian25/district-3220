@@ -8,6 +8,7 @@ import { ArchiveRail } from '@/components/archives/archive-rail';
 import { ARCHIVE_YEARS, UNRECORDED_SPAN } from '@/lib/archives';
 import { PAST_COUNCILS } from '@/lib/councils';
 import { DEFAULT_FOCUS } from '@/lib/people';
+import { keepTogether } from '@/components/people/keep-together';
 
 export const metadata: Metadata = {
   title: 'Archives',
@@ -28,8 +29,22 @@ export default function ArchivesPage() {
           <SectionHeader
             id="years-heading"
             tone="dark"
-            title="Every year on record, oldest first."
-            lede="Scroll to move through the years. Open any one for its council, its projects and the people who ran them."
+            // The rail runs oldest first and pans as you scroll; the phone list
+            // below runs newest first and scrolls down, so it gets its own
+            // wording (decided 2026-10-06). display:none keeps screen readers
+            // to the one that is showing.
+            title={
+              <>
+                <span className="md:hidden">Every year on record, newest first.</span>
+                <span className="hidden md:inline">Every year on record, oldest first.</span>
+              </>
+            }
+            lede={
+              <>
+                <span className="hidden md:inline">Scroll to move through the years. </span>
+                Open any one for its council, its projects and the people who ran them.
+              </>
+            }
           />
         </div>
 
@@ -45,7 +60,7 @@ export default function ArchivesPage() {
                   {y.shape === 'compiling' && <span className="label-micro text-white/60">Being compiled</span>}
                 </span>
                 {y.theme && <span className="mt-2 block font-display text-white/80 italic">“{y.theme}”</span>}
-                {y.dir && <span className="label-micro mt-1.5 block text-white/55">DIR {y.dir}</span>}
+                {y.dir && <span className="label-micro mt-1.5 block text-white/55">DIR {keepTogether(y.dir)}</span>}
               </Link>
               {y.slug === '2020-21' && (
                 <Link href="/college-of-dirs" className="block border-t border-white/15 py-5" data-placeholder>
@@ -74,7 +89,7 @@ export default function ArchivesPage() {
           {PAST_COUNCILS.map((c, i) => {
             const dir = c.groups[0]?.people[0];
             return (
-              <Reveal key={c.year} step={i} as="li">
+              <Reveal key={c.year} step={Math.min(i, 4)} as="li">
                 <Link
                   href={`/archives/council/${c.year}`}
                   className="group grid grid-cols-[6rem_minmax(0,1fr)] items-end gap-5 rounded-panel border border-hairline bg-surface p-4 transition-colors duration-200 hover:border-accent-fill md:grid-cols-[7rem_minmax(0,1fr)]"
@@ -86,7 +101,7 @@ export default function ArchivesPage() {
                         alt=""
                         fill
                         sizes="112px"
-                        className="object-cover transition-[scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04]"
+                        className="object-cover transition-[scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04] motion-reduce:group-hover:scale-100"
                         style={{ objectPosition: dir.focus ?? DEFAULT_FOCUS }}
                       />
                     )}
@@ -97,7 +112,7 @@ export default function ArchivesPage() {
                       Council {c.label}
                     </span>
                     <span className="mt-1.5 block text-sm text-content-muted">
-                      “{c.theme}” · DIR {c.dir}
+                      “{c.theme}” · DIR {keepTogether(c.dir)}
                     </span>
                   </span>
                 </Link>
