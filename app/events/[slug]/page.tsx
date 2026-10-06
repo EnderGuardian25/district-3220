@@ -9,6 +9,7 @@ import { PeopleGrid } from '@/components/people/people-grid';
 import { CommitteeGrid } from '@/components/events/committee-grid';
 import { MailtoForm } from '@/components/forms/mailto-form';
 import { TextArea, TextField } from '@/components/forms/fields';
+import { Button } from '@/components/ui/button';
 import { EVENT_PAGES, getEventPage } from '@/lib/event-pages';
 
 export const dynamicParams = false;
@@ -31,7 +32,7 @@ export default async function EventPageRoute({ params }: { params: Promise<{ slu
     <main id="main">
       <PageHeader crumbs={[{ label: 'Calendar', href: '/calendar' }]} title={`${e.name}.`} lede={e.standfirst}>
         <span className="label-micro inline-flex items-center gap-2 rounded-control border border-control-border px-4 py-2.5 text-content-muted">
-          <span aria-hidden="true" className={`size-1.5 rounded-full ${e.status === 'past' ? 'bg-chalk-500' : 'bg-accent'}`} />
+          <span aria-hidden="true" className={`size-1.5 rounded-full ${e.status === 'past' ? 'bg-control-border' : 'bg-accent'}`} />
           {e.status === 'past' ? 'Past event' : 'Upcoming'} · {e.when}
         </span>
       </PageHeader>
@@ -43,13 +44,13 @@ export default async function EventPageRoute({ params }: { params: Promise<{ slu
             <div className="flex flex-col items-center justify-center gap-8 px-6 py-12 sm:flex-row sm:gap-14 md:py-16">
               {e.emblem && (
                 <div className="relative aspect-square w-32 md:w-44">
-                  <Image src={e.emblem} alt="" fill priority sizes="176px" className="object-contain" />
+                  <Image src={e.emblem} alt="" fill preload sizes="176px" className="object-contain" />
                 </div>
               )}
               {e.wordmark && (
                 <div className="relative aspect-[16/9] w-72 md:w-[30rem]">
                   {/* The wordmark file carries wide transparent margins, hence the large box. */}
-                  <Image src={e.wordmark} alt={e.shortName} fill priority sizes="480px" className="object-contain" />
+                  <Image src={e.wordmark} alt={e.shortName} fill preload sizes="480px" className="object-contain" />
                 </div>
               )}
             </div>
@@ -96,10 +97,10 @@ export default async function EventPageRoute({ params }: { params: Promise<{ slu
               <p className="mt-2 max-w-[56ch] text-content-muted">{e.registration.detail}</p>
             </div>
             {e.registration.status === 'open' && e.registration.href ? (
-              <a href={e.registration.href} target="_blank" rel="noreferrer" data-morph className="shrink-0 rounded-control border border-accent-fill bg-accent-fill px-6 py-3.5 text-sm font-semibold text-accent-on transition-colors duration-200 hover:border-signal-700 hover:bg-signal-700">
+              <Button href={e.registration.href} target="_blank" rel="noreferrer" className="shrink-0">
                 Register
                 <span className="sr-only"> (opens in a new tab)</span>
-              </a>
+              </Button>
             ) : (
               <span className="label-micro shrink-0 self-start rounded-control border border-control-border px-4 py-2.5 text-content-soft md:self-auto">
                 Closed

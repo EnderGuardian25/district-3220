@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { DrawLine, Reveal } from '@/components/motion/reveal';
+import { DrawLine } from '@/components/motion/reveal';
 import { ClipReveal } from '@/components/motion/clip-reveal';
 
 /**
@@ -27,7 +27,10 @@ export function PageHeader({
 }) {
   return (
     <div className="container-page pt-12 md:pt-20">
-      <Reveal>
+      {/* The header animates from first paint (rise-in-load, globals.css), not
+          through Reveal: Reveal server-renders at opacity 0 until JavaScript
+          hydrates, which held back the page's h1, its largest text. */}
+      <div className="rise-in-load">
         <nav aria-label="Breadcrumb" className="label-micro text-content-soft">
           <Link href="/" className="transition-colors duration-200 hover:text-accent-text">
             Home
@@ -41,19 +44,19 @@ export function PageHeader({
             </span>
           ))}
         </nav>
-      </Reveal>
-      <Reveal step={1} as="h1" className="mt-5 max-w-[18ch] text-display">
+      </div>
+      <h1 className="rise-in-load mt-5 max-w-[18ch] text-display" style={{ ['--step' as string]: 1 }}>
         {title}
-      </Reveal>
+      </h1>
       {lede && (
-        <Reveal step={2} as="p" className="mt-5 max-w-[58ch] text-[1.075rem] text-content-muted">
+        <p className="rise-in-load mt-5 max-w-[58ch] text-[1.075rem] text-content-muted" style={{ ['--step' as string]: 2 }}>
           {lede}
-        </Reveal>
+        </p>
       )}
       {children && (
-        <Reveal step={3} className="mt-8 flex flex-wrap gap-3">
+        <div className="rise-in-load mt-8 flex flex-wrap gap-3" style={{ ['--step' as string]: 3 }}>
           {children}
-        </Reveal>
+        </div>
       )}
       <DrawLine className="mt-10 md:mt-14" />
     </div>
@@ -63,7 +66,7 @@ export function PageHeader({
 /**
  * A full-width photograph straight under the page header, opened with the
  * Clip Reveal wipe. It is in the first viewport, so it animates from first
- * paint and takes `priority` as the likely LCP element.
+ * paint and takes `preload` (Next 16's name for priority) as the likely LCP element.
  */
 export function PageMedia({
   src,
@@ -77,7 +80,7 @@ export function PageMedia({
   return (
     <figure className="container-page mt-8 md:mt-10">
       <ClipReveal onLoad className="relative aspect-[4/3] overflow-hidden rounded-panel bg-sunk md:aspect-[21/9]">
-        <Image src={src} alt={alt} fill priority sizes="(max-width: 1408px) 100vw, 1408px" className="object-cover" />
+        <Image src={src} alt={alt} fill preload sizes="(max-width: 1408px) 100vw, 1408px" className="object-cover" />
       </ClipReveal>
       {caption && <figcaption className="label-micro mt-3 text-content-soft">{caption}</figcaption>}
     </figure>

@@ -17,9 +17,10 @@ import { AVENUE_PANELS } from '@/lib/home';
  *  - below md: five columns of 78px is unusable, so it becomes a list with the
  *    colour on the left edge and the description revealed on open.
  *
- * `onSolid` picks the band's text colour. Community Service is light enough
- * that white on it measures 2.6:1 and fails AA, so that one panel takes dark
- * text; every other avenue colour is dark enough for white.
+ * `onSolid` picks the band's text colour. All five are 'light' (white) by
+ * request, including Community Service, where white measures about 2.6:1 and
+ * fails AA; the accepted trade-off and its one-line fix are in
+ * design/DECISIONS.md §2. The 'dark' branch is kept for that fix.
  *
  * Deliberately NOT a morph-cursor target: a collapsed panel is roughly
  * 140x520, so the cursor would inflate into a slab and fight the hover.
@@ -43,6 +44,8 @@ export function AvenuesAccordion() {
             aria-expanded={isOpen}
             onMouseEnter={() => locked === null && setHovered(i)}
             onFocus={() => locked === null && setHovered(i)}
+            // Tabbing out must close what tabbing in opened.
+            onBlur={() => locked === null && setHovered(null)}
             onClick={() => setLocked((l) => (l === i ? null : i))}
             style={{
               ['--k' as string]: a.colour,
@@ -53,7 +56,7 @@ export function AvenuesAccordion() {
             // longer, gentler curve than the default. The description used to
             // animate max-height alongside it, which is never linear with the
             // real content height and was most of the roughness.
-            className="group relative grid min-h-[92px] grid-cols-[92px_1fr] items-center overflow-hidden rounded-media border-l-4 border-l-[var(--k)] text-left transition-[flex-grow,background-color] duration-[750ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[flex-grow] md:block md:min-h-0 md:min-w-0 md:border-l-0"
+            className="group relative grid min-h-[92px] grid-cols-[92px_1fr] items-center overflow-hidden rounded-media border-l-4 border-l-[var(--k)] text-left transition-[flex-grow,background-color] duration-[750ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:block md:min-h-0 md:min-w-0 md:border-l-0"
           >
             {/* Logo. Centred in the plate above the band on desktop; a fixed
                 column on mobile. */}
@@ -69,7 +72,9 @@ export function AvenuesAccordion() {
 
             <span
               className="label-micro absolute top-2.5 right-3 z-10 md:top-3.5 md:right-auto md:left-4"
-              style={{ color: `color-mix(in srgb, ${a.colour} 78%, #000000)` }}
+              // 60% with black clears 4.5:1 on every avenue's tint, including
+              // Community Service's amber (78% measured 3.74:1).
+              style={{ color: `color-mix(in srgb, ${a.colour} 60%, #000000)` }}
             >
               {String(i + 1).padStart(2, '0')}
               {locked === i && <span className="opacity-60"> locked</span>}

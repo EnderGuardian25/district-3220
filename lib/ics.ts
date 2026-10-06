@@ -23,7 +23,16 @@ export type CalendarEvent = {
 /** How far either side of today recurring events are expanded. */
 const PAST_DAYS = 400;
 const FUTURE_DAYS = 550;
+/** Occurrences kept per series, inside the window. */
 const MAX_OCCURRENCES = 400;
+/**
+ * Iterations walked per series, counting those before the window. Separate
+ * from MAX_OCCURRENCES: counting skipped history against the kept cap made a
+ * long-running series (a weekly meeting since 2018) show nothing at all.
+ */
+const MAX_ITERATIONS = 20_000;
+/** Sri Lanka has no daylight saving: UTC+05:30 all year. */
+const COLOMBO_OFFSET_MS = 5.5 * 60 * 60 * 1000;
 
 export function parseIcs(text: string): CalendarEvent[] {
   const root = new ICAL.Component(ICAL.parse(text));
@@ -55,11 +64,16 @@ export function parseIcs(text: string): CalendarEvent[] {
     }
     const it = ev.iterator();
     let next: ICAL.Time | null;
-    let n = 0;
-    while ((next = it.next()) && next.compare(until) <= 0 && n < MAX_OCCURRENCES) {
-      n++;
+    let kept = 0;
+    let walked = 0;
+    while ((next = it.next()) && next.compare(until) <= 0 && kept < MAX_OCCURRENCES && walked < MAX_ITERATIONS) {
+      walked++;
       if (next.compare(from) < 0) continue;
       const occ = ev.getOccurrenceDetails(next);
+      // A single deleted instance of a series arrives as an exception with
+      // STATUS:CANCELLED; only the master's status was being checked.
+      if (occ.item.component.getFirstPropertyValue('status') === 'CANCELLED') continue;
+      kept++;
       out.push(toEvent(`${ev.uid}-${next.toString()}`, occ.item, occ.startDate, occ.endDate));
     }
   }
@@ -68,7 +82,16 @@ export function parseIcs(text: string): CalendarEvent[] {
 
 function toEvent(id: string, ev: ICAL.Event, start: ICAL.Time, end: ICAL.Time | null): CalendarEvent {
   const allDay = start.isDate;
-  const iso = (t: ICAL.Time) => (t.isDate ? t.toString() : t.toJSDate().toISOString());
+  const iso = (t: ICAL.Time) => {
+    if (t.isDate) return t.toString();
+    // A floating time (no Z, or a TZID the feed never defined) would be read
+    // in the server's own zone, UTC on Vercel, and land 5h30 late. Every
+    // event is in the district, so floating means Sri Lanka time.
+    if (t.zone?.tzid === 'floating') {
+      return new Date(Date.UTC(t.year, t.month - 1, t.day, t.hour, t.minute, t.second) - COLOMBO_OFFSET_MS).toISOString();
+    }
+    return t.toJSDate().toISOString();
+  };
   const url = ev.component.getFirstPropertyValue('url');
   const description = cleanDescription(ev.description);
   return {

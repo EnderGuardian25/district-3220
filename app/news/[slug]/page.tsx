@@ -47,12 +47,18 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           </div>
           <div>
             <dt className="sr-only">Published</dt>
-            <dd>{formatDate(p.date)}</dd>
+            <dd>
+              <time dateTime={p.date}>{formatDate(p.date)}</time>
+            </dd>
           </div>
           {p.updated && (
             <div>
               <dt className="sr-only">Updated</dt>
-              <dd>Updated {formatDate(p.updated)}</dd>
+              {/* "Updated" is visible here and hidden in the dt, so it is read once. */}
+              <dd>
+                <span aria-hidden="true">Updated </span>
+                <time dateTime={p.updated}>{formatDate(p.updated)}</time>
+              </dd>
             </div>
           )}
           <div>
@@ -69,7 +75,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             className={`relative overflow-hidden rounded-panel bg-sunk ${isPortrait(p.imageRatio) ? 'max-w-md' : ''}`}
           >
             <div style={{ aspectRatio: p.imageRatio }} className="relative">
-              <Image src={p.image} alt={p.imageAlt} fill priority sizes="(max-width: 768px) 100vw, 672px" className="object-cover" />
+              <Image src={p.image} alt={p.imageAlt} fill preload sizes="(max-width: 768px) 100vw, 672px" className="object-cover" />
             </div>
           </ClipReveal>
 
@@ -96,7 +102,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                   <span className="font-display text-[1.3rem] leading-tight font-semibold tracking-[-0.015em] transition-colors duration-200 group-hover:text-accent-text">
                     {o.shortTitle ?? o.title}
                   </span>
-                  <span className="label-micro text-content-soft">{formatDate(o.date)}</span>
+                  <time dateTime={o.date} className="label-micro text-content-soft">
+                    {formatDate(o.date)}
+                  </time>
                 </Link>
               </li>
             ))}

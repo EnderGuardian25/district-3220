@@ -20,12 +20,11 @@ export function Odometer({ value, className = '' }: { value: string; className?:
   let digitIndex = -1;
 
   return (
-    <span
-      ref={ref}
-      className={`inline-flex items-end whitespace-nowrap tabular-nums ${className}`}
-      // The strip is decorative once the real value is announced here.
-      aria-label={value}
-    >
+    <span ref={ref} className={`inline-flex items-end whitespace-nowrap tabular-nums ${className}`}>
+      {/* The real value for assistive tech. aria-label on a plain span is
+          prohibited ARIA and ignored by screen readers, which left every
+          figure reading as empty, since the digit strips are aria-hidden. */}
+      <span className="sr-only">{value}</span>
       {value.split('').map((char, i) => {
         const isDigit = char >= '0' && char <= '9';
         if (!isDigit) {

@@ -30,6 +30,9 @@ export function ServicesAccordion({ formId }: { formId: string }) {
       box.dispatchEvent(new Event('input', { bubbles: true }));
     }
     document.getElementById(formId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Take keyboard and screen-reader users along: focus the service just
+    // ticked, without letting focus fight the smooth scroll.
+    box?.focus({ preventScroll: true });
   };
 
   return (
@@ -45,7 +48,7 @@ export function ServicesAccordion({ formId }: { formId: string }) {
             // With basis auto each panel starts at its content width (the
             // hidden Request button included), the row is already full, and
             // flex-grow has nothing to distribute.
-            className={`group relative min-h-[96px] overflow-hidden rounded-media bg-navy-900 transition-[flex-grow] duration-[750ms] ${EASE} will-change-[flex-grow] md:min-h-0 md:min-w-0 md:basis-0`}
+            className={`group relative min-h-[96px] overflow-hidden rounded-media bg-navy-900 transition-[flex-grow] duration-[750ms] ${EASE} md:min-h-0 md:min-w-0 md:basis-0`}
           >
             <Image
               src={s.image}
@@ -61,7 +64,14 @@ export function ServicesAccordion({ formId }: { formId: string }) {
               aria-expanded={isOpen}
               onFocus={() => locked === null && setHovered(i)}
               onClick={() => setLocked((l) => (l === i ? null : i))}
-              className="absolute inset-0 z-10 text-left"
+              // Close on leaving the panel, but not when focus moves on to the
+              // panel's own Request button.
+              onBlur={(e) => {
+                if (locked === null && !e.currentTarget.parentElement?.contains(e.relatedTarget as Node)) setHovered(null);
+              }}
+              // An inset ring: the panel is overflow-hidden, so the default
+              // ring (drawn 3px outside) was clipped away entirely.
+              className="absolute inset-0 z-10 text-left focus-visible:outline-offset-[-4px]"
             >
               <span className="sr-only">{s.name}</span>
             </button>
@@ -86,7 +96,7 @@ export function ServicesAccordion({ formId }: { formId: string }) {
                     tabIndex={isOpen ? 0 : -1}
                     data-morph
                     onClick={() => request(s.formOption)}
-                    className="pointer-events-auto rounded-control border border-white bg-white px-4 py-2 text-sm font-semibold text-chalk-950 transition-colors duration-200 hover:border-accent hover:bg-accent hover:text-white"
+                    className="pointer-events-auto rounded-control border border-white bg-white px-4 py-2 text-sm font-semibold text-chalk-950 transition-colors duration-200 hover:border-accent-fill hover:bg-accent-fill hover:text-accent-on"
                   >
                     Request {s.name.toLowerCase()}
                   </button>

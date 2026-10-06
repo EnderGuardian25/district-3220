@@ -4,6 +4,7 @@ import { Placeholder } from '@/components/page/placeholder';
 import { CalendarView } from '@/components/calendar/calendar-view';
 import { Button } from '@/components/ui/button';
 import { getCalendar } from '@/lib/calendar';
+import { colomboDayKey } from '@/lib/colombo';
 
 export const metadata: Metadata = {
   title: 'Calendar',
@@ -15,12 +16,7 @@ export const revalidate = 3600;
 
 export default async function CalendarPage() {
   const { source, events } = await getCalendar();
-  const today = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Colombo',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date());
+  const today = colomboDayKey(new Date());
 
   return (
     <main id="main">

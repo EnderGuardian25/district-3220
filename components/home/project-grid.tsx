@@ -3,7 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useModal } from '@/components/motion/use-modal';
 import { FLAGSHIPS } from '@/lib/home';
 
 /**
@@ -23,20 +24,17 @@ export function ProjectGrid() {
   const [openSlug, setOpenSlug] = useState<string | null>(null);
   const reduced = useReducedMotion();
   const open = FLAGSHIPS.find((f) => f.slug === openSlug) ?? null;
+  const tiles = useRef<Record<string, HTMLButtonElement | null>>({});
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const closeRef = useRef<HTMLButtonElement | null>(null);
 
-  useEffect(() => {
-    if (!openSlug) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpenSlug(null);
-    };
-    document.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [openSlug]);
+  useModal({
+    open: openSlug !== null,
+    onClose: () => setOpenSlug(null),
+    panelRef,
+    initialFocusRef: closeRef,
+    returnFocusTo: () => (openSlug ? tiles.current[openSlug] : null),
+  });
 
   return (
     <>
@@ -44,15 +42,19 @@ export function ProjectGrid() {
         {FLAGSHIPS.map((f, i) => (
           <li key={f.slug} className={SPAN[i] ?? 'md:col-span-2'}>
             <motion.button
+              ref={(el) => {
+                tiles.current[f.slug] = el;
+              }}
               type="button"
               layoutId={reduced ? undefined : `project-${f.slug}`}
               onClick={() => setOpenSlug(f.slug)}
-              aria-expanded={openSlug === f.slug}
+              aria-haspopup="dialog"
               className="group relative block h-full min-h-[260px] w-full overflow-hidden rounded-panel bg-navy-900 text-left text-white"
             >
+              {/* alt="" on the tile: the button already reads the project's name. */}
               <Image
                 src={f.image}
-                alt={f.imageAlt}
+                alt=""
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 40vw"
                 className="object-cover opacity-55 transition-[opacity,scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04] group-hover:opacity-70"
@@ -80,6 +82,7 @@ export function ProjectGrid() {
       <AnimatePresence>
         {open && (
           <motion.div
+            data-lenis-prevent
             className="fixed inset-0 z-80 flex items-center justify-center p-4 md:p-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -89,15 +92,18 @@ export function ProjectGrid() {
             <button
               type="button"
               aria-label="Close project"
+              tabIndex={-1}
               onClick={() => setOpenSlug(null)}
               className="absolute inset-0 bg-chalk-950/70"
             />
             <motion.div
+              ref={panelRef}
               layoutId={reduced ? undefined : `project-${open.slug}`}
               role="dialog"
               aria-modal="true"
               aria-label={open.name}
-              className="relative grid max-h-full w-full max-w-4xl overflow-hidden rounded-panel bg-navy-900 text-white md:grid-cols-2"
+              // Scrolls on short and landscape screens; clipping hid the Close button.
+              className="relative grid max-h-full w-full max-w-4xl overflow-y-auto overscroll-contain rounded-panel bg-navy-900 text-white md:grid-cols-2"
             >
               <div className="relative min-h-[220px]">
                 <Image
@@ -128,12 +134,13 @@ export function ProjectGrid() {
                     <Link
                       href={open.href}
                       data-morph
-                      className="rounded-control border border-on-ink bg-on-ink px-5 py-2.5 text-sm font-semibold text-ink-panel transition-colors duration-200 hover:border-accent hover:bg-accent hover:text-white"
+                      className="rounded-control border border-on-ink bg-on-ink px-5 py-2.5 text-sm font-semibold text-ink-panel transition-colors duration-200 hover:border-accent-fill hover:bg-accent-fill hover:text-accent-on"
                     >
                       Open the {open.name} page
                     </Link>
                   )}
                   <button
+                    ref={closeRef}
                     type="button"
                     data-morph
                     onClick={() => setOpenSlug(null)}

@@ -38,5 +38,9 @@ names.
   one-off markup.
 - Every content gap goes through `<Placeholder>`; never invent facts, dates or
   names to fill one.
+- Dialogs use `useModal` (focus, Tab trap, Escape, scroll lock) and put
+  `data-lenis-prevent` on the overlay. First-viewport content animates with
+  the CSS load utilities (`rise-in-load`, `clip-in-load`), not `Reveal`.
+  The motion map is in `design/DECISIONS.md` §6.
 - Hosting is Vercel. Forms send via pre-filled email until a back-end exists.
 - Verify UI in a real browser at 1440×900 and 390×844 before calling it done.

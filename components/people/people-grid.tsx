@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useModal } from '@/components/motion/use-modal';
 import { DEFAULT_FOCUS, type Person } from '@/lib/people';
 
 /**
@@ -21,24 +22,16 @@ export function PeopleGrid({ people, scope }: { people: Person[]; scope: string 
   const reduced = useReducedMotion();
   const triggers = useRef<(HTMLButtonElement | null)[]>([]);
   const closeRef = useRef<HTMLButtonElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
   const open = openIndex === null ? null : people[openIndex];
 
-  useEffect(() => {
-    if (openIndex === null) return;
-    const returnTo = triggers.current[openIndex];
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpenIndex(null);
-    };
-    document.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    closeRef.current?.focus({ preventScroll: true });
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
-      returnTo?.focus({ preventScroll: true });
-    };
-  }, [openIndex]);
+  useModal({
+    open: openIndex !== null,
+    onClose: () => setOpenIndex(null),
+    panelRef,
+    initialFocusRef: closeRef,
+    returnFocusTo: () => (openIndex === null ? null : triggers.current[openIndex]),
+  });
 
   const layoutKey = (i: number) => (reduced ? undefined : `person-${scope}-${i}`);
 
@@ -63,7 +56,9 @@ export function PeopleGrid({ people, scope }: { people: Person[]; scope: string 
                   layoutId={layoutKey(i)}
                   className="relative block aspect-[4/5] overflow-hidden rounded-media bg-sunk"
                 >
-                  <Portrait person={person} sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, (max-width: 1280px) 22vw, 270px" />
+                  {/* alt="" in the card: the button already reads the name and
+                      position, so a portrait alt would say the name twice. */}
+                  <Portrait person={person} decorative sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, (max-width: 1280px) 22vw, 270px" />
                 </motion.span>
                 <span className="label-micro mt-3.5 block text-content-soft">{person.position}</span>
                 <span className="mt-1.5 block font-display text-[1.05rem] leading-snug font-semibold tracking-[-0.01em] transition-colors duration-200 group-hover:text-accent-text">
@@ -78,6 +73,7 @@ export function PeopleGrid({ people, scope }: { people: Person[]; scope: string 
       <AnimatePresence>
         {open && openIndex !== null && (
           <motion.div
+            data-lenis-prevent
             className="fixed inset-0 z-80 flex items-center justify-center p-4 md:p-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -92,11 +88,11 @@ export function PeopleGrid({ people, scope }: { people: Person[]; scope: string 
               className="absolute inset-0 bg-chalk-950/70"
             />
             <div
+              ref={panelRef}
               role="dialog"
               aria-modal="true"
               aria-labelledby={`person-${scope}-name`}
-              data-lenis-prevent
-              className="relative grid max-h-full w-full max-w-3xl overflow-y-auto rounded-panel bg-navy-900 text-white sm:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]"
+              className="relative grid max-h-full w-full max-w-3xl overflow-y-auto overscroll-contain rounded-panel bg-navy-900 text-white sm:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]"
             >
               <motion.div
                 layoutId={layoutKey(openIndex)}
@@ -133,7 +129,17 @@ export function PeopleGrid({ people, scope }: { people: Person[]; scope: string 
   );
 }
 
-function Portrait({ person, sizes, dark = false }: { person: Person; sizes: string; dark?: boolean }) {
+function Portrait({
+  person,
+  sizes,
+  dark = false,
+  decorative = false,
+}: {
+  person: Person;
+  sizes: string;
+  dark?: boolean;
+  decorative?: boolean;
+}) {
   if (!person.image) {
     // A real person whose portrait the district has not supplied (or that was
     // lost on the old CDN). Initials, not a stock silhouette: it is still them.
@@ -158,7 +164,7 @@ function Portrait({ person, sizes, dark = false }: { person: Person; sizes: stri
   return (
     <Image
       src={person.image}
-      alt={`Portrait of ${person.name}`}
+      alt={decorative ? '' : `Portrait of ${person.name}`}
       fill
       sizes={sizes}
       className="object-cover transition-[scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04]"

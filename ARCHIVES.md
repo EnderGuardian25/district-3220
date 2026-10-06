@@ -2,6 +2,7 @@
 
 > Companion to [CONTENT.md](CONTENT.md) §11. Captures the full content of every Archives sub-page on the live site, year by year.
 > **Captured:** 2026-06-15
+> **Snapshot of the old site; leave it as captured.** "Current" here means 2025/26. The rebuilt archive's data lives in `lib/archives.ts`, `lib/councils.ts` and `lib/dirs.ts`; HANDOFF.md lists where the rebuild resolved this file's conflicts and gaps.
 
 ## Archive page map (live URLs)
 

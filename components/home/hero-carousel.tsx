@@ -14,7 +14,7 @@ import { SITE } from '@/lib/site';
  * fully driveable by arrow keys, the two buttons, the progress segments, or a
  * swipe.
  *
- * Only the first slide gets `priority`: it is the LCP element. The rest are
+ * Only the first slide gets `preload`: it is the LCP element. The rest are
  * lazy, which is why the wipe is on clip-path (compositable) rather than on a
  * property that would force layout while an image is still decoding.
  */
@@ -29,7 +29,12 @@ export function HeroCarousel() {
    * real regression and what Next was warning about.
    */
   const [maxSeen, setMaxSeen] = useState(0);
+  /** Hover or keyboard focus inside the carousel: a temporary hold. */
   const [paused, setPaused] = useState(false);
+  /** The pause button: holds until pressed again. Touch has no hover, so this
+   *  is the only way a phone user can stop a slideshow that never ends
+   *  (WCAG 2.2.2 Pause, Stop, Hide). */
+  const [stopped, setStopped] = useState(false);
   const [reduced, setReduced] = useState(false);
   const dragStart = useRef<number | null>(null);
   const count = HERO_SLIDES.length;
@@ -51,11 +56,12 @@ export function HeroCarousel() {
     [count],
   );
 
-  useEffect(() => {
-    if (paused || reduced) return;
-    const t = window.setTimeout(() => go(index + 1), INTERVAL);
-    return () => window.clearTimeout(t);
-  }, [index, paused, reduced, go]);
+  // No timer: the live progress bar's own animationend advances the slide
+  // (see the segment buttons below), so pausing freezes the bar and the
+  // countdown together and resuming continues exactly where it stopped. A
+  // separate timer restarted a full 6s after every hover while the bar
+  // showed it part-filled.
+  const holding = paused || stopped;
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowRight') {
@@ -83,6 +89,11 @@ export function HeroCarousel() {
       onPointerDown={(e) => {
         dragStart.current = e.clientX;
       }}
+      // Without this Android claims the horizontal pan for itself, sends
+      // pointercancel instead of pointerup, and the swipe never lands.
+      onPointerCancel={() => {
+        dragStart.current = null;
+      }}
       onPointerUp={(e) => {
         if (dragStart.current === null) return;
         const dx = e.clientX - dragStart.current;
@@ -96,7 +107,7 @@ export function HeroCarousel() {
       // resizes the hero mid-scroll and shifts the copy under the reader's
       // thumb. svh is stable and guarantees the CTAs are reachable on first
       // paint. min-h keeps it usable in a short landscape window.
-      className="relative isolate -mt-16 h-[100svh] min-h-[520px] overflow-hidden bg-chalk-950 md:-mt-18"
+      className="relative isolate -mt-16 h-[100svh] min-h-[520px] touch-pan-y overflow-hidden bg-chalk-950 md:-mt-18"
     >
       {HERO_SLIDES.map((s, i) => {
         if (i > maxSeen) return null;
@@ -111,7 +122,7 @@ export function HeroCarousel() {
               zIndex: state === 'live' ? 3 : state === 'past' ? 2 : 1,
             }}
           >
-            {/* Slide 0 is the LCP element, so it gets priority. Later slides
+            {/* Slide 0 is the LCP element, so it gets preload. Later slides
                 are above the fold too, and because they only mount once
                 reached, `eager` loads them exactly when they are needed rather
                 than competing with the first paint. Leaving them lazy made
@@ -121,7 +132,7 @@ export function HeroCarousel() {
               alt={s.alt}
               fill
               sizes="100vw"
-              {...(i === 0 ? { priority: true } : { loading: 'eager' as const })}
+              {...(i === 0 ? { preload: true } : { loading: 'eager' as const })}
               className="object-cover"
             />
             <div
@@ -173,27 +184,57 @@ export function HeroCarousel() {
 
         <div className="container-page mt-10 flex flex-col gap-4 pb-7 md:flex-row md:items-end md:justify-between">
           <p className="label-micro text-white/80">{slide.caption}</p>
-          <div className="pointer-events-auto flex w-full gap-1.5 md:w-[min(42%,360px)]">
-            {HERO_SLIDES.map((s, i) => (
-              <button
-                key={s.src}
-                type="button"
-                data-morph
-                onClick={() => go(i)}
-                aria-label={`Go to slide ${i + 1}`}
-                aria-current={i === index}
-                className="relative h-[3px] flex-1 overflow-hidden rounded-full bg-white/30"
-              >
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-0 origin-left bg-white transition-transform ease-linear"
-                  style={{
-                    transform: i < index ? 'scaleX(1)' : i === index ? 'scaleX(1)' : 'scaleX(0)',
-                    transitionDuration: i === index && !paused && !reduced ? `${INTERVAL}ms` : '0ms',
-                  }}
-                />
-              </button>
-            ))}
+          <div className="pointer-events-auto flex w-full items-center gap-3 md:w-[min(46%,400px)]">
+            <button
+              type="button"
+              data-morph
+              onClick={() => setStopped((v) => !v)}
+              // The label states the action; no aria-pressed as well, or a
+              // screen reader announces the state twice.
+              aria-label={stopped ? 'Play slideshow' : 'Pause slideshow'}
+              className="inline-flex size-9 shrink-0 items-center justify-center rounded-control border border-white/45 text-white transition-[background-color,border-color] duration-200 hover:border-white hover:bg-white/15"
+            >
+              <svg viewBox="0 0 16 16" aria-hidden="true" className="size-3.5" fill="currentColor">
+                {stopped ? <path d="M4.5 2.8v10.4L13 8z" /> : <path d="M4 3h3v10H4zM9 3h3v10H9z" />}
+              </svg>
+            </button>
+            <div className="flex flex-1 gap-1.5">
+              {HERO_SLIDES.map((s, i) => (
+                // The button is a 24px-tall hit target (WCAG 2.5.8); the 3px
+                // track is drawn inside it.
+                <button
+                  key={s.src}
+                  type="button"
+                  data-morph
+                  onClick={() => go(i)}
+                  aria-label={`Go to slide ${i + 1}`}
+                  aria-current={i === index}
+                  className="group relative flex h-6 flex-1 items-center"
+                >
+                  <span className="relative block h-[3px] w-full overflow-hidden rounded-full bg-white/30 transition-colors duration-200 group-hover:bg-white/45">
+                    {i < index && <span aria-hidden="true" className="absolute inset-0 bg-white" />}
+                    {i === index &&
+                      (reduced ? (
+                        // No autoplay under reduced motion: the bar simply marks the slide.
+                        <span aria-hidden="true" className="absolute inset-0 bg-white" />
+                      ) : (
+                        <span
+                          // Keyed by index so every slide's bar starts from empty,
+                          // including slide 1 on first load and after wrapping.
+                          key={index}
+                          aria-hidden="true"
+                          className="absolute inset-0 origin-left bg-white"
+                          style={{
+                            animation: `progress-fill ${INTERVAL}ms linear both`,
+                            animationPlayState: holding ? 'paused' : 'running',
+                          }}
+                          onAnimationEnd={() => go(index + 1)}
+                        />
+                      ))}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

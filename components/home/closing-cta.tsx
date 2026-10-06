@@ -3,8 +3,9 @@ import { Reveal } from '@/components/motion/reveal';
 
 /**
  * One destination, one label. "Join a club" is the same string here as in the
- * header and the hero, because three different phrasings of one intent is how
- * a page ends up feeling like three different sites.
+ * hero (which scrolls here), because three phrasings of one intent is how a
+ * page ends up feeling like three different sites. The second button goes
+ * somewhere different, so two labels never share one destination.
  */
 export function ClosingCta() {
   return (
@@ -21,8 +22,8 @@ export function ClosingCta() {
           <Button href="/contact" tone="onInk">
             Join a club
           </Button>
-          <Button href="/contact" tone="onInkGhost">
-            Contact the council
+          <Button href="/about" tone="onInkGhost">
+            About the district
           </Button>
         </div>
       </Reveal>

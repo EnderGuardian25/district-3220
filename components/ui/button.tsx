@@ -15,10 +15,10 @@ const TONES: Record<Tone, string> = {
     'border-accent-fill bg-accent-fill text-accent-on hover:border-signal-700 hover:bg-signal-700',
   ghost:
     'border-control-border bg-transparent text-content hover:border-content',
-  onPhoto: 'border-white bg-white text-chalk-950 hover:border-accent hover:bg-accent hover:text-white',
+  onPhoto: 'border-white bg-white text-chalk-950 hover:border-accent-fill hover:bg-accent-fill hover:text-accent-on',
   onPhotoGhost:
     'border-white/55 bg-transparent text-white hover:border-white hover:bg-white/15',
-  onInk: 'border-on-ink bg-on-ink text-ink-panel hover:border-accent hover:bg-accent hover:text-white',
+  onInk: 'border-on-ink bg-on-ink text-ink-panel hover:border-accent-fill hover:bg-accent-fill hover:text-accent-on',
   onInkGhost:
     'border-on-ink/40 bg-transparent text-on-ink hover:border-on-ink',
 };

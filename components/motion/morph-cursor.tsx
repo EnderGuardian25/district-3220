@@ -48,6 +48,17 @@ export function MorphCursor() {
     };
 
     const loop = () => {
+      // A parked element that has been removed (a dialog's Close button, a
+      // link that navigated) measures as a zero rect, which flew the blob to
+      // the top-left corner with the native cursor still hidden. One scrolled
+      // out from under a still pointer never fires pointerout. Release both.
+      if (parked) {
+        const r = parked.getBoundingClientRect();
+        const slack = 8;
+        const pointerOff =
+          pointerX < r.left - slack || pointerX > r.right + slack || pointerY < r.top - slack || pointerY > r.bottom + slack;
+        if (!parked.isConnected || pointerOff) release();
+      }
       if (parked) {
         // Re-measured each frame so the blob tracks elements that move or
         // resize under it, such as an accordion panel opening.
@@ -94,7 +105,8 @@ export function MorphCursor() {
     window.addEventListener('pointermove', onMove, { passive: true });
     document.addEventListener('pointerover', onOver);
     document.addEventListener('pointerout', onOut);
-    // A parked element can be removed or scrolled away; drop the reference.
+    // Leaving the window drops the park too (removal and scroll-away are
+    // handled per frame in the loop).
     window.addEventListener('blur', release);
 
     return () => {
