@@ -5,7 +5,7 @@
 >
 > The home page as built on `main` **is** the design system. Every new page
 > extends it; nothing here is reopened by a new page, a new section or a new
-> session. Changing anything in §1–§6 needs the user's explicit approval, and
+> session. Changing anything in §1–§8 needs the user's explicit approval, and
 > the approval gets recorded here as a dated revision.
 >
 > When this file and the code disagree, the code on `main` is what was approved:
@@ -148,11 +148,63 @@ design change (see the top of this file).
 
 ---
 
-## 8. Still in force from before the redesign
+## 8. Site build: inner pages (decided by the user 2026-10-05)
+
+### Page map
+| Page | URL | Signature motion (all from §6) |
+|---|---|---|
+| About | `/about` | Clip Reveal photo band, Odometer stats |
+| Meet The Council 2026/27 | `/council/2026-27` | Expand Grid profiles; "To be announced" slots until the roster arrives |
+| College of DIRs | `/college-of-dirs` | Vertical Line Draw timeline down the years |
+| Calendar | `/calendar` | Reveal only; month switch on `ease-clip` |
+| Request a Date | `/calendar/request-a-date` | Reveal only |
+| Event pages | `/events/[slug]` (first: `dimun-2025`) | Expand Grid for committees and people |
+| Admin Documents | `/admin-documents` | Reveal only |
+| News | `/news`, `/news/[slug]` | Clip Reveal on post images |
+| Newsletter | `/newsletter` | Reveal only |
+| Archives | `/archives` | Pinned horizontal timeline + Line Draw (the photo-band mechanic) |
+| Archive year | `/archives/[year]` | Reveal + DrawLine section rules |
+| Past councils | `/archives/council/[year]` | Expand Grid profiles |
+| Media Crew | `/media-crew` | Accordion Gallery for the six services |
+| Contact | `/contact` | Reveal only |
+
+Every old Wix path 301s to its new URL (`next.config.ts`).
+
+### Decisions
+- **Animation:** inner pages reuse the home-page effects only (table above). No new effects.
+- **Inner-page header:** solid chalk bar (no transparent hero treatment), then a
+  chalk page header: micro-label eyebrow linking to the parent, Fraunces display
+  title, muted lede, DrawLine.
+- **Forms** (Contact, Request a Date, Media Crew): full UI with every field and
+  validation from CONTENT.md, submitting by opening a pre-filled email to the
+  district address. A real back-end later replaces only the submit handler.
+- **Calendar:** our own month + list calendar, styled in this system, reading the
+  district's public Google Calendar iCal feed from `DISTRICT_CALENDAR_ICS_URL`,
+  refreshed hourly on the server. Falls back to `lib/events.ts` until the URL is set.
+- **Hosting:** Vercel (Node runtime, ISR).
+- **DIMUN:** a reusable `/events/[slug]` template; DIMUN '25 is its first entry.
+- **Archive gaps:** every year appears. 2023/24, 2021/22 and 1991/92 get pages with
+  what is known plus a "records being compiled" note. 1999/2000 hides its
+  duplicated council roster until verified.
+- **Council bios:** kept verbatim. The sharpest ones are listed in HANDOFF for the
+  district to veto before launch.
+- **Council 2026/27:** structured placeholder grid of "To be announced" slots.
+- **Placeholders** always use the shared `Placeholder` component (or, for an
+  unfilled person, the dashed-outline "To be announced" card in `PeopleGrid`).
+  Both carry `data-placeholder`, so every gap is visibly marked and searchable
+  before launch.
+- **Shared components live in `components/page`, `components/people` and
+  `components/forms`.** `/kit` (development only) renders all of them; check it
+  after any change to them.
+- **Branches:** `pages/foundation` first (shared components, shared data,
+  redirects), then one branch and PR per page group. The user reviews and merges.
+
+---
+
+## 9. Still in force from before the redesign
 
 **Stack:** Next.js 16 (App Router, TypeScript), Tailwind CSS v4 (CSS-first
-`@theme`), Framer Motion 12 + Lenis. Hosting not decided; the build stays
-host-agnostic.
+`@theme`), Framer Motion 12 + Lenis. Hosting: Vercel (decided 2026-10-05, §8).
 
 **Navigation:** labels and order identical to the Wix site. Clean URLs with 301s
 from every old path (`next.config.ts`).
