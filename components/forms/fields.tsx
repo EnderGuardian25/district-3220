@@ -85,10 +85,12 @@ export function TextField({
  * next to the soft placeholders of the other fields. CSS can't see "empty"
  * on these inputs, but a required empty one is :invalid, so that state takes
  * the placeholder colour (the district's date/time fields are all required).
+ * A filled-in date before `min` is :invalid as well, but it is also
+ * :out-of-range, so it's excluded and keeps the ink colour of a real value.
  * The icon is softened to match the select's chevron.
  */
 const DATE_TIME =
-  'invalid:not-focus:text-content-soft [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-55';
+  '[&:invalid:not(:out-of-range):not(:focus)]:text-content-soft [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-55';
 
 export function TextArea({
   name,

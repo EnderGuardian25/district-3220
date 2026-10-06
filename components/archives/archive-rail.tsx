@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
+import { useHscrollPan } from '@/components/motion/use-hscroll-pan';
 import { UNRECORDED_SPAN, type ArchiveYear } from '@/lib/archives';
 import { keepTogether } from '@/components/people/keep-together';
 
@@ -80,24 +81,7 @@ export function ArchiveRail({ years }: { years: ArchiveYear[] }) {
     window.scrollTo({ top: sectionTop + progress * range, behavior: 'instant' });
   };
 
-  useEffect(() => {
-    const rail = railRef.current;
-    if (!rail) return;
-    const measure = () => {
-      const pan = Math.max(0, rail.offsetLeft + rail.scrollWidth - window.innerWidth);
-      rail.style.setProperty('--pan', `${pan}px`);
-    };
-    measure();
-    // The rail's own width can change without the window resizing (fonts
-    // loading, the scrollbar appearing), so watch the rail as well.
-    const ro = new ResizeObserver(measure);
-    ro.observe(rail);
-    window.addEventListener('resize', measure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener('resize', measure);
-    };
-  }, []);
+  useHscrollPan(railRef);
 
   return (
     // Scroll distance scales with the plate count so the pan runs at about one

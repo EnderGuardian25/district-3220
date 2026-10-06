@@ -4,12 +4,13 @@
  * single-letter initials ("D S Senanayake"). Applied at render time so the
  * data stays as written.
  */
-const JOIN = /(^|\s)(De|Da|Di|Du|Dos|Del|Van|Von|St\.|[A-Z]\.?)\s+(?=\S)/g;
+// A lookbehind, not a consuming group: the space before each token stays
+// available, so adjacent initials ("D S Senanayake", "Fabian D K Schokman")
+// all join in a single pass.
+const JOIN = /(?<=^|\s)(De|Da|Di|Du|Dos|Del|Van|Von|St\.|[A-Z]\.?)\s+(?=\S)/g;
 
 export function keepTogether(text: string): string {
-  // Twice, because the regex consumes the space it joins and adjacent
-  // initials ("D S Senanayake") need both of theirs.
-  return text.replace(JOIN, '$1$2\u00a0').replace(JOIN, '$1$2\u00a0');
+  return text.replace(JOIN, '$1\u00a0');
 }
 
 const DATE = /\b(\d{1,2}) (January|February|March|April|May|June|July|August|September|October|November|December) (\d{4})\b/g;

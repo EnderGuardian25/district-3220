@@ -1,7 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
+import { useHscrollPan } from '@/components/motion/use-hscroll-pan';
 import { WALL_ITEMS, type WallItem } from '@/lib/home';
 
 /**
@@ -84,27 +85,7 @@ export function PhotoWall() {
   const { placed, trackWidth } = layout(WALL_ITEMS);
   const d = pathThrough(placed);
 
-  useEffect(() => {
-    const rail = railRef.current;
-    if (!rail) return;
-    const measure = () => {
-      // The rail is container-page: centred with a max width, so on screens
-      // wider than 88rem it starts offsetLeft in from the edge. That offset
-      // has to be panned too, or the last plate stops short, clipped.
-      const pan = Math.max(0, rail.offsetLeft + rail.scrollWidth - window.innerWidth);
-      rail.style.setProperty('--pan', `${pan}px`);
-    };
-    measure();
-    // offsetLeft and scrollWidth can change without a window resize (fonts
-    // loading, the scrollbar appearing), so watch the rail itself too.
-    const ro = new ResizeObserver(measure);
-    ro.observe(rail);
-    window.addEventListener('resize', measure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener('resize', measure);
-    };
-  }, []);
+  useHscrollPan(railRef);
 
   return (
     <section id="work" aria-labelledby="work-heading" className="bg-navy-900 text-white">

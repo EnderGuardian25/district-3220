@@ -40,19 +40,39 @@ const RING = 36;
  */
 const FOLLOW_TAU = 22;
 const PARK_TAU = 45;
-const CLICKABLE = 'a[href], button:not(:disabled), [role="button"], summary';
+/** Minimum gap between hit tests while scrolling (see the loop). */
+const RESCAN_MS = 100;
+const CLICKABLE ='a[href], button:not(:disabled), [role="button"], summary';
 
 type Mode = 'dot' | 'park' | 'link';
+
+let swatch: CanvasRenderingContext2D | null = null;
+
+/**
+ * Any computed colour as 0–255 RGBA. Computed colours aren't always rgb():
+ * color-mix() backgrounds (the avenue plates) serialise as `color(srgb …)`
+ * or `oklab(…)`, whose 0–1 channels read as near-black if parsed as numbers.
+ * Painting one canvas pixel lets the browser do the conversion.
+ */
+function toRgba(colour: string): [number, number, number, number] {
+  swatch ??= document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+  if (!swatch) return [255, 255, 255, 0];
+  swatch.clearRect(0, 0, 1, 1);
+  swatch.fillStyle = colour;
+  swatch.fillRect(0, 0, 1, 1);
+  const [r, g, b, a] = swatch.getImageData(0, 0, 1, 1).data;
+  return [r, g, b, a / 255];
+}
 
 /** True when the first opaque background behind `el` is dark. */
 function onDarkBackground(el: Element | null): boolean {
   for (let node = el; node && node !== document.documentElement; node = node.parentElement) {
-    const m = getComputedStyle(node).backgroundColor.match(/[\d.]+/g);
-    if (!m) continue;
-    const [r, g, b, a = '1'] = m;
-    if (Number(a) < 0.5) continue;
+    const bg = getComputedStyle(node).backgroundColor;
+    if (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') continue;
+    const [r, g, b, a] = toRgba(bg);
+    if (a < 0.5) continue;
     // Relative luminance, close enough for a light/dark split.
-    const lum = (0.2126 * Number(r) + 0.7152 * Number(g) + 0.0722 * Number(b)) / 255;
+    const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
     return lum < 0.4;
   }
   return false;
@@ -84,6 +104,7 @@ export function MorphCursor() {
     let autoDark = false;
     let dark = false;
     let rescan = false;
+    let lastScan = 0;
     let frame = 0;
     let last = performance.now();
 
@@ -137,9 +158,14 @@ export function MorphCursor() {
       last = now;
 
       // Scrolling moves content under a still pointer without a pointerover,
-      // so look again once per frame after a scroll.
-      if (rescan) {
+      // so look again — but at most every RESCAN_MS. elementFromPoint and the
+      // tone walk force layout and style, and Lenis plus the pinned rails
+      // scroll every frame; a per-frame hit test added jank exactly there.
+      // The last scroll event leaves `rescan` set, so one final look always
+      // happens once scrolling stops.
+      if (rescan && now - lastScan >= RESCAN_MS) {
         rescan = false;
+        lastScan = now;
         resolve(document.elementFromPoint(pointerX, pointerY));
       }
 

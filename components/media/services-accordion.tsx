@@ -1,11 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
+import { useHoverIntent } from '@/components/motion/use-hover-intent';
 import { MEDIA_SERVICES } from '@/lib/media-crew';
 
-/** Hover-intent delay, as on the home avenues (approved 2026-10-06). */
-const HOVER_INTENT_MS = 80;
 
 /**
  * Accordion Gallery (lab.damiandc.com/accordion-gallery), the photographic
@@ -24,12 +23,8 @@ export function ServicesAccordion({ formId }: { formId: string }) {
   const [hovered, setHovered] = useState<number | null>(null);
   const [locked, setLocked] = useState<number | null>(null);
   const open = locked ?? hovered;
-  const intent = useRef<number | null>(null);
-  const cancelIntent = () => {
-    if (intent.current !== null) window.clearTimeout(intent.current);
-    intent.current = null;
-  };
-  useEffect(() => cancelIntent, []);
+  // Hover opens after a short intent delay (components/motion/use-hover-intent).
+  const { schedule, cancel: cancelIntent } = useHoverIntent();
 
   const request = (option: string) => {
     const box = document.querySelector<HTMLInputElement>(
@@ -63,8 +58,7 @@ export function ServicesAccordion({ formId }: { formId: string }) {
             key={s.name}
             onMouseEnter={() => {
               if (locked !== null) return;
-              cancelIntent();
-              intent.current = window.setTimeout(() => setHovered(i), HOVER_INTENT_MS);
+              schedule(() => setHovered(i));
             }}
             onMouseLeave={cancelIntent}
             style={{ flexGrow: isOpen ? 4 : 1 }}

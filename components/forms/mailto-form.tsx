@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { Button } from '@/components/ui/button';
 import { SITE } from '@/lib/site';
 
 /**
@@ -117,9 +118,8 @@ export function MailtoForm({
         {sent.body}
       </pre>
       <div className="mt-6 flex flex-wrap gap-3">
-        <button
-          type="button"
-          data-morph
+        <Button
+          tone="primary"
           onClick={async () => {
             try {
               await navigator.clipboard.writeText(sent.body);
@@ -128,7 +128,6 @@ export function MailtoForm({
               setCopy('failed');
             }
           }}
-          className="press rounded-control border border-accent-fill bg-accent-fill px-6 py-3 text-sm font-semibold text-accent-on hover:border-signal-700 hover:bg-signal-700"
         >
           {/* Both labels share one grid cell, so the pill keeps the wider
               label's width and the swap is a 150ms cross-fade, not a jump. */}
@@ -146,7 +145,7 @@ export function MailtoForm({
               Copied
             </span>
           </span>
-        </button>
+        </Button>
         <a
           href={sent.href}
           data-morph
@@ -210,13 +209,9 @@ export function MailtoForm({
       >
         {children}
         <div className="flex flex-wrap items-center gap-4 pt-2">
-          <button
-            type="submit"
-            data-morph
-            className="press rounded-control border border-accent-fill bg-accent-fill px-6 py-3.5 text-sm font-semibold text-accent-on hover:border-signal-700 hover:bg-signal-700"
-          >
+          <Button type="submit" tone="primary">
             {submitLabel}
-          </button>
+          </Button>
           <p className="text-[13px] text-content-soft">Opens your email app with the message written for you.</p>
         </div>
       </form>

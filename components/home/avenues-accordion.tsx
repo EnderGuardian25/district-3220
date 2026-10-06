@@ -1,14 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
+import { useHoverIntent } from '@/components/motion/use-hover-intent';
 import { AVENUE_PANELS } from '@/lib/home';
-
-/**
- * Hover-intent delay (approved 2026-10-06): a pointer crossing the row on its
- * way somewhere else shouldn't fling panels open. Click and focus stay instant.
- */
-const HOVER_INTENT_MS = 80;
 
 /**
  * Accordion Gallery (lab.damiandc.com/accordion-gallery).
@@ -36,12 +31,8 @@ export function AvenuesAccordion() {
   const [hovered, setHovered] = useState<number | null>(null);
   const [locked, setLocked] = useState<number | null>(null);
   const open = locked ?? hovered;
-  const intent = useRef<number | null>(null);
-  const cancelIntent = () => {
-    if (intent.current !== null) window.clearTimeout(intent.current);
-    intent.current = null;
-  };
-  useEffect(() => cancelIntent, []);
+  // Hover opens after a short intent delay (components/motion/use-hover-intent).
+  const { schedule, cancel: cancelIntent } = useHoverIntent();
 
   return (
     <div
@@ -59,18 +50,18 @@ export function AvenuesAccordion() {
             type="button"
             // The name alone is the accessible name; the blurb is its
             // description while open, rather than the whole paragraph being
-            // read out as the button's name. Expanded tracks the click-lock,
-            // the user's own disclosure: hover and focus only preview, so
-            // tabbing along the row doesn't announce "expanded" at every stop.
+            // read out as the button's name. Expanded reports what is on
+            // screen: focus opens a panel, so a focused panel is expanded
+            // (the Media Crew accordion behaves the same). Announcing
+            // "collapsed" over a visible blurb was the worse lie.
             aria-labelledby={`avenue-${a.slug}-name`}
             aria-describedby={isOpen ? `avenue-${a.slug}-blurb` : undefined}
             aria-controls={`avenue-${a.slug}-blurb`}
-            aria-expanded={locked === i}
+            aria-expanded={isOpen}
             data-open={isOpen}
             onMouseEnter={() => {
               if (locked !== null) return;
-              cancelIntent();
-              intent.current = window.setTimeout(() => setHovered(i), HOVER_INTENT_MS);
+              schedule(() => setHovered(i));
             }}
             onMouseLeave={cancelIntent}
             onFocus={() => locked === null && setHovered(i)}

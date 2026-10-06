@@ -54,7 +54,7 @@ function Wordmark({ src, alt }: { src: string; alt: string }) {
         width={art.w}
         height={art.h}
         preload
-        sizes="(max-width: 768px) 173px, 292px"
+        sizes="(max-width: 767px) 173px, 292px"
         className="absolute h-auto max-w-none"
         style={{
           width: `${(art.w / art.artW) * 100}%`,

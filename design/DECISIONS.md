@@ -142,6 +142,12 @@ Section headings are full sentences ending in a full stop
   for one extra transitioned property and `--press-dur` for a longer colour
   change (the header's 300ms). It never transitions `outline-color`: focus
   rings appear instantly. Large cards and tiles don't get it.
+- **Shared motion hooks** (`components/motion/`): `useHoverIntent` (the 80ms
+  accordion hover delay) and `useHscrollPan` (measures `--pan` for the pinned
+  horizontal rails). Reuse them; don't copy the timer or measure logic.
+- **Cropped photos** (`object-cover` in a box of a different shape) derive
+  `sizes` from the photo's real aspect ratio, which `lib/home.ts` reads from
+  a static import of the same file, never a hand-typed number.
 - **`Reveal`** / **`DrawLine`** (`components/motion/reveal.tsx`) for enter
   motion below the fold: 550ms, `ease-out-expo`, 18px rise, 70ms stagger
   steps. Content in the first viewport uses the CSS load animations instead

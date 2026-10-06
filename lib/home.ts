@@ -7,13 +7,30 @@
  * Every other image here is a real district photograph from public/images.
  */
 
+import type { StaticImageData } from 'next/image';
+import assembly from '@/public/images/hero/assembly.webp';
+import assembly35th from '@/public/images/blog/blog-35th-district-assembly.jpg';
+import compering from '@/public/images/media-crew/media-compering.jpg';
+import livestreaming from '@/public/images/media-crew/media-livestreaming.jpg';
+import photography from '@/public/images/media-crew/media-photography.jpg';
+import videography from '@/public/images/media-crew/media-videography.jpg';
+import designing from '@/public/images/media-crew/media-designing.jpg';
+import photoBooths from '@/public/images/media-crew/media-photo-booths.jpg';
+
+/**
+ * Source width / height, read from the image file at build time (static
+ * imports carry the real dimensions), so swapping a photo can't leave a stale
+ * hand-typed ratio behind. The `src` strings stay as plain public paths.
+ */
+const ratio = (img: StaticImageData) => img.width / img.height;
+
 export type HeroSlide = {
   src: string;
   /**
    * Source width / height. The hero crops with object-cover into a portrait
    * box on phones, so `sizes` has to ask for the cropped width, not 100vw, or
-   * a 390px phone was served a 1024px file stretched 4x. Update it if the
-   * image is swapped.
+   * a 390px phone was served a 1024px file stretched 4x. Always `ratio(import)`
+   * of the same file as `src`.
    */
   aspect: number;
   /** Empty alt is wrong here: these are content images, not decoration. */
@@ -26,25 +43,25 @@ export type HeroSlide = {
 export const HERO_SLIDES: HeroSlide[] = [
   {
     src: '/images/hero/assembly.webp',
-    aspect: 2.47,
+    aspect: ratio(assembly),
     alt: 'Interactors from clubs across the district filling the assembly hall',
     caption: 'District Assembly, Colombo',
   },
   {
     src: '/images/blog/blog-35th-district-assembly.jpg',
-    aspect: 1.5,
+    aspect: ratio(assembly35th),
     alt: 'Delegates seated at the 35th District Assembly',
     caption: '35th District Assembly',
   },
   {
     src: '/images/media-crew/media-compering.jpg',
-    aspect: 1.5,
+    aspect: ratio(compering),
     alt: 'Student compères running a district conference from the podium',
     caption: 'Interactors running the floor',
   },
   {
     src: '/images/media-crew/media-livestreaming.jpg',
-    aspect: 1.5,
+    aspect: ratio(livestreaming),
     alt: 'Students operating a livestream desk at a district event',
     caption: 'Media Crew, livestreaming a district event',
   },
@@ -263,14 +280,14 @@ export type WallItem = {
 export const WALL_ITEMS: WallItem[] = [
   // TODO(district): confirm the year. Almost certainly the same 2025 assembly
   // as the plate below, but the repo does not say so and it is a different shot.
-  { src: '/images/hero/assembly.webp', aspect: 2.47, alt: 'Interactors from clubs across the district filling the assembly hall', caption: 'District Assembly', provenance: 'district', size: 'lg', drop: 'mid' },
-  { src: '/images/media-crew/media-photography.jpg', aspect: 1.5, alt: 'A photographer holding a camera at sunset', caption: 'Media Crew, photography', provenance: 'stock', size: 'sm', drop: 'top' },
-  { src: '/images/blog/blog-35th-district-assembly.jpg', aspect: 1.5, alt: 'The incoming District Interact Representative being collared at the 35th District Assembly', caption: '35th District Assembly', year: '2025', provenance: 'district', size: 'md', drop: 'low' },
-  { src: '/images/media-crew/media-compering.jpg', aspect: 1.5, alt: 'A compère addressing an audience from a podium', caption: 'Media Crew, compering', provenance: 'stock', size: 'lg', drop: 'top' },
-  { src: '/images/media-crew/media-livestreaming.jpg', aspect: 1.5, alt: 'A live streaming camera at an event', caption: 'Media Crew, live streaming', provenance: 'stock', size: 'sm', drop: 'mid' },
-  { src: '/images/media-crew/media-videography.jpg', aspect: 1.5, alt: 'A video camera with a shotgun microphone', caption: 'Media Crew, videography', provenance: 'stock', size: 'md', drop: 'low' },
-  { src: '/images/media-crew/media-designing.jpg', aspect: 1.5, alt: 'A designer working at a laptop', caption: 'Media Crew, design', provenance: 'stock', size: 'md', drop: 'mid' },
-  { src: '/images/media-crew/media-photo-booths.jpg', aspect: 1.5, alt: 'A hand holding printed photo booth strips', caption: 'Media Crew, photo booths', provenance: 'stock', size: 'sm', drop: 'low' },
+  { src: '/images/hero/assembly.webp', aspect: ratio(assembly), alt: 'Interactors from clubs across the district filling the assembly hall', caption: 'District Assembly', provenance: 'district', size: 'lg', drop: 'mid' },
+  { src: '/images/media-crew/media-photography.jpg', aspect: ratio(photography), alt: 'A photographer holding a camera at sunset', caption: 'Media Crew, photography', provenance: 'stock', size: 'sm', drop: 'top' },
+  { src: '/images/blog/blog-35th-district-assembly.jpg', aspect: ratio(assembly35th), alt: 'The incoming District Interact Representative being collared at the 35th District Assembly', caption: '35th District Assembly', year: '2025', provenance: 'district', size: 'md', drop: 'low' },
+  { src: '/images/media-crew/media-compering.jpg', aspect: ratio(compering), alt: 'A compère addressing an audience from a podium', caption: 'Media Crew, compering', provenance: 'stock', size: 'lg', drop: 'top' },
+  { src: '/images/media-crew/media-livestreaming.jpg', aspect: ratio(livestreaming), alt: 'A live streaming camera at an event', caption: 'Media Crew, live streaming', provenance: 'stock', size: 'sm', drop: 'mid' },
+  { src: '/images/media-crew/media-videography.jpg', aspect: ratio(videography), alt: 'A video camera with a shotgun microphone', caption: 'Media Crew, videography', provenance: 'stock', size: 'md', drop: 'low' },
+  { src: '/images/media-crew/media-designing.jpg', aspect: ratio(designing), alt: 'A designer working at a laptop', caption: 'Media Crew, design', provenance: 'stock', size: 'md', drop: 'mid' },
+  { src: '/images/media-crew/media-photo-booths.jpg', aspect: ratio(photoBooths), alt: 'A hand holding printed photo booth strips', caption: 'Media Crew, photo booths', provenance: 'stock', size: 'sm', drop: 'low' },
 ];
 
 /** The member-facing utility band. Mirrors the nav, minus the public pages. */
