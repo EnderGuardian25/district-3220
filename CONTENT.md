@@ -43,7 +43,7 @@
 - **Current RI Year theme (2025/26):** "Unite For Good"
 - **Tagline used on home:** *"create a robust mindset of 'Unite For Good' during our year of Interact"*
 - **Contact email:** interactdistrictcouncil3220@gmail.com
-- **Contact phone:** +94 77 458 2006
+- **Contact phone:** +94 77 458 2006 *(old site only. Not published on the rebuild: email is the only public contact, 2026-10-06)*
 - **Copyright line:** © Interact District 3220
 
 ### Social media (used site-wide in footer)
@@ -463,7 +463,7 @@ Interactor's Name · Interact Club · Designation · Phone · Email · Event/Pro
 **URL:** `/contact-8`
 
 - Heading: **Contact Us** · Subheading: **Email Us!**
-- **Phone:** +94 77 458 2006
+- **Phone:** +94 77 458 2006 *(old site only. Not published on the rebuild, 2026-10-06)*
 - **Email:** interactdistrictcouncil3220@gmail.com
 - **Contact form fields:** First Name* · Email* · Phone* · Country selector (defaults to Sri Lanka) · Interact Club/Company Name · Inquiry* · Submit
 

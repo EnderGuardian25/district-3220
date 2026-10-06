@@ -77,14 +77,6 @@ export function SiteFooter() {
                   <wbr />@{SITE.email.split('@')[1]}
                 </a>
               </li>
-              <li>
-                <a
-                  href={`tel:${SITE.phone.replace(/\s/g, '')}`}
-                  className="text-content-muted transition-colors duration-200 hover:text-content"
-                >
-                  {SITE.phone}
-                </a>
-              </li>
             </ul>
 
             <h2 className="mt-7 text-[11px] font-semibold tracking-[0.12em] text-content-muted uppercase">

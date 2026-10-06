@@ -39,8 +39,8 @@ export const SITE = {
   name: 'Interact District 3220',
   shortName: 'Interact 3220',
   region: 'Sri Lanka & Maldives',
+  /** The only public contact: no phone number is published (2026-10-06). */
   email: 'interactdistrictcouncil3220@gmail.com',
-  phone: '+94 77 458 2006',
   url: 'https://www.interactdistrict3220.org',
   /**
    * Two DIFFERENT dates — don't conflate them.

@@ -33,14 +33,6 @@ export default function ContactPage() {
               </dd>
             </div>
             <div>
-              <dt className="label-micro text-content-soft">Phone</dt>
-              <dd className="mt-2">
-                <a href={`tel:${SITE.phone.replace(/\s/g, '')}`} className="font-display text-[1.15rem] font-semibold underline-offset-4 hover:underline">
-                  {SITE.phone}
-                </a>
-              </dd>
-            </div>
-            <div>
               <dt className="label-micro text-content-soft">Follow the district</dt>
               <dd className="mt-3 flex flex-wrap gap-2">
                 {SOCIALS.map((s) => (
