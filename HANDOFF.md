@@ -46,6 +46,22 @@ verified in the browser.
   white-on-accent hover fills changed to `accent-fill` per DECISIONS §2; the
   closing CTA's second button now goes to About, not a second link to Contact.
 
+### Dependencies — 2026-10-06
+`npm audit fix` cleared 5 advisories, including a critical Next.js RCE on
+Windows-hosted servers and in the image optimizer: Next 16.2.12 → 16.3.8,
+sharp → 0.35.5, postcss → 8.5.25 (also Next's bundled copy), nanoid and
+source-map-js patched. `package.json` floors raised to match, so a fresh
+install can't resolve the vulnerable versions. `npm audit` is clean; tsc,
+build and every route (plus `/_next/image`) checked on `next start`.
+
+- **Setup:** `npm ci`, then `npx next dev --port 3100`. If the network drops
+  connections (`ECONNRESET`), add `--fetch-retries=5 --maxsockets=4`. `EPERM`
+  means something (VS Code, a stray node) holds `node_modules` open.
+- **`ffmpeg-static` install script is blocked** by npm's `allowScripts`
+  default, so its ffmpeg binary isn't downloaded. Nothing in the build uses
+  it; it is only for re-encoding the videos. Before that, run
+  `npm install-scripts approve ffmpeg-static` and `npm ci`.
+
 ### To switch on at launch
 - **Hosting is Vercel.** Set `DISTRICT_CALENDAR_ICS_URL` to the district
   Google Calendar's public iCal address (see `.env.example`). Until then the
@@ -250,7 +266,7 @@ under Current Status).
 | Framework | Next.js 16 (App Router, TypeScript) |
 | Styling | Tailwind CSS v4 (CSS-first `@theme`) |
 | Motion | Framer Motion 12 + Lenis |
-| Media | sharp, ffmpeg-static, ffprobe-static |
+| Media | sharp; ffmpeg-static, ffprobe-static (dev only, video re-encodes) |
 | Hosting | **Not decided** at the time — Vercel since 2026-10-05 (DECISIONS.md §8) |
 
 Versions deliberately match `EnderGuardian25/personal-portfolio` (the effects lab at
@@ -430,6 +446,9 @@ Open `download-images.html` in any browser. Click **Download All** (saves to you
 - CMS need: will council/DIR/events/newsletter data be edited by non-developers (suggests a CMS or structured data files)?
 
 ## Change log
+- **2026-10-06 (security)** — `npm audit fix`: Next 16.3.8 (critical RCE
+  advisories), sharp 0.35.5, postcss 8.5.25, nanoid, source-map-js;
+  `package.json` floors raised. See "Dependencies" under Current Status.
 - **2026-10-06 (later)** — Merges into `main` verified (every branch contained,
   tree identical to the checked integration). Full-site audit and fixes on
   `fix/site-audit`; see "Site audit" under Current Status. DECISIONS §5–§6
