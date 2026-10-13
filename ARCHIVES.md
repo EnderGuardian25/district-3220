@@ -30,7 +30,7 @@
 > - **1991/92 has no archive page** (gap between 1990/91 and 1992/93).
 > - The **1999/2000 page reuses the 1998/99 council list verbatim** on the live site (apparent copy-paste error); only its theme and events differ. Verify council names for 1999/2000 before publishing.
 > - Recent-year pages (2020-25) are **event journals**; older pages (pre-2001) are **council roster + project summaries**. New design should support both shapes.
-> - Year header/theme logos are saved in `images/archive-logos/`.
+> - Year header/theme logos are saved in `images/archive-logos/`. The 2021/22 ("Serve to Change Lives"), 2023/24 ("Create Hope in the World") and 2025/26 ("Unite For Good") theme marks were not on the old site; the user supplied them on 2026-10-13.
 
 ---
 

@@ -12,6 +12,10 @@ pass made these approved changes:
 - the photo band has eight plates and its captions sit on a navy backing
 - the footer social icons line up with their column
 
+`02` and `03` retaken 2026-10-13 from a production build after an approved
+revision: Interflash is off the projects (four tiles, two by two) and each
+avenue card is a photo collage with its logo as a badge (DECISIONS §2).
+
 These are
 the visual ground truth for `design/DECISIONS.md`: new pages should look like
 they belong next to these.

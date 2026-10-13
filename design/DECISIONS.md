@@ -40,7 +40,7 @@ photography do the work. Light theme only.
 | **Sunk** (`sunk`) | `#EFECE4` | Recessed bands | `content` |
 | **Navy band** (`navy-900`) | `#0A1628` | Full-bleed photography sections; the rounded closing CTA panel; image fallback behind photo tiles | `white`, muted `white/70–75` |
 | **Ink band** (`ink-panel`) | `#14120D` | **Only** the members/officers utility band | `on-ink` `#F2EFE8` (15.9), muted `on-ink-muted` `#A09A8D` (6.21) |
-| **Photograph** | — | Hero, project tiles | White over a `chalk-950` gradient scrim |
+| **Photograph** | — | Hero, project tiles; avenue collages (no text on them, so no scrim) | White over a `chalk-950` gradient scrim |
 
 Rules:
 - **Chalk is the default.** A page is mostly chalk; dark bands are punctuation.
@@ -88,6 +88,19 @@ Sampled from the logo artwork. They appear **only** on their own avenue (the
 accordion's label band and its tint), never as palette colours elsewhere:
 Community `#D8951C` · International `#97114B` · Club `#A85619` ·
 Green Life `#187777` · Finance `#1B244A`.
+
+**Revision 2026-10-13 (requested and approved by the user): avenue photo
+collages.** From md up, each accordion panel is a 2×2 collage of four of the
+avenue's own photographs above its solid colour band. The seams between
+photos are the band colour. The logo moves from the tinted plate to a 44px
+white badge on the band's top edge, and the number moves into the band (white
+at 90%, as the blurb). Below md the list keeps the logo on its tint, and
+opening a row reveals the collage under the description. Media Crew credit
+bars are cropped off the photographs. No new effect: the collage is laid out
+at the open panel's width and anchored left, so the existing `flex-grow` open
+uncovers the right column. The collage box is fixed in every state and the
+band slides up over it: a box that resized re-cropped the photos every frame
+and shook. Photo files: `public/images/avenues/<avenue>/`.
 
 ### Contrast values that look wrong and are right. Do not "tidy" them.
 - Button fill is signal-**600**, not 500 (white on 500 = 3.90, fails AA).
@@ -284,7 +297,7 @@ design change (see the top of this file).
 | Page | URL | Signature motion (all from §6) |
 |---|---|---|
 | About | `/about` | Clip Reveal photo band, Odometer stats |
-| Meet The Council 2026/27 | `/council/2026-27` | Expand Grid profiles; "To be announced" slots until the roster arrives |
+| Meet The Council 2026/27 | `/council/2026-27` | Expand Grid profiles (full roster since 2026-10-13) |
 | College of DIRs | `/archives/college-of-dirs` (moved from `/college-of-dirs`, which redirects) | Vertical Line Draw timeline down the years |
 | Calendar | `/calendar` | Reveal only; month switch on `ease-clip` |
 | Request a Date | `/calendar/request-a-date` | Reveal only |
@@ -325,6 +338,14 @@ Every old Wix path 301s to its new URL (`next.config.ts`).
 - **Council bios:** kept verbatim. The sharpest ones are listed in HANDOFF for the
   district to veto before launch.
 - **Council 2026/27:** structured placeholder grid of "To be announced" slots.
+  **Revision 2026-10-13 (decided by the user):** the roster arrived; the page
+  shows the 40 supplied people in Exco (core leadership and officers
+  together), Zonal Leadership, Directors, Chairpersons, then Secretaries and
+  Treasurers, as the user ordered them; with the
+  full council confirmed the unfilled slots are dropped rather than kept as
+  "To be announced". `/kit` keeps its own sample of the empty-slot card.
+  The archived councils follow the same grouping (Exco first, Zonal
+  Leadership before Directors), at the user's request.
 - **Placeholders** always use the shared `Placeholder` component (or, for an
   unfilled person, the dashed-outline "To be announced" card in `PeopleGrid`).
   Both carry `data-placeholder`, so every gap is visibly marked and searchable

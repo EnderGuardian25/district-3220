@@ -185,7 +185,7 @@ Profile card per member: **photo + position title + name + one-line bio.** Group
 | Zonal Coordinator & Head of Club Revival and Outreach | Int. Chanuth Amarasinghe | "He evolved from playful banter into one of most committed." |
 | Zonal Co-ordinator & Representative of the Maldives Region | Int. PP. Shavini Weerasinghe | "While she may seem reserved at first, she's full of wit." |
 | Zonal Representative of Colombo | Int. Ethan Vishara | "With a spark of mischief and an unforgettable presence." |
-| Zonal Representative of Negombo | Int. PP. Gihansa Ratnamalala | "Always willing to lend a hand, no matter who's asking." |
+| Zonal Representative of Negombo | Int. PP. Gihansa Rathnamalala | "Always willing to lend a hand, no matter who's asking." |
 | Zonal Representative of Hill Country & Tea Country | Int. PP. Vinuki Jayasena | "This individual's work ethic is second to none." |
 | Zonal Representative of Kurunegala | Int. Dhinil Rathnathilake | "Towering with his presence both in Interact and courts." |
 | Zonal Representative of Down South | Int. Veenu Ovinya | "She has a special talent for giving people mini heart attacks." |
