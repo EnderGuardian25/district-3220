@@ -138,7 +138,7 @@ export default function AboutPage() {
         </ul>
       </section>
 
-      <ClosingCta />
+      <ClosingCta aboutLink={false} />
     </main>
   );
 }
