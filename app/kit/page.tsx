@@ -6,7 +6,17 @@ import { Placeholder } from '@/components/page/placeholder';
 import { CouncilRoster } from '@/components/people/council-roster';
 import { MailtoForm } from '@/components/forms/mailto-form';
 import { ChoiceChips, COUNTRIES, SelectField, TextArea, TextField } from '@/components/forms/fields';
-import { COUNCIL_2026_27, PAST_COUNCILS } from '@/lib/councils';
+import { PAST_COUNCILS } from '@/lib/councils';
+import type { PeopleGroup } from '@/lib/people';
+
+/** The unfilled-slot card, kept on show now the 2026/27 roster is real. */
+const TBA_SAMPLE: PeopleGroup = {
+  title: 'Exco',
+  people: [
+    { name: 'To be announced', position: 'District Interact Representative', tba: true },
+    { name: 'To be announced', position: 'District Interact Secretary', tba: true },
+  ],
+};
 
 /**
  * Development-only kit: every shared inner-page component on one page, so a
@@ -43,7 +53,7 @@ export default function KitPage() {
       <section aria-labelledby="kit-tba" className="container-page py-16 md:py-24">
         <SectionHeader id="kit-tba" title="To be announced." />
         <div className="mt-10">
-          <CouncilRoster groups={COUNCIL_2026_27.groups.slice(0, 1)} scope="kit-tba" />
+          <CouncilRoster groups={[TBA_SAMPLE]} scope="kit-tba" />
         </div>
       </section>
 

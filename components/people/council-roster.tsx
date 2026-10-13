@@ -3,7 +3,7 @@ import { PeopleGrid } from '@/components/people/people-grid';
 import type { PeopleGroup } from '@/lib/people';
 
 /**
- * A council laid out group by group: Core Leadership, Directors and so on.
+ * A council laid out group by group: Exco, Zonal Leadership, Directors and so on.
  * Each group is a small heading with its count, a hairline, then the grid.
  */
 export function CouncilRoster({ groups, scope }: { groups: PeopleGroup[]; scope: string }) {

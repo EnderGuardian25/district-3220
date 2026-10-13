@@ -24,6 +24,7 @@ export type Council = {
   groups: PeopleGroup[];
 };
 
+const c26 = (file: string) => `/images/council-2026-27/council-2026-27-${file}`;
 const c25 = (file: string) => `/images/council/council-${file}`;
 const c24 = (file: string) => `/images/council-2024-25/council-2024-25-${file}`;
 const c22 = (file: string) => `/images/council-2022-23/council-2022-23-${file}`;
@@ -35,43 +36,82 @@ const c22 = (file: string) => `/images/council-2022-23/council-2022-23-${file}`;
 const LANDSCAPE_FOCUS = '50% 30%';
 
 /**
- * The incoming council. The roster is announced at the District Assembly and
- * has not reached the repo yet, so every slot is a marked placeholder. Filling
- * it in is a change to this object only: replace `tba` entries with people.
+ * The 2026/27 council: the full roster as supplied on 2026-10-13, 40 portraits.
+ * Names and positions come from the portrait filenames, with "Sargeant"
+ * corrected and abbreviations written out in the 2025/26 style. The user
+ * confirmed the spellings of Gihansa Rathnamalala, Diyana Poogalarachchi and
+ * Abdullah Althaf. No bios were supplied, so a profile opens to the portrait
+ * alone. The DIR's portrait is the one with the collar.
  */
 export const COUNCIL_2026_27: Council = {
   year: '2026-27',
   label: '2026/27',
   theme: 'Create Lasting Impact',
-  dir: '',
+  dir: 'Shavini Weerasinghe',
   groups: [
     {
-      title: 'Core Leadership',
+      title: 'Exco',
       people: [
-        { name: 'To be announced', position: 'District Interact Representative', tba: true },
-        { name: 'To be announced', position: 'District Interact Secretary', tba: true },
-        { name: 'To be announced', position: 'District Interact Treasurer', tba: true },
-        { name: 'To be announced', position: 'Assistant District Interact Representative', tba: true },
+        { position: 'District Interact Representative', name: 'Int. PP. Shavini Weerasinghe', image: c26('shavini-weerasinghe-dir.jpg') },
+        { position: 'District Interact Secretary', name: 'Int. Aaron Gunasekara', image: c26('aaron-gunasekara-secretary.jpg') },
+        { position: 'District Interact Treasurer', name: 'Int. Ginura Kariyawasam', image: c26('ginura-kariyawasam-treasurer.jpg') },
+        { position: 'Assistant District Interact Representative', name: 'Int. PP. Hamad Jiffry', image: c26('hamad-jiffry-adir.jpg') },
+        { position: 'Assistant District Interact Representative', name: 'Int. Dhinil Rathnathilake', image: c26('dhinil-rathnathilake-adir.jpg') },
+        { position: 'District Interact Editor', name: 'Int. Fadhil Irshan', image: c26('fadhil-irshan-editor.jpg') },
+        { position: 'District Interact Editor', name: 'Int. Ryan Anthony', image: c26('ryan-anthony-editor.jpg') },
+        { position: 'District Interact Sergeant At Arms', name: 'Int. PP. Gihansa Rathnamalala', image: c26('gihansa-rathnamalala-saa.jpg') },
+        { position: 'District Interact Sergeant At Arms', name: 'Int. Thenuwara Rupasinghe', image: c26('thenuwara-rupasinghe-saa.jpg') },
+        { position: 'Assistant District Interact Secretary', name: 'Int. PP. Inshaf Riyaz', image: c26('inshaf-riyaz-asst-sec.jpg') },
+        { position: 'Assistant District Interact Secretary', name: 'Int. Luja Jameel', image: c26('luja-jameel-asst-sec.jpg') },
       ],
     },
     {
-      title: 'Officers',
+      title: 'Zonal Leadership',
       people: [
-        { name: 'To be announced', position: 'District Interact Editor', tba: true },
-        { name: 'To be announced', position: 'Sergeant At Arms', tba: true },
-        { name: 'To be announced', position: 'Assistant District Interact Secretary', tba: true },
-        { name: 'To be announced', position: 'Assistant District Interact Treasurer', tba: true },
+        { position: 'Zonal Representative of Colombo', name: 'Int. PP. Anuththara Wimalarathne', image: c26('anuththara-wimalarathne-zr-colombo.jpg') },
+        { position: 'Secretary of the Colombo Zone', name: 'Int. Keshika Ushanthan', image: c26('keshika-ushanthan-sec-colombo-zone.jpg') },
+        { position: 'Zonal Representative of Negombo', name: 'Int. PP. Sethumdee Nissanka', image: c26('sethumdee-nissanka-zr-negombo.jpg') },
+        { position: 'Zonal Representative of Hill Country & Tea Country', name: 'Int. PP. Fatheena Mirisar', image: c26('fatheena-mirisar-zr-hill-tea.jpg') },
+        { position: 'Zonal Representative of Kurunegala', name: 'Int. Rakitha Rathnayake', image: c26('rakitha-rathnayake-zr-kurunegala.jpg') },
+        { position: 'Zonal Representative of Rajarata & East', name: 'Int. Sawmya Sathsara', image: c26('sawmya-sathsara-zr-rajarata.jpg') },
+        { position: 'Zonal Representative of Gem City', name: 'Int. PP. Nethmi Sathsarani', image: c26('nethmi-sathsarani-zr-gem-city.jpg') },
       ],
     },
     {
       title: 'Directors',
       people: [
-        { name: 'To be announced', position: 'Director of Club Service', tba: true },
-        { name: 'To be announced', position: 'Director of Community Service', tba: true },
-        { name: 'To be announced', position: 'Director of International Understanding', tba: true },
-        { name: 'To be announced', position: 'Director of Green Life', tba: true },
-        { name: 'To be announced', position: 'Director of Finance', tba: true },
-        { name: 'To be announced', position: 'Director of Public Relations', tba: true },
+        { position: 'Director of Club Service', name: 'Int. PP. Jason Januka', image: c26('jason-januka-dir-club-service.jpg') },
+        { position: 'Co-Director of Community Service', name: 'Int. Ahmad Shiraz', image: c26('ahmad-shiraz-dir-community.jpg') },
+        { position: 'Co-Director of Community Service', name: 'Int. Gagul Jayawardena', image: c26('gagul-jayawardena-dir-community.jpg') },
+        { position: 'Co-Director of International Understanding', name: 'Int. PP. Dulani Rupasinghe', image: c26('dulani-rupasinghe-dir-iu.jpg') },
+        { position: 'Co-Director of International Understanding', name: 'Int. Abdullah Althaf', image: c26('abdullah-althaf-dir-iu.jpg') },
+        { position: 'Director of Rotary – Rotaract Relations', name: 'Int. PP. Kemith Rajapakshe', image: c26('kemith-rajapakshe-dir-rr.jpg') },
+        { position: 'Director of Green Life', name: 'Int. PP. Hafiz Habeeb', image: c26('hafiz-habeeb-dir-green-life.jpg') },
+        { position: 'Director of Finance', name: 'Int. Sehanya Perera', image: c26('sehanya-perera-dir-finance.jpg') },
+        { position: 'Director of the District Media Crew', name: 'Int. Rehan Jayasena', image: c26('rehan-jayasena-dir-media.jpg') },
+      ],
+    },
+    {
+      title: 'Chairpersons',
+      people: [
+        { position: 'Chairperson of Interaction – Colombo', name: 'Int. Melissa Wimalawansha', image: c26('melissa-wimalawansha-chair-interaction-colombo.jpg') },
+        { position: 'Chairperson of Interact Leadership Training – Colombo', name: 'Int. Saneli Dissanayake', image: c26('saneli-dissanayake-chair-ilt-colombo.jpg') },
+        { position: 'Chairperson of Interact Leadership Training – Kandy', name: 'Int. Wenuri Jayasenaka', image: c26('wenuri-jayasenaka-chair-ilt-kandy.jpg') },
+        { position: 'Chairperson of Iris', name: 'Int. Poorna Koggala', image: c26('poorna-koggala-chair-iris.jpg') },
+      ],
+    },
+    {
+      title: 'Secretaries and Treasurers',
+      people: [
+        { position: 'Secretary of Community Service', name: 'Int. Diyana Poogalarachchi', image: c26('diyana-poogalarachchi-sec-community.jpg') },
+        { position: 'Secretary of Community Service', name: 'Int. Nethini Sandithma', image: c26('nethini-sandithma-sec-community.jpg') },
+        { position: 'Secretary of Interaction – Colombo', name: 'Int. Yasith Wickramasinghe', image: c26('yasith-wickramasinghe-sec-interaction-colombo.jpg') },
+        { position: 'Treasurer of Interaction – Hill Country', name: 'Int. Sithuki Liyanage', image: c26('sithuki-liyanage-treas-interaction-hill.jpg') },
+        { position: 'Treasurer of Interact Leadership Training – Colombo', name: 'Int. Manal Rahimdeen', image: c26('manal-rahimdeen-treas-ilt-colombo.jpg') },
+        { position: 'Secretary of Iris', name: 'Int. PP. Minoli Winston', image: c26('minoli-winston-sec-iris.jpg') },
+        { position: 'Treasurer of Interflash ’27', name: 'Int. Nathan Malwanna', image: c26('nathan-malwanna-treas-interflash.jpg') },
+        { position: 'Secretary of the District Media Crew', name: 'Int. Shiraf Zahir', image: c26('shiraf-zahir-sec-media.jpg') },
+        { position: 'Treasurer of the District Media Crew', name: 'Int. Linoli Seyara', image: c26('linoli-seyara-treas-media.jpg') },
       ],
     },
   ],
@@ -85,39 +125,19 @@ export const PAST_COUNCILS: Council[] = [
     dir: 'Jezon Fernando',
     groups: [
       {
-        title: 'Core Leadership',
+        title: 'Exco',
         people: [
           { position: 'District Interact Representative', name: 'Int. PP. Jezon Fernando', bio: 'This individual is hardworking, punctual and a perfectionist.', image: c25('jezon-fernando-dir.jpg') },
           { position: 'District Interact Secretary', name: 'Int. PP. Menuli Perera', bio: 'A person who has given more than her 100% to the movement.', image: c25('menuli-perera-secretary.jpg') },
           { position: 'District Interact Treasurer', name: 'Int. PP. Haroon Shamil', bio: 'This man effortlessly keeping everything under control.', image: c25('haroon-shamil-treasurer.jpg') },
           { position: 'Assistant District Interact Representative', name: 'Int. PP. Yazid Niyas', bio: 'Always moving, always helping, and never backing down.', image: c25('yazid-niyas-adir.jpg') },
           { position: 'Assistant District Interact Representative', name: 'Int. PP. Jenuka De Silva', bio: 'Steadfast and dependable, he adds loyalty to every challenge.', image: c25('jenuka-de-silva-adir.jpg') },
-        ],
-      },
-      {
-        title: 'Editors',
-        people: [
           { position: 'District Interact Editor', name: 'Int. Joshua Fernando', bio: 'Quiet in presence yet loud in his impact.', image: c25('joshua-fernando-editor.jpg') },
           { position: 'District Interact Editor', name: 'Int. Lakshin Fernando', bio: 'A guy who works hard to the point where his body shuts down.', image: c25('lakshin-fernando-editor.jpg') },
-        ],
-      },
-      {
-        title: 'Sergeants At Arms',
-        people: [
           { position: 'Co-Sergeant At Arms', name: 'Int. Yesith Gallage', bio: 'He leads with discipline, backed by musical rhythm.', image: c25('yesith-gallage-saa.jpg') },
           { position: 'Co-Sergeant At Arms', name: 'Int. PP. Menoli Yatigammana', bio: 'She’s sweet but doesn’t let anyone break the rules.', image: c25('menoli-yatigammana-saa.jpg') },
-        ],
-      },
-      {
-        title: 'Assistant Secretaries',
-        people: [
           { position: 'Co-Assistant District Interact Secretary', name: 'Int. Kaveeka Kulatunga', bio: 'A silent interactor who returned with fresh energy.', image: c25('kaveeka-kulatunga-asst-sec.jpg') },
           { position: 'Co-Assistant District Interact Secretary', name: 'Int. Seniya Rajugamuwa', bio: 'Full of quick wit and sharper comebacks.', image: c25('seniya-rajugamuwa-asst-sec.jpg') },
-        ],
-      },
-      {
-        title: 'Assistant Treasurers',
-        people: [
           { position: 'Co-Assistant District Interact Treasurer', name: 'Int. Abishek Maheshwaran', bio: 'The word clueless in human form. Friendly and cheerful.', image: c25('abishek-maheshwaran-asst-treas.jpg') },
           { position: 'Co-Assistant District Interact Treasurer', name: 'Int. PP. Piyathma De Zoysa', bio: 'She’s sweet, gentle, and always ready to go the extra mile.', image: c25('piyathma-de-zoysa-asst-treas.jpg') },
         ],
@@ -128,7 +148,7 @@ export const PAST_COUNCILS: Council[] = [
           { position: 'Zonal Coordinator & Head of Club Revival and Outreach', name: 'Int. Chanuth Amarasinghe', bio: 'He evolved from playful banter into one of most committed.', image: c25('chanuth-amarasinghe-zc.png') },
           { position: 'Zonal Co-ordinator & Representative of the Maldives Region', name: 'Int. PP. Shavini Weerasinghe', bio: 'While she may seem reserved at first, she’s full of wit.', image: c25('shavini-weerasinghe-zc-maldives.png') },
           { position: 'Zonal Representative of Colombo', name: 'Int. Ethan Vishara', bio: 'With a spark of mischief and an unforgettable presence.', image: c25('ethan-vishara-zr-colombo.jpg') },
-          { position: 'Zonal Representative of Negombo', name: 'Int. PP. Gihansa Ratnamalala', bio: 'Always willing to lend a hand, no matter who’s asking.', image: c25('gihansa-ratnamalala-zr-negombo.png') },
+          { position: 'Zonal Representative of Negombo', name: 'Int. PP. Gihansa Rathnamalala', bio: 'Always willing to lend a hand, no matter who’s asking.', image: c25('gihansa-ratnamalala-zr-negombo.png') },
           { position: 'Zonal Representative of Hill Country & Tea Country', name: 'Int. PP. Vinuki Jayasena', bio: 'This individual’s work ethic is second to none.', image: c25('vinuki-jayasena-zr-hill-tea.jpg') },
           { position: 'Zonal Representative of Kurunegala', name: 'Int. Dhinil Rathnathilake', bio: 'Towering with his presence both in Interact and courts.', image: c25('dhinil-rathnathilake-zr-kurunegala.png') },
           { position: 'Zonal Representative of Down South', name: 'Int. Veenu Ovinya', bio: 'She has a special talent for giving people mini heart attacks.', image: c25('veenu-ovinya-zr-down-south.jpg') },
@@ -171,17 +191,12 @@ export const PAST_COUNCILS: Council[] = [
     dir: 'Damian De Cruz',
     groups: [
       {
-        title: 'Core Leadership',
+        title: 'Exco',
         people: [
           { position: 'District Interact Representative', name: 'PHF Int. Damian De Cruz', bio: 'A passionate individual who adores the movement and lives by the phrase ‘If it’s meant to be, it will be.’', image: c24('damian-de-cruz-dir.jpg'), focus: LANDSCAPE_FOCUS },
           { position: 'District Interact Secretary', name: 'Int. Ashalee Pathirana', bio: 'A dependable and strategic interactor with a keen sense of organization.', image: c24('ashalee-pathirana-secretary.jpg'), focus: LANDSCAPE_FOCUS },
           { position: 'District Interact Treasurer', name: 'PHF Int. Haarene Arasaratnam', bio: 'A young interactor who stands strong through every challenge.', image: c24('haarene-arasaratnam-treasurer.jpg'), focus: LANDSCAPE_FOCUS },
           { position: 'Assistant District Interact Representative', name: 'PHF Int. Danindu Fernando', bio: 'The Deputy from Kandy with an infectious energy at every function.', image: c24('danindu-fernando-adir.jpg'), focus: LANDSCAPE_FOCUS },
-        ],
-      },
-      {
-        title: 'Officers',
-        people: [
           { position: 'District Interact Editor', name: 'Int. PP. Jezon Fernando', bio: 'A reliable leader and an indispensable presence in the executive team.', image: c24('jezon-fernando-editor.jpg'), focus: LANDSCAPE_FOCUS },
           { position: 'Co-Sergeant At Arms', name: 'PHF Int. Lamha Rizwan', bio: 'A firm yet compassionate leader who excels in maintaining discipline.', image: c24('lamha-rizwan-saa.jpg'), focus: LANDSCAPE_FOCUS },
           { position: 'Co-Sergeant At Arms', name: 'PHF Int. Yumeth Rathnayake', bio: 'A dedicated individual with a deep passion for treasury and aquatic adventures.', image: c24('yumeth-rathnayake-saa.jpg'), focus: LANDSCAPE_FOCUS },
@@ -201,17 +216,12 @@ export const PAST_COUNCILS: Council[] = [
     dir: 'Julian Fernandopulle',
     groups: [
       {
-        title: 'Core Leadership',
+        title: 'Exco',
         people: [
           { position: 'District Interact Representative', name: 'Int. PP. Julian Fernandopulle', bio: '“A passionate individual who adores the movement”; embodies “humility and valour”.', image: c22('julian-fernandopulle-dir.jpg') },
           { position: 'District Interact Secretary', name: 'Int. PP. Onellie Jayawardena', bio: 'Silent, dependable Interactor with unique experience in the movement.', image: c22('onellie-jayawardena-secretary.jpg') },
           { position: 'District Interact Treasurer', name: 'Int. Rezon David', bio: 'Trustworthy; known for a “presence that intimidates” due to distinctive eyewear.', image: c22('rezon-david-treasurer.jpg') },
           { position: 'Assistant District Interact Representative', name: 'Int. PP. Thareen Jayadewa', bio: '“Humble man with a down-to-earth smile” who goes above and beyond.', image: c22('thareen-jayadewa-adir.png') },
-        ],
-      },
-      {
-        title: 'Officers',
-        people: [
           { position: 'Co-Sergeant At Arms', name: 'Int. Janindu Ratnayake', bio: '“One of the most disciplined individuals” with a unique sense of humour.', image: c22('janindu-ratnayake-saa.jpg') },
           { position: 'Co-Sergeant At Arms', name: 'Int. Janudi Yatagampitiya', bio: 'Focused on maintaining district standards and professional expectations.', image: c22('janudi-yatagampitiya-saa.jpg') },
           { position: 'Co-Assistant District Interact Secretary', name: 'Int. PP. Senandi Jayawardena', bio: 'Dedicated worker; awarded “Best President” for 2021/22.', image: c22('senandi-jayawardena-asst-sec.jpg') },
