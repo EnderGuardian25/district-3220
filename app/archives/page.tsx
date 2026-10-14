@@ -115,9 +115,10 @@ export default function ArchivesPage() {
                     <span className="mt-2 block font-display text-[1.3rem] leading-tight font-semibold tracking-[-0.015em]">
                       Council {c.label}
                     </span>
-                    <span className="mt-1.5 block text-sm text-content-muted">
-                      “{c.theme}” · DIR {keepTogether(c.dir)}
-                    </span>
+                    {/* Theme and DIR on their own lines: run together they
+                        wrapped mid-name ("DIR Damian / De Cruz"). */}
+                    <span className="mt-1.5 block text-sm text-content-muted">“{c.theme}”</span>
+                    <span className="mt-0.5 block text-sm text-content-muted">DIR {keepTogether(c.dir)}</span>
                   </span>
                 </Link>
               </Reveal>

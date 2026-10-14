@@ -19,7 +19,7 @@ export default function NewsPage() {
         title="District news."
         lede="Announcements, reports and tributes from the district council."
       >
-        <Button href="/newsletter" tone="ghost">
+        <Button href="/newsletter">
           The quarterly newsletter
         </Button>
       </PageHeader>

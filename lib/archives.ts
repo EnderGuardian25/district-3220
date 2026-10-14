@@ -29,7 +29,11 @@ export type ArchiveYear = {
   label: string;
   theme?: string;
   dir?: string;
-  /** Year header or RI theme artwork from the old archive page. */
+  /**
+   * Year header or RI theme artwork from the old archive page. The 2021/22,
+   * 2023/24 and 2025/26 theme marks, which the old site never had, were
+   * supplied by the user on 2026-10-13.
+   */
   logo?: string;
   shape: 'journal' | 'roster' | 'unrecorded';
   /** One line for the archive index. */
@@ -51,6 +55,7 @@ export const ARCHIVE_YEARS: ArchiveYear[] = [
     label: '2025/26',
     theme: 'Unite For Good',
     dir: 'Jezon Fernando',
+    logo: logo('archive-2025-26-logo.png'),
     shape: 'journal',
     summary: 'BizConnect, the Interaction ’26 and ILT awards nights, Race4Change 2026 and the Interarchive book.',
     councilPage: true,
@@ -140,6 +145,7 @@ export const ARCHIVE_YEARS: ArchiveYear[] = [
     label: '2023/24',
     theme: 'Create Hope in the World',
     dir: 'Aamir Akram',
+    logo: logo('archive-2023-24-logo.jpg'),
     shape: 'unrecorded',
     summary: UNRECORDED_NOTE,
     sections: [],
@@ -198,6 +204,7 @@ export const ARCHIVE_YEARS: ArchiveYear[] = [
     label: '2021/22',
     theme: 'Serve to Change Lives',
     dir: 'Murthaaz Barry',
+    logo: logo('archive-2021-22-logo.png'),
     shape: 'unrecorded',
     summary: UNRECORDED_NOTE,
     sections: [],

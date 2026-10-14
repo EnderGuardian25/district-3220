@@ -10,7 +10,8 @@ import { FLAGSHIPS } from '@/lib/home';
 /**
  * Expand Grid (lab.damiandc.com/expand-grid).
  *
- * Five numbered project tiles. Tapping one hands the tile off to an expanded
+ * Four numbered project tiles, two by two (five until Interflash came off on
+ * 2026-10-13). Tapping one hands the tile off to an expanded
  * panel via a shared-element transition: the image itself animates from its
  * place in the grid into the panel, rather than a new panel fading in over the
  * top. Framer's `layoutId` is exactly this primitive, so it does the FLIP work.
@@ -18,7 +19,6 @@ import { FLAGSHIPS } from '@/lib/home';
  * Deliberately NOT a morph-cursor target: the tiles are far larger than a
  * control, and the cursor's size guard would decline them anyway.
  */
-const SPAN = ['md:col-span-3', 'md:col-span-3', 'md:col-span-2', 'md:col-span-2', 'md:col-span-2'];
 
 export function ProjectGrid() {
   const [openSlug, setOpenSlug] = useState<string | null>(null);
@@ -38,9 +38,9 @@ export function ProjectGrid() {
 
   return (
     <>
-      <ul className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-6">
+      <ul className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {FLAGSHIPS.map((f, i) => (
-          <li key={f.slug} className={SPAN[i] ?? 'md:col-span-2'}>
+          <li key={f.slug}>
             <motion.button
               ref={(el) => {
                 tiles.current[f.slug] = el;
@@ -56,7 +56,7 @@ export function ProjectGrid() {
                 src={f.image}
                 alt=""
                 fill
-                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 40vw"
+                sizes="(max-width: 640px) 100vw, 50vw"
                 className="object-cover opacity-55 transition-[opacity,scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04] group-hover:opacity-70 motion-reduce:group-hover:scale-100"
               />
               <span

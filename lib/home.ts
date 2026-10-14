@@ -2,9 +2,10 @@
  * Home-page content. Kept out of the components so copy can be edited without
  * touching layout, and so the eventual CMS swap is a change to this file only.
  *
- * Photography status (2026-09-14): Interflash and Race4Change have no images in
- * the repo. Both use a marked placeholder; see `needsPhoto` on each flagship.
- * Every other image here is a real district photograph from public/images.
+ * Photography status: Race4Change, IBTS and Intercede use a marked placeholder
+ * on their project tiles (`needsPhoto`). Interflash was taken off the home
+ * page's projects on 2026-10-13 at the user's request. The avenue collages
+ * are district photographs supplied on 2026-10-13 (`AVENUE_PANELS`).
  */
 
 import type { StaticImageData } from 'next/image';
@@ -16,6 +17,26 @@ import photography from '@/public/images/media-crew/media-photography.jpg';
 import videography from '@/public/images/media-crew/media-videography.jpg';
 import designing from '@/public/images/media-crew/media-designing.jpg';
 import photoBooths from '@/public/images/media-crew/media-photo-booths.jpg';
+import csRaceStart from '@/public/images/avenues/community-service/race4change-start.jpg';
+import csRaceWarmUp from '@/public/images/avenues/community-service/race4change-warm-up.jpg';
+import csFridge from '@/public/images/avenues/community-service/donation-refrigerator.jpg';
+import csSports from '@/public/images/avenues/community-service/donation-sports-equipment.jpg';
+import iuDiwali from '@/public/images/avenues/international-understanding/diwali.jpg';
+import iuChristmas from '@/public/images/avenues/international-understanding/christmas.jpg';
+import iuAwrudhu from '@/public/images/avenues/international-understanding/awrudhu.jpg';
+import iuIfthar from '@/public/images/avenues/international-understanding/ifthar-2026.jpg';
+import clubAssembly from '@/public/images/avenues/club-service/36th-district-assembly.jpg';
+import clubBeachDay from '@/public/images/avenues/club-service/interaction-26-beach-day.jpg';
+import clubIbtsAudience from '@/public/images/avenues/club-service/ibts-2025-audience.jpg';
+import clubIbtsHall from '@/public/images/avenues/club-service/ibts-hall.jpg';
+import glGreencon1 from '@/public/images/avenues/green-life/greencon-1.jpg';
+import glGreencon2 from '@/public/images/avenues/green-life/greencon-2.jpg';
+import glGreencon3 from '@/public/images/avenues/green-life/greencon-3.jpg';
+import glGreencon4 from '@/public/images/avenues/green-life/greencon-4.jpg';
+import finIgnite from '@/public/images/avenues/finance/interflash-ignite.jpg';
+import finLivelight from '@/public/images/avenues/finance/livelight-26.jpg';
+import finCrowd from '@/public/images/avenues/finance/interflash-crowd.jpg';
+import finStage from '@/public/images/avenues/finance/interflash-stage.jpg';
 
 /**
  * Source width / height, read from the image file at build time (static
@@ -87,18 +108,6 @@ export type Flagship = {
 
 export const FLAGSHIPS: Flagship[] = [
   {
-    slug: 'interflash',
-    name: 'Interflash',
-    figure: '10,000+',
-    figureLabel: 'Guests',
-    headline: 'A concert on a ten thousand seat scale.',
-    blurb:
-      "The district's largest public event, staged and run end to end by school students.",
-    image: '/images/hero/assembly.webp',
-    imageAlt: 'Placeholder for Interflash photography',
-    needsPhoto: true,
-  },
-  {
     slug: 'dimun',
     name: 'DIMUN',
     figure: '6',
@@ -155,9 +164,16 @@ export const FLAGSHIPS: Flagship[] = [
 ];
 
 /**
- * The five avenues, with the colour sampled from each logo. The mark sits on a
- * tint of its own colour and the name sits on the solid version; `onSolid` sets
- * the text colour on that band.
+ * The five avenues, with the colour sampled from each logo. From md up, each
+ * panel is a collage of four of the avenue's own photographs above a solid band
+ * in its colour, with the logo as a badge on the band (2026-10-13, approved by
+ * the user; DECISIONS §2). On phones the logo sits on a tint of the colour and
+ * the collage opens with the description. `onSolid` sets the band's text colour.
+ *
+ * Photos are the district Media Crew's, with the credit bar cropped off at the
+ * user's request. Order matters: the collage is laid out at the open panel's
+ * width and anchored left, so a closed panel shows only the left column,
+ * photos[0] over photos[2].
  *
  * CONTRAST NOTE: all five are 'light' (white) by request. White on Community
  * Service's #D8951C measures 2.55:1, because that amber is the one light colour
@@ -178,6 +194,14 @@ export type AvenuePanel = {
   /** Solid band behind the white name, when `colour` itself can't carry white text at AA. */
   solid?: string;
   onSolid: 'light' | 'dark';
+  /** Four photographs, row by row: top-left, top-right, bottom-left, bottom-right. */
+  photos: [AvenuePhoto, AvenuePhoto, AvenuePhoto, AvenuePhoto];
+};
+
+export type AvenuePhoto = {
+  /** Static import, so the crop's `sizes` reads the real ratio (DECISIONS §5). */
+  image: StaticImageData;
+  alt: string;
 };
 
 export const AVENUE_PANELS: AvenuePanel[] = [
@@ -190,6 +214,12 @@ export const AVENUE_PANELS: AvenuePanel[] = [
     colour: '#D8951C',
     solid: '#906413',
     onSolid: 'light',
+    photos: [
+      { image: csRaceStart, alt: 'Runners lined up under the start arch at Race4Change' },
+      { image: csRaceWarmUp, alt: 'Runners warming up together before Race4Change' },
+      { image: csFridge, alt: 'Interactors handing over a donated refrigerator at a school' },
+      { image: csSports, alt: 'Interactors handing over donated sports equipment at a school' },
+    ],
   },
   {
     slug: 'international-understanding',
@@ -198,6 +228,12 @@ export const AVENUE_PANELS: AvenuePanel[] = [
     logo: '/images/avenues/avenue-international-understanding.png',
     colour: '#97114B',
     onSolid: 'light',
+    photos: [
+      { image: iuDiwali, alt: 'Interactors in saris dancing at the district Diwali celebrations' },
+      { image: iuChristmas, alt: 'The head table at the district Christmas celebrations' },
+      { image: iuAwrudhu, alt: 'Interactors in traditional dress at the District Awrudhu celebrations' },
+      { image: iuIfthar, alt: 'Guests seated at the District Ifthar celebrations 2026' },
+    ],
   },
   {
     slug: 'club-service',
@@ -206,6 +242,12 @@ export const AVENUE_PANELS: AvenuePanel[] = [
     logo: '/images/avenues/avenue-club-service.png',
     colour: '#A85619',
     onSolid: 'light',
+    photos: [
+      { image: clubAssembly, alt: 'The ballroom at the 36th District Assembly' },
+      { image: clubBeachDay, alt: 'Interactors in a team game at the Interaction ’26 beach day' },
+      { image: clubIbtsAudience, alt: 'Interactors seated at the Interact Board Training Seminar ’25' },
+      { image: clubIbtsHall, alt: 'A full hall listening to a speaker at the Interact Board Training Seminar' },
+    ],
   },
   {
     slug: 'green-life',
@@ -214,6 +256,12 @@ export const AVENUE_PANELS: AvenuePanel[] = [
     logo: '/images/avenues/avenue-green-life.png',
     colour: '#187777',
     onSolid: 'light',
+    photos: [
+      { image: glGreencon1, alt: 'Interactors in gloves collecting litter on a beach at Greencon' },
+      { image: glGreencon3, alt: 'An Interactor carrying bags of collected litter along the shore at Greencon' },
+      { image: glGreencon2, alt: 'Interactors filling bags with litter at Greencon' },
+      { image: glGreencon4, alt: 'An Interactor wearing a sheet of newspaper at Greencon' },
+    ],
   },
   {
     slug: 'finance',
@@ -222,6 +270,12 @@ export const AVENUE_PANELS: AvenuePanel[] = [
     logo: '/images/avenues/avenue-finance.png',
     colour: '#1B244A',
     onSolid: 'light',
+    photos: [
+      { image: finIgnite, alt: 'A band performing under stage lights at Interflash' },
+      { image: finLivelight, alt: 'Musicians on stage under beams of light at Livelight ’26' },
+      { image: finCrowd, alt: 'Friends posing for the camera in the crowd at Interflash' },
+      { image: finStage, alt: 'The crowd facing the stage at Interflash, in black and white' },
+    ],
   },
 ];
 

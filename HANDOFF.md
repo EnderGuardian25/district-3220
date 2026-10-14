@@ -8,12 +8,74 @@
 
 ---
 
-## Current Status — 2026-10-06
+## Current Status — 2026-10-13
 
 **Phase:** The whole site is built and merged to `main` (PRs #2–#8), then
 audited end to end (below). Every page in CONTENT.md exists on the locked
 design system (`design/DECISIONS.md`; §6 has the motion map, §8 the
 site-build decisions).
+
+### Remaining before launch (as of 2026-10-13, set by the user)
+These are the only items left. Everything else on the site is complete.
+1. **Hero images** on the home page: real district photographs for the
+   slideshow (`HERO_SLIDES` in `lib/home.ts`). Swapping a photo means
+   re-measuring the scrim contrast (DECISIONS §2).
+2. **The four project tiles** on the home page (DIMUN, Race4Change, IBTS,
+   Intercede): a photograph and a description for each (`FLAGSHIPS` in
+   `lib/home.ts`). IBTS and Intercede also need their figure and headline.
+3. **The horizontal scroll images** on the home page ("A year of the
+   district, in photographs"): real district photographs, with captions and
+   years only where sourced (`WALL_ITEMS` in `lib/home.ts`).
+4. **Admin documents:** the files for Admin Documents and the Newsletter
+   (`lib/publications.ts`).
+5. **Calendar:** the district's public Google Calendar iCal URL, set as
+   `DISTRICT_CALENDAR_ICS_URL` on Vercel; until then the calendar shows
+   `lib/events.ts`.
+
+### Avenue collages and the 2026/27 council — 2026-10-13 (branch `content/avenue-collages-council-2026-27`)
+Requested by the user, decisions asked up front. Checked in Chrome at
+1440×900 and 390×844.
+- **Avenue cards:** each is a 2×2 collage of four of the avenue's photos
+  (supplied as one zip per avenue) above its colour band, with the logo as a
+  white badge on the band's edge (DECISIONS §2 revision). The Media Crew
+  credit bar is cropped off every photo, at the user's request. Files:
+  `public/images/avenues/<avenue>/`. The collage is laid out at the open
+  panel's width and anchored left, so a closed card shows the left column.
+  Its box never changes size: the band slides up over the photos as it opens.
+  An earlier build sized the collage to the space above the band, so every
+  frame of the open re-cropped the photos and they visibly shook (the user
+  caught it).
+- **Interflash** is off the home page's projects; the remaining four sit two
+  by two. Race4Change and IBTS photos came in the avenue zips; the user chose
+  to use them in the avenue cards only, so those tiles keep their placeholders.
+- **Council 2026/27:** all 40 supplied portraits, grouped Exco (the core
+  leadership and officers in one section, at the user's request), Zonal
+  Leadership, Directors, Chairpersons, Secretaries and Treasurers. The user confirmed it is the full council, so the "To be
+  announced" slots and the "Roster to come" note are gone. DIR Shavini
+  Weerasinghe's collared portrait is used. Names and positions come from the
+  filenames ("Sargeant" corrected, abbreviations spelt out, 2025/26 style).
+  No bios were supplied. The user gave the spellings of Gihansa Rathnamalala,
+  Diyana Poogalarachchi and Abdullah Althaf; the 2025/26 page's
+  "Ratnamalala" is corrected to match.
+- **Archived councils** (2025/26, 2024/25, 2022/23) use the same Exco
+  grouping: core leadership plus every officer group (editors, sergeants,
+  assistant secretaries and treasurers) in one section, Zonal Leadership
+  before Directors. No one was added or dropped (38, 12 and 31 people).
+- **Scroll fix:** following a link while Lenis was still easing (desktop
+  only) carried the ease into the next page, so "Meet the council" from the
+  long Archives page opened the council page at Directors. `SmoothScroll` now
+  settles Lenis on internal link clicks and on every route change.
+- **Archives council cards:** the theme and the DIR are on separate lines.
+- **About page:** its "Join a club" panel has no "About the district" button
+  (it pointed at the page itself); the home page keeps both buttons
+  (`ClosingCta aboutLink`).
+- **News:** the quarterly newsletter link is a primary (filled) button.
+- **Archive theme marks:** 2021/22, 2023/24 and 2025/26 now carry their RI
+  theme logos (supplied by the user), on the Archives rail and each year page.
+  Every year from 2020/21 to 2025/26 now has artwork.
+- **For the district:** Nethmi Sathsarani's portrait is 501×553 (a phone
+  crop) and Sawmya Sathsara's and Sithuki Liyanage's are not from the studio
+  shoot; higher-resolution studio portraits would match the rest.
 
 ### Brand, navigation and launch copy — 2026-10-06 (branch `polish/brand-nav-stack`)
 Requested by the user; every judgement call is listed in the PR. Checked in
@@ -156,15 +218,13 @@ Placeholders render through `<Placeholder>` or carry `data-placeholder`, so
 the source for `Placeholder`, lists what is still missing.
 
 Since the launch-copy pass (2026-10-06) public pages carry no requests to the
-district and no notes about the old site. Four gaps still show a visible note,
-each waiting on content the user is sending: the IBTS and Intercede home
-tiles, the 2026/27 council roster, and the Admin Documents and Newsletter
-files (items 1, 4 and 8 below).
+district and no notes about the old site. Three gaps still show a visible
+note, each waiting on content the user is sending: the IBTS and Intercede home
+tiles, and the Admin Documents and Newsletter files (items 4 and 8 below).
 
 ### Content to request from the district
-1. **2026/27 council** (the user is sending it): names, positions, portraits,
-   bios → `COUNCIL_2026_27` in `lib/councils.ts` (every position is a "To be
-   announced" slot today).
+1. **2026/27 council bios** (roster and portraits arrived 2026-10-13) →
+   `COUNCIL_2026_27` in `lib/councils.ts`.
 2. **Google Calendar** public iCal URL (and the calendar set to public).
 3. **2026/27 news posts**; the two posts on the site are from July 2025.
 4. **Files** (the user is sending a link to all of them): First Quarterly
@@ -176,8 +236,9 @@ files (items 1, 4 and 8 below).
 6. **2025/26 record**: the year is built from the old home feed, captured
    mid-year. Dates, figures and photos to complete it.
 7. Portrait of **Chathula Fernando** (DIR 2016/17), blocked on the old CDN.
-8. Still open from before: Interflash and Race4Change photography; IBTS and
-   Intercede content (the user is sending it); real photographs for the home collage; avenue photos.
+8. Still open from before: Race4Change photography for its project tile; IBTS
+   and Intercede content (the user is sending it); real photographs for the
+   home collage.
 9. **Found in the 2026-10-06 polish pass:**
    - **Media Crew service names.** The tiles say "Live Streaming",
      "Designing" and "Photo Booths"; the request-form chips say "Livestream",
@@ -272,10 +333,12 @@ not estimated. Three are deliberately non-obvious and should not be "tidied":
    mid-scroll). Header bar is transparent over it at rest and goes solid on the
    first scroll.
 2. **Stats** — Odometer Roll.
-3. **Projects** — Expand Grid. Five numbered tiles, tap for a shared-element
-   handoff (Framer `layoutId`) into a detail panel.
+3. **Projects** — Expand Grid. Four numbered tiles, two by two (Interflash
+   came off 2026-10-13), tap for a shared-element handoff (Framer `layoutId`)
+   into a detail panel.
 4. **Avenues** — Accordion Gallery. All five start collapsed and equal; hover
-   opens, click locks. Becomes a list below `md`.
+   opens, click locks. Each panel is a photo collage above its colour band
+   (2026-10-13). Becomes a list below `md`, the collage opening under the row.
 5. **Photographs** — pinned horizontal collage threaded by a Line Draw.
 6. **Officers band** — inverted near-black panel, tiles fill Signal on hover.
 7. **Closing CTA.**
@@ -300,8 +363,9 @@ own width and overshoots. Falls back to a snap-scroll rail where unsupported,
 and to a vertical stack below `md`.
 
 ### BLOCKING content gaps
-1. **Interflash and Race4Change have no photography.** Both flagged
-   `needsPhoto` in `lib/home.ts`.
+1. **Race4Change has no photography** on its project tile, flagged
+   `needsPhoto` in `lib/home.ts`. (Interflash is off the home page since
+   2026-10-13.)
 2. **IBTS and Intercede have no content at all.** Not in CONTENT.md, ARCHIVES.md
    or lib/. Each needs a figure, headline, blurb and photo. Flagged
    `needsContent`.
@@ -317,8 +381,8 @@ and to a vertical stack below `md`.
 4. **Years.** Only the 35th District Assembly is dated in the repo (29 June
    2025, Wave & Lake, the collaring of Int. PP. Jezon Fernando — CONTENT.md §9).
    Every other image is undated. Years are omitted rather than guessed.
-5. Still outstanding from before: the 2026/27 council roster, current events,
-   and avenue photography.
+5. Still outstanding from before: current events. (The 2026/27 council and
+   the avenue photography arrived 2026-10-13.)
 
 ### Removed in the cleanup
 `components/home/*` (old), `site-background`, `hero-reveal`, `theme-toggle`,
