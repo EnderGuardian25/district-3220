@@ -71,7 +71,9 @@ export default async function EventPageRoute({ params }: { params: Promise<{ slu
   if (!e) notFound();
 
   return (
-    <main id="main">
+    // Bottom padding on main, not on whichever section happens to be last:
+    // every section below is optional, so any of them can end the page.
+    <main id="main" className="pb-16 md:pb-24">
       <PageHeader crumbs={[{ label: 'Calendar', href: '/calendar' }]} title={`${e.name}.`} lede={e.standfirst}>
         <span className="label-micro inline-flex items-center gap-2 rounded-control border border-control-border px-4 py-2.5 text-content-muted">
           <span aria-hidden="true" className={`size-1.5 rounded-full ${e.status === 'past' ? 'bg-control-border' : 'bg-accent'}`} />
@@ -148,7 +150,7 @@ export default async function EventPageRoute({ params }: { params: Promise<{ slu
       )}
 
       {e.contact && (
-        <section aria-labelledby="contact-heading" className="container-page py-16 md:py-24">
+        <section aria-labelledby="contact-heading" className="container-page pt-16 md:pt-24">
           <SectionHeader id="contact-heading" title={e.contact.title} lede={e.contact.lede} />
           {/* Fields as on the old DIMUN contact page (CONTENT.md §15.5). */}
           <div className="mt-8 max-w-3xl">

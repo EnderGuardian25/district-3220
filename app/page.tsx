@@ -1,4 +1,4 @@
-import { HeroCarousel } from '@/components/home/hero-carousel';
+import { Hero } from '@/components/home/hero';
 import { StatsBand } from '@/components/home/stats-band';
 import { ProjectGrid } from '@/components/home/project-grid';
 import { AvenuesAccordion } from '@/components/home/avenues-accordion';
@@ -14,7 +14,7 @@ import { DrawLine, Reveal } from '@/components/motion/reveal';
 export default function HomePage() {
   return (
     <main id="main">
-      <HeroCarousel />
+      <Hero />
       <StatsBand />
 
       <section id="projects" aria-labelledby="projects-heading" className="container-page py-16 md:py-24">

@@ -8,29 +8,66 @@
 
 ---
 
-## Current Status — 2026-10-13
+## Current Status — 2026-10-14
 
 **Phase:** The whole site is built and merged to `main` (PRs #2–#8), then
 audited end to end (below). Every page in CONTENT.md exists on the locked
 design system (`design/DECISIONS.md`; §6 has the motion map, §8 the
 site-build decisions).
 
-### Remaining before launch (as of 2026-10-13, set by the user)
+### Remaining before launch (as of 2026-10-14, set by the user)
 These are the only items left. Everything else on the site is complete.
-1. **Hero images** on the home page: real district photographs for the
-   slideshow (`HERO_SLIDES` in `lib/home.ts`). Swapping a photo means
-   re-measuring the scrim contrast (DECISIONS §2).
-2. **The four project tiles** on the home page (DIMUN, Race4Change, IBTS,
-   Intercede): a photograph and a description for each (`FLAGSHIPS` in
-   `lib/home.ts`). IBTS and Intercede also need their figure and headline.
-3. **The horizontal scroll images** on the home page ("A year of the
-   district, in photographs"): real district photographs, with captions and
-   years only where sourced (`WALL_ITEMS` in `lib/home.ts`).
-4. **Admin documents:** the files for Admin Documents and the Newsletter
+1. **Intercede's photographs** for its project tile and dialog. The zip
+   supplied on 2026-10-14 was empty; the user is re-sending it. Until then
+   the tile is plain navy (`needsPhoto`, `data-placeholder`). Add them to
+   `public/images/projects/intercede/` and the `photos` array in
+   `FLAGSHIPS` (`lib/home.ts`), cover first, and drop `needsPhoto`.
+2. **Each new quarter's photographs** for the home timeline, as the quarter
+   closes (`TIMELINE` in `lib/home.ts`; one entry per quarter).
+3. **Admin documents:** the files for Admin Documents and the Newsletter
    (`lib/publications.ts`).
-5. **Calendar:** the district's public Google Calendar iCal URL, set as
+4. **Calendar:** the district's public Google Calendar iCal URL, set as
    `DISTRICT_CALENDAR_ICS_URL` on Vercel; until then the calendar shows
    `lib/events.ts`.
+
+### Hero artwork, Q1 timeline and project photos — 2026-10-14 (branch `content/hero-q1-timeline-project-photos`)
+Requested by the user, decisions asked up front in two rounds. Checked in
+Chrome at 1440×900 and 390×844 (plus 1024×768 and 1920×1080 for the hero).
+DECISIONS §6 has the revision.
+- **Hero:** the slideshow is gone. One piece of district artwork
+  (`public/images/hero/district-3220-hero.jpg`, 3840×2160, from the user's
+  `Hero.png`) carries the title; the h1 is screen-reader only and the
+  visible copy is the two buttons, centred. The user removed the lede line
+  too. Below 1024px the artwork shows whole at 16:9 with the buttons
+  underneath on navy. `HERO_SLIDES`, the carousel and its `progress-fill`
+  keyframes are deleted. Scrim re-measured (worst 10% of pixels, text
+  hidden): ghost-button label ≥ 10.5:1, its 55% border ≥ 3.3:1 (measured at
+  45%), nav ≥ 10.2:1 at 1024, 1440 and 1920 wide. With no scrim the ghost
+  label was 2.5:1 over the artwork's yellow edge, so the bottom scrim stays.
+- **Timeline:** the photo band is now "The year so far, quarter by quarter."
+  Q1 (Jul–Sep 2026) holds eight of the nine supplied graphics, two per event,
+  in the order the user gave: IBTS, then District Meetings 1–3. The 1st
+  District Meeting's investiture shot was left out (the other two meetings
+  already have one). The graphics carry their titles, so plates keep the
+  3:2 ratio. The user declined a host-club line under each plate. Files:
+  `public/images/timeline/2026-27/`. The six Media Crew stock plates and the
+  two District Assembly photos are off the band.
+- **Projects:** real photos for DIMUN (5), Race4Change (7) and IBTS (5) in
+  `public/images/projects/`, Media Crew credit bar cropped off each (as with
+  the avenue collages). Covers: the DIMUN hall under the Rotary wheel, the
+  Race4Change sprinters, IBTS officers applauding. The dialog shows the
+  user's description in place of the old headline and blurb, with
+  thumbnails to swap the lead photo. Copy edits, each agreed with the user:
+  British spelling (organised, programme, prioritised); Race4Change names
+  the Little Hearts Foundation ("raising funds, through the Little Hearts
+  Foundation, to equip…"), and its tile reads "5 km · Charity run". IBTS and
+  Intercede have no figure, by the user's decision; their tiles show the name
+  only.
+- **DIMUN page:** the closing-ceremony registration panel and the "Questions
+  about DIMUN" form are off `/events/dimun-2025`, at the user's request. The
+  event template still supports both for other events.
+- **Reference screenshots** `01`, `02` and `04` retaken from a production
+  build (design/reference/README.md).
 
 ### Avenue collages and the 2026/27 council — 2026-10-13 (branch `content/avenue-collages-council-2026-27`)
 Requested by the user, decisions asked up front. Checked in Chrome at
@@ -208,7 +245,7 @@ uses the 5.x JS API. `npm audit` is clean.
 - **Hosting is Vercel.** Set `DISTRICT_CALENDAR_ICS_URL` to the district
   Google Calendar's public iCal address (see `.env.example`). Until then the
   calendar shows the recorded events.
-- Forms (Contact, Request a Date, Media Crew, DIMUN enquiries) open a
+- Forms (Contact, Request a Date, Media Crew) open a
   pre-filled email to the district address. A real back-end later replaces
   only `send()` in `components/forms/mailto-form.tsx`.
 
@@ -363,6 +400,9 @@ own width and overshoots. Falls back to a snap-scroll rail where unsupported,
 and to a vertical stack below `md`.
 
 ### BLOCKING content gaps
+**Update 2026-10-14:** items 1–4 below are resolved. The project tiles,
+hero and timeline now use the district's own photographs and descriptions;
+only Intercede's photos remain (see "Remaining before launch").
 1. **Race4Change has no photography** on its project tile, flagged
    `needsPhoto` in `lib/home.ts`. (Interflash is off the home page since
    2026-10-13.)

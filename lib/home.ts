@@ -2,21 +2,41 @@
  * Home-page content. Kept out of the components so copy can be edited without
  * touching layout, and so the eventual CMS swap is a change to this file only.
  *
- * Photography status: Race4Change, IBTS and Intercede use a marked placeholder
- * on their project tiles (`needsPhoto`). Interflash was taken off the home
- * page's projects on 2026-10-13 at the user's request. The avenue collages
- * are district photographs supplied on 2026-10-13 (`AVENUE_PANELS`).
+ * Photography status (2026-10-14): the hero artwork, the DIMUN, IBTS and
+ * Race4Change project photos and the Q1 timeline photos are the district's,
+ * supplied by the user. Intercede keeps a marked placeholder (`needsPhoto`)
+ * until its photos arrive. Interflash was taken off the home page's projects
+ * on 2026-10-13 at the user's request. The avenue collages are district
+ * photographs supplied on 2026-10-13 (`AVENUE_PANELS`).
  */
 
 import type { StaticImageData } from 'next/image';
-import assembly from '@/public/images/hero/assembly.webp';
-import assembly35th from '@/public/images/blog/blog-35th-district-assembly.jpg';
-import compering from '@/public/images/media-crew/media-compering.jpg';
-import livestreaming from '@/public/images/media-crew/media-livestreaming.jpg';
-import photography from '@/public/images/media-crew/media-photography.jpg';
-import videography from '@/public/images/media-crew/media-videography.jpg';
-import designing from '@/public/images/media-crew/media-designing.jpg';
-import photoBooths from '@/public/images/media-crew/media-photo-booths.jpg';
+import heroArt from '@/public/images/hero/district-3220-hero.jpg';
+import dimunHall from '@/public/images/projects/dimun/dimun-hall.jpg';
+import dimunPodium from '@/public/images/projects/dimun/dimun-podium.jpg';
+import dimunChoir from '@/public/images/projects/dimun/dimun-choir.jpg';
+import dimunStage from '@/public/images/projects/dimun/dimun-stage.jpg';
+import dimunDelegates from '@/public/images/projects/dimun/dimun-delegates.jpg';
+import r4cSprint from '@/public/images/projects/race4change/r4c-sprint.jpg';
+import r4cStartArch from '@/public/images/projects/race4change/r4c-start-arch.jpg';
+import r4cRunners from '@/public/images/projects/race4change/r4c-runners.jpg';
+import r4cMascot from '@/public/images/projects/race4change/r4c-mascot.jpg';
+import r4cHosts from '@/public/images/projects/race4change/r4c-hosts.jpg';
+import r4cFinish from '@/public/images/projects/race4change/r4c-finish.jpg';
+import r4cAwards from '@/public/images/projects/race4change/r4c-awards.jpg';
+import ibtsApplause from '@/public/images/projects/ibts/ibts-applause.jpg';
+import ibtsHall from '@/public/images/projects/ibts/ibts-hall.jpg';
+import ibtsAudience from '@/public/images/projects/ibts/ibts-audience.jpg';
+import ibtsFinance from '@/public/images/projects/ibts/ibts-finance-session.jpg';
+import ibtsWorkshop from '@/public/images/projects/ibts/ibts-workshop.jpg';
+import q1Dm1Address from '@/public/images/timeline/2026-27/q1-district-meeting-1-address.jpg';
+import q1Dm1Group from '@/public/images/timeline/2026-27/q1-district-meeting-1-group.jpg';
+import q1Dm2Floor from '@/public/images/timeline/2026-27/q1-district-meeting-2-floor.jpg';
+import q1Dm2Investiture from '@/public/images/timeline/2026-27/q1-district-meeting-2-investiture.jpg';
+import q1Dm3Investiture from '@/public/images/timeline/2026-27/q1-district-meeting-3-investiture.jpg';
+import q1Dm3Audience from '@/public/images/timeline/2026-27/q1-district-meeting-3-audience.jpg';
+import q1IbtsHall from '@/public/images/timeline/2026-27/q1-ibts-hall.jpg';
+import q1IbtsSpeaker from '@/public/images/timeline/2026-27/q1-ibts-speaker.jpg';
 import csRaceStart from '@/public/images/avenues/community-service/race4change-start.jpg';
 import csRaceWarmUp from '@/public/images/avenues/community-service/race4change-warm-up.jpg';
 import csFridge from '@/public/images/avenues/community-service/donation-refrigerator.jpg';
@@ -39,69 +59,34 @@ import finCrowd from '@/public/images/avenues/finance/interflash-crowd.jpg';
 import finStage from '@/public/images/avenues/finance/interflash-stage.jpg';
 
 /**
- * Source width / height, read from the image file at build time (static
- * imports carry the real dimensions), so swapping a photo can't leave a stale
- * hand-typed ratio behind. The `src` strings stay as plain public paths.
+ * The hero is one piece of district artwork (supplied 2026-10-14), not a
+ * slideshow: the title "Interact District 3220, Sri Lanka & Maldives" is part
+ * of the image, so the page's h1 carries the same words for screen readers
+ * and the visible copy stays out of the artwork's way (DECISIONS §6 revision).
  */
-const ratio = (img: StaticImageData) => img.width / img.height;
-
-export type HeroSlide = {
-  src: string;
-  /**
-   * Source width / height. The hero crops with object-cover into a portrait
-   * box on phones, so `sizes` has to ask for the cropped width, not 100vw, or
-   * a 390px phone was served a 1024px file stretched 4x. Always `ratio(import)`
-   * of the same file as `src`.
-   */
-  aspect: number;
-  /** Empty alt is wrong here: these are content images, not decoration. */
-  alt: string;
-  /** Shown in the carousel's caption line. */
-  caption: string;
+export const HERO = {
+  image: heroArt,
+  alt: 'Interactors at district events: delegates speaking at a district meeting, the district council in a group photograph, and club officers in school blazers.',
 };
 
-/** Four slides. Fewer feels thin, more and the last ones are never seen. */
-export const HERO_SLIDES: HeroSlide[] = [
-  {
-    src: '/images/hero/assembly.webp',
-    aspect: ratio(assembly),
-    alt: 'Interactors from clubs across the district filling the assembly hall',
-    caption: 'District Assembly, Colombo',
-  },
-  {
-    src: '/images/blog/blog-35th-district-assembly.jpg',
-    aspect: ratio(assembly35th),
-    alt: 'Delegates seated at the 35th District Assembly',
-    caption: '35th District Assembly',
-  },
-  {
-    src: '/images/media-crew/media-compering.jpg',
-    aspect: ratio(compering),
-    alt: 'Student compères running a district conference from the podium',
-    caption: 'Interactors running the floor',
-  },
-  {
-    src: '/images/media-crew/media-livestreaming.jpg',
-    aspect: ratio(livestreaming),
-    alt: 'Students operating a livestream desk at a district event',
-    caption: 'Media Crew, livestreaming a district event',
-  },
-];
+/** A content photograph, imported statically so its real ratio drives `sizes` (DECISIONS §5). */
+export type Photo = {
+  image: StaticImageData;
+  alt: string;
+};
 
 export type Flagship = {
   slug: string;
   name: string;
-  /** The single number this project is known for. */
-  figure: string;
-  figureLabel: string;
-  headline: string;
-  blurb: string;
-  image: string;
-  imageAlt: string;
-  /** True where the district has no photograph yet and this is a placeholder. */
+  /** The single number this project is known for, where it has one. */
+  figure?: string;
+  figureLabel?: string;
+  /** The district's own description of the project (supplied 2026-10-14). */
+  description: string;
+  /** The first is the tile's cover and the dialog's lead photo. Empty until supplied. */
+  photos: Photo[];
+  /** True where the district's photographs are still to come: a plain navy tile, marked as a placeholder. */
   needsPhoto?: boolean;
-  /** True where the copy itself is a placeholder awaiting the district. */
-  needsContent?: boolean;
   /** The project's own page, where one exists. */
   href?: string;
 };
@@ -112,54 +97,56 @@ export const FLAGSHIPS: Flagship[] = [
     name: 'DIMUN',
     figure: '6',
     figureLabel: 'Committees',
-    headline: 'The first Interact Model UN in Sri Lanka.',
-    blurb:
-      'District Interact Model United Nations, with its own committees, topics and study guides.',
-    image: '/images/media-crew/media-compering.jpg',
-    imageAlt: 'Student delegates at a district conference',
+    description:
+      'District Interact Model United Nations (DIMUN) is a conference organised by Interact District 3220 that brings together students from across Sri Lanka to debate global issues. Through meaningful dialogue and collaborative problem-solving, DIMUN develops communication, diplomacy, and leadership skills while inspiring young people to become informed, responsible global citizens.',
+    photos: [
+      { image: dimunHall, alt: 'A full hall facing the DIMUN stage, lit in blue under the Rotary wheel' },
+      { image: dimunPodium, alt: 'A delegate speaking from the podium at DIMUN' },
+      { image: dimunChoir, alt: 'Interactors singing on stage at DIMUN, with a guitarist among them' },
+      { image: dimunStage, alt: 'The DIMUN organising team on stage in front of a screen of blossom trees' },
+      { image: dimunDelegates, alt: 'The DIMUN team gathered on stage behind the giant DIMUN letters' },
+    ],
     href: '/events/dimun-2025',
   },
   {
     slug: 'race4change',
     name: 'Race4Change',
     figure: '5 km',
-    figureLabel: 'Galle Face Green',
-    headline: 'A public charity run for the Little Hearts Foundation.',
-    blurb:
-      "Open registration and corporate teams, raising funds for children's cardiac care.",
-    image: '/images/blog/blog-35th-district-assembly.jpg',
-    imageAlt: 'Placeholder for Race4Change photography',
-    needsPhoto: true,
+    figureLabel: 'Charity run',
+    description:
+      '“Race 4 Change” is a 5km charity run in Colombo raising funds, through the Little Hearts Foundation, to equip the newly built cardiac and critical care complex at Lady Ridgeway Hospital. This government-approved, nationally prioritised project often faces long timelines for completion, making community support essential.',
+    photos: [
+      { image: r4cSprint, alt: 'Two runners sprinting across the grass at Race4Change' },
+      { image: r4cStartArch, alt: 'Runners and the lion mascot gathering at the Race4Change start arch on Galle Face Green' },
+      { image: r4cRunners, alt: 'Runners in Race4Change shirts and caps waiting for the start' },
+      { image: r4cMascot, alt: 'The lion mascot holding a flag beside the compère on the Race4Change stage' },
+      { image: r4cHosts, alt: 'Two compères speaking from the Race4Change stage' },
+      { image: r4cFinish, alt: 'Runners walking in after the finish at Race4Change, with palm trees behind' },
+      { image: r4cAwards, alt: 'Winners receiving a trophy on stage, with the lion mascot beside them' },
+    ],
   },
-  /**
-   * TODO(district): IBTS and Intercede have no content anywhere in the repo.
-   * Each needs a name check, the one figure it is known for, a one-line
-   * headline, a sentence of detail, and a photograph. Everything below is a
-   * deliberate placeholder so the five-tile layout is real.
-   */
+  // IBTS and Intercede have no figure: the district's description is all (2026-10-14).
   {
     slug: 'ibts',
     name: 'IBTS',
-    figure: 'TODO',
-    figureLabel: 'Awaiting figure',
-    headline: 'Headline to come from the district.',
-    blurb: 'Placeholder. Send the one-line description and the number this project is known for.',
-    image: '/images/media-crew/media-designing.jpg',
-    imageAlt: 'Placeholder for IBTS photography',
-    needsPhoto: true,
-    needsContent: true,
+    description:
+      'The Interact Board Training Seminar is a programme organised by the Interact District Council to prepare newly elected Board Members through the year ahead, guiding them through their roles, responsibilities and duties as Interactors.',
+    photos: [
+      { image: ibtsApplause, alt: 'Club officers applauding from their seats at the Interact Board Training Seminar' },
+      { image: ibtsHall, alt: 'A speaker addressing a full hall under the IBTS title screen' },
+      { image: ibtsAudience, alt: 'Club officers laughing during a session at the Interact Board Training Seminar' },
+      { image: ibtsFinance, alt: 'A speaker presenting a session on the Finance avenue' },
+      { image: ibtsWorkshop, alt: 'Club officers working in groups against a timer during an IBTS workshop' },
+    ],
   },
   {
     slug: 'intercede',
     name: 'Intercede',
-    figure: 'TODO',
-    figureLabel: 'Awaiting figure',
-    headline: 'Headline to come from the district.',
-    blurb: 'Placeholder. Send the one-line description and the number this project is known for.',
-    image: '/images/media-crew/media-photo-booths.jpg',
-    imageAlt: 'Placeholder for Intercede photography',
+    description:
+      'Intercede is the biggest community service project carried out by Interact District 3220, Sri Lanka and Maldives. Held every Rotary year under the Community Service avenue of the District Council, it brings clubs from across the district together to deliver one sustainable project for a community in need. Each year, the project identifies an underserved school or community, looks at what it needs most, and puts Interactors on the ground to meet that need. More than a single act of giving, Intercede is built to leave something lasting behind, while giving Interactors the chance to serve beyond their own clubs and cities.',
+    // TODO(district): Intercede's photographs. The zip supplied on 2026-10-14 was empty.
+    photos: [],
     needsPhoto: true,
-    needsContent: true,
   },
 ];
 
@@ -279,69 +266,51 @@ export const AVENUE_PANELS: AvenuePanel[] = [
   },
 ];
 
-export type WallItem = {
-  src: string;
-  alt: string;
-  /** Source width / height, for `sizes` (see HeroSlide.aspect). */
-  aspect: number;
-  /** Shown above the image, the way the reference strip labels each plate. */
+export type TimelinePhoto = Photo & {
+  /** The event, shown above the plate. One line: the Line Draw passes through its diamond. */
   caption: string;
-  /**
-   * Rendered after the caption. Only set where the date is actually sourced;
-   * see the note on WALL_ITEMS. An unsourced year is a fabricated fact about
-   * the district's own record, so absent is correct where it is unknown.
-   */
-  year?: string;
-  /**
-   * 'district' is a real photograph of this district. 'stock' is a generic
-   * image inherited from the old Wix site. The distinction drives what may
-   * legitimately be captioned as an event.
-   */
-  provenance: 'district' | 'stock';
-  /** Plate size in the horizontal collage. */
+  /** Plate width in the horizontal timeline. Every plate keeps the photo's own ratio. */
   size: 'sm' | 'md' | 'lg';
   /** Vertical placement, which is what stops the strip reading as a row. */
   drop: 'top' | 'mid' | 'low';
 };
 
+export type TimelineQuarter = {
+  label: string;
+  /** The quarter of the Rotary year (which starts 1 July), not event dates. */
+  range: string;
+  photos: TimelinePhoto[];
+};
+
 /**
- * The horizontal collage. Sizes and drops alternate on purpose: a strip where
- * every plate is the same size at the same height reads as a filmstrip, not as
- * an edit.
+ * The home page's horizontal band: the Rotary year so far, a quarter at a
+ * time (2026-10-14, at the user's request; it replaced a strip of Media Crew
+ * stock images). Add a quarter here when it ends.
  *
- * TWO THINGS TO FIX BEFORE THIS SECTION IS HONEST:
+ * The photos are the district's own graphics, with the event title and its
+ * organisers set into their lower quarter, so the plates are never cropped: each
+ * keeps its 3:2 ratio and only its width varies.
  *
- * 1. Provenance. Only two of these are photographs of District 3220. The six
- *    `media-*.jpg` are the Media Crew SERVICE CATEGORY images from the old Wix
- *    site (CONTENT.md §12). They are generic stock. A section headed "A year
- *    of the district, in photographs" that is 75% stock misrepresents the
- *    district, so their captions name the service rather than claiming an
- *    event, and they carry no year. Replace them with real photography.
- *
- *    The two `decor-*.jpg` plates ("decorative imagery", CONTENT.md §3) were
- *    dropped on 2026-10-06 at the user's request: a plate captioned
- *    "Decorative" read as a bug, and nothing true could be said about them.
- *
- * 2. Years. Only the 35th District Assembly is dated anywhere in the repo:
- *    CONTENT.md §9 records it as 29 June 2025 at Wave & Lake, the collaring of
- *    Int. PP. Jezon Fernando. Everything else is undated, and inventing a year
- *    on a district's own record is worse than leaving it off.
- *
- * `blog-shawn-shiek-tribute.jpg` is deliberately absent. It is a memorial card,
- * and a tribute used as decorative filler reads badly however good the image
- * is. If the district wants it on the site it belongs in News with its context.
+ * Order within the quarter is chronological, as the user gave it: IBTS, then
+ * the three district meetings. Two photographs per event.
  */
-export const WALL_ITEMS: WallItem[] = [
-  // TODO(district): confirm the year. Almost certainly the same 2025 assembly
-  // as the plate below, but the repo does not say so and it is a different shot.
-  { src: '/images/hero/assembly.webp', aspect: ratio(assembly), alt: 'Interactors from clubs across the district filling the assembly hall', caption: 'District Assembly', provenance: 'district', size: 'lg', drop: 'mid' },
-  { src: '/images/media-crew/media-photography.jpg', aspect: ratio(photography), alt: 'A photographer holding a camera at sunset', caption: 'Media Crew, photography', provenance: 'stock', size: 'sm', drop: 'top' },
-  { src: '/images/blog/blog-35th-district-assembly.jpg', aspect: ratio(assembly35th), alt: 'The incoming District Interact Representative being collared at the 35th District Assembly', caption: '35th District Assembly', year: '2025', provenance: 'district', size: 'md', drop: 'low' },
-  { src: '/images/media-crew/media-compering.jpg', aspect: ratio(compering), alt: 'A compère addressing an audience from a podium', caption: 'Media Crew, compering', provenance: 'stock', size: 'lg', drop: 'top' },
-  { src: '/images/media-crew/media-livestreaming.jpg', aspect: ratio(livestreaming), alt: 'A live streaming camera at an event', caption: 'Media Crew, live streaming', provenance: 'stock', size: 'sm', drop: 'mid' },
-  { src: '/images/media-crew/media-videography.jpg', aspect: ratio(videography), alt: 'A video camera with a shotgun microphone', caption: 'Media Crew, videography', provenance: 'stock', size: 'md', drop: 'low' },
-  { src: '/images/media-crew/media-designing.jpg', aspect: ratio(designing), alt: 'A designer working at a laptop', caption: 'Media Crew, design', provenance: 'stock', size: 'md', drop: 'mid' },
-  { src: '/images/media-crew/media-photo-booths.jpg', aspect: ratio(photoBooths), alt: 'A hand holding printed photo booth strips', caption: 'Media Crew, photo booths', provenance: 'stock', size: 'sm', drop: 'low' },
+export const TIMELINE_YEAR = '2026/27';
+
+export const TIMELINE: TimelineQuarter[] = [
+  {
+    label: 'Q1',
+    range: 'Jul–Sep 2026',
+    photos: [
+      { image: q1IbtsHall, alt: 'A speaker presenting to a full hall at the Interact Board Training Seminar', caption: 'Interact Board Training Seminar', size: 'lg', drop: 'low' },
+      { image: q1IbtsSpeaker, alt: 'An Interactor speaking from the podium at the Interact Board Training Seminar', caption: 'Interact Board Training Seminar', size: 'md', drop: 'mid' },
+      { image: q1Dm1Address, alt: 'A club officer addressing the 1st District Meeting from the podium', caption: '1st District Meeting', size: 'sm', drop: 'top' },
+      { image: q1Dm1Group, alt: 'Club officers in a group photograph on stage at the 1st District Meeting', caption: '1st District Meeting', size: 'md', drop: 'low' },
+      { image: q1Dm2Floor, alt: 'A delegate speaking into a microphone from the floor at the 2nd District Meeting', caption: '2nd District Meeting', size: 'lg', drop: 'top' },
+      { image: q1Dm2Investiture, alt: 'A club officer being invested with a district ribbon at the 2nd District Meeting', caption: '2nd District Meeting', size: 'sm', drop: 'low' },
+      { image: q1Dm3Investiture, alt: 'A club officer being invested with a district ribbon at the 3rd District Meeting', caption: '3rd District Meeting', size: 'md', drop: 'mid' },
+      { image: q1Dm3Audience, alt: 'Club officers seated in the audience at the 3rd District Meeting', caption: '3rd District Meeting', size: 'sm', drop: 'top' },
+    ],
+  },
 ];
 
 /** The member-facing utility band. Mirrors the nav, minus the public pages. */

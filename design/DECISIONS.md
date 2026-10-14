@@ -62,7 +62,7 @@ Rules:
 | Fill | `accent-fill` | `#155FD9` (signal-600) | Primary button background; officers tile hover fill. White label 5.78. |
 | Text | `accent-text` | `#124AAD` (signal-700) | Links and inline accents on chalk (7.30). Also the focus ring. |
 | Soft | `accent-soft` | `#EFF5FF` (signal-50) | Tinted backgrounds, sparingly |
-| On photo | `signal-400` | `#5B90F8` | The highlighted phrase in the hero headline over photography; meta labels on photo scrims (project tiles) |
+| On photo | `signal-400` | `#5B90F8` | Meta labels on photo scrims (project tiles). It also marked the highlighted phrase in the hero headline until the hero became artwork with no visible headline (2026-10-14). |
 
 There is **no second accent colour.** No cyan, no orange, no gradients between
 hues. The official Interact cyan `#01B4E6` exists only inside the supplied logo
@@ -118,6 +118,12 @@ and shook. Photo files: `public/images/avenues/<avenue>/`.
   piece of hero copy and the see-through nav at AA on every slide, measured on
   the worst 10% of pixels behind the text, text-shadow ignored (2026-10-06).
   Swapping a hero photo means re-measuring.
+  **Revision 2026-10-14:** the hero is one piece of district artwork with
+  only the two buttons on it, so its bottom scrim is much lighter (50% → 36%
+  at 150px → 0 at 280px); measured at 1024×768, 1440×900 and 1920×1080
+  (HANDOFF). The project-tile scrim went to `chalk-950/95 → /60 at 45%` when
+  the tiles got real photographs at 80% opacity: Race4Change's bright sky
+  put its number label at 3.9:1 on the old one.
 
 ## 3. Typography
 
@@ -236,7 +242,28 @@ design change (see the top of this file).
     are new effects.
 - **Autoplay must be stoppable.** The hero slideshow has a pause button (touch
   has no hover), and the progress bar's own `animationend` advances the slide,
-  so pausing freezes bar and countdown together.
+  so pausing freezes bar and countdown together. (Nothing on the site
+  autoplays since the slideshow came out on 2026-10-14; the rule stands for
+  anything that ever does.)
+- **Revision 2026-10-14 (approved by the user): home page content pass.**
+  - **Hero:** the four-photo Clip Reveal slideshow is replaced by one piece of
+    district artwork that carries its own title ("Interact District 3220,
+    Sri Lanka & Maldives"). The h1 says the same for screen readers; the only
+    visible copy is "Join a club" and "See the projects", centred under the
+    title. The artwork clips in on load (`clip-in-load`), the buttons rise in
+    (`rise-in-load`). From 1024px it is full-bleed; below that it shows
+    whole at 16:9 on navy-900 with the buttons beneath, because a full-height
+    box crops the title on phones and portrait tablets.
+  - **Photo band → quarterly timeline:** "The year so far, quarter by
+    quarter." Each quarter of the Rotary year opens with a marker on the
+    line (its date range as the caption, "Q1" in Fraunces), then its
+    photographs. The plates keep the photos' own 3:2 shape, because the
+    district's graphics carry their titles in the lower quarter. Same
+    mechanic as before; a quarter is added in `lib/home.ts`.
+  - **Project dialogs:** the lead photo has a row of thumbnails that swaps
+    which photo shows, on a 200ms opacity change (colour-change timing, not a
+    new effect). Thumbnails are `press` controls. The description replaces
+    the headline and blurb.
 - **Revision 2026-10-06 (approved by the user): Morph Cursor states.**
   - It follows faster, and the speed is time-based, so it doesn't lag on
     slow or high-refresh screens.
@@ -260,13 +287,12 @@ design change (see the top of this file).
 
 | Effect | Where | Notes |
 |---|---|---|
-| Clip Reveal (slides) | Home hero | 950ms `ease-clip` wipe between photographs; 6s autoplay with pause |
-| Clip Reveal (single image) | Lead photo on About; post images (News, articles); archive-year artwork; DIMUN and Media Crew mastheads | On load (CSS) in the first viewport; on scroll (observer) below it |
+| Clip Reveal (single image) | Home hero artwork (since 2026-10-14; a four-slide Clip Reveal carousel before that); lead photo on About; post images (News, articles); archive-year artwork; DIMUN and Media Crew mastheads | On load (CSS) in the first viewport; on scroll (observer) below it |
 | Clip wipe (control) | Calendar month changes | 400ms (650ms until 2026-10-06), from the side the new month came from |
 | Odometer Roll | Home and About stats | Digits roll to the figure on entering view |
-| Expand Grid (shared element) | Home projects; every council and profile grid; DIMUN committees and executive committee | The image moves from card into the dialog via `layoutId` |
+| Expand Grid (shared element) | Home projects (dialog thumbnails swap the lead photo, 200ms opacity); every council and profile grid; DIMUN committees and executive committee | The image moves from card into the dialog via `layoutId` |
 | Accordion Gallery | Home avenues; Media Crew services | Hover opens after ~80ms intent, click locks; 750ms `flex-grow` |
-| Pinned horizontal scroll + Line Draw | Home photo band; Archives timeline | CSS scroll-driven; progress bar along the bottom. In both rails the line passes through every caption diamond (node = 3px in, caption centre) and behind the label, on one navy backing per caption (home fixed 2026-10-06: its nodes sat 22px above the diamonds) |
+| Pinned horizontal scroll + Line Draw | Home quarterly timeline (the photo band until 2026-10-14); Archives timeline | CSS scroll-driven; progress bar along the bottom. In both rails the line passes through every caption diamond (node = 3px in, caption centre) and behind the label, on one navy backing per caption (home fixed 2026-10-06: its nodes sat 22px above the diamonds) |
 | Vertical Line Draw | College of DIRs | Line fills to mid-screen; each year lights as it crosses |
 | Load fade-up | Every inner-page header | `rise-in-load`, CSS, from first paint |
 | Reveal fade-up + DrawLine | Section headings, rows, cards site-wide | Observer, once per element |
