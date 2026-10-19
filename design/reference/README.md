@@ -16,16 +16,21 @@ pass made these approved changes:
 revision: Interflash is off the projects (four tiles, two by two) and each
 avenue card is a photo collage with its logo as a badge (DECISIONS §2).
 
+`01`, `02` and `04` retaken 2026-10-14 from a production build after an
+approved revision (DECISIONS §6): the hero is one piece of district artwork
+with centred buttons, the project tiles carry real photographs, and the photo
+band is the quarterly timeline.
+
 These are
 the visual ground truth for `design/DECISIONS.md`: new pages should look like
 they belong next to these.
 
 | File | Shows |
 |---|---|
-| `01-hero.jpeg` | Hero over photography, transparent header, Signal-400 highlight, `onPhoto` pills, pause control beside the progress bar |
+| `01-hero.jpeg` | Hero artwork full-bleed, transparent header, `onPhoto` pills centred under the artwork's title |
 | `02-stats-projects.jpeg` | Solid chalk header, stats band, section header pattern, project tiles |
 | `03-avenues.jpeg` | Avenues accordion with the identity colours |
-| `04-photographs.jpeg` | Navy-900 photography band, monospace captions |
+| `04-photographs.jpeg` | Navy-900 timeline band: heading, Q1 marker, monospace captions |
 | `05-officers.jpeg` | Ink-panel officers band, hairline grid; navy closing panel below |
 | `06-closing-footer.jpeg` | Navy-900 rounded closing CTA on chalk ("Join a club" / "About the district"), footer |
 

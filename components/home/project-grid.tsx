@@ -16,12 +16,19 @@ import { FLAGSHIPS } from '@/lib/home';
  * place in the grid into the panel, rather than a new panel fading in over the
  * top. Framer's `layoutId` is exactly this primitive, so it does the FLIP work.
  *
+ * Each tile is the project's cover photo; the panel leads with the same photo
+ * and a row of thumbnails swaps in the rest (2026-10-14). A project still
+ * waiting on its photographs (`needsPhoto`) is a plain navy tile and opens on
+ * its description alone.
+ *
  * Deliberately NOT a morph-cursor target: the tiles are far larger than a
  * control, and the cursor's size guard would decline them anyway.
  */
 
 export function ProjectGrid() {
   const [openSlug, setOpenSlug] = useState<string | null>(null);
+  /** The photo leading the open panel. Every open starts on the cover. */
+  const [shown, setShown] = useState(0);
   const reduced = useReducedMotion();
   const open = FLAGSHIPS.find((f) => f.slug === openSlug) ?? null;
   const tiles = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -39,46 +46,59 @@ export function ProjectGrid() {
   return (
     <>
       <ul className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {FLAGSHIPS.map((f, i) => (
-          <li key={f.slug}>
-            <motion.button
-              ref={(el) => {
-                tiles.current[f.slug] = el;
-              }}
-              type="button"
-              layoutId={reduced ? undefined : `project-${f.slug}`}
-              onClick={() => setOpenSlug(f.slug)}
-              aria-haspopup="dialog"
-              className="group relative block h-full min-h-[260px] w-full overflow-hidden rounded-panel bg-navy-900 text-left text-white"
-            >
-              {/* alt="" on the tile: the button already reads the project's name. */}
-              <Image
-                src={f.image}
-                alt=""
-                fill
-                sizes="(max-width: 640px) 100vw, 50vw"
-                className="object-cover opacity-55 transition-[opacity,scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04] group-hover:opacity-70 motion-reduce:group-hover:scale-100"
-              />
-              <span
-                aria-hidden="true"
-                className="absolute inset-0 bg-gradient-to-t from-chalk-950/95 via-chalk-950/35 to-transparent"
-              />
-              <span className="relative flex h-full flex-col justify-end p-5 md:p-6">
-                {/* white/70 and signal-400 (the over-photography step, §2):
-                    white/55 and `accent` measured 3.5–4.3:1 on the scrim. */}
-                <span className="label-micro text-white/70">
-                  {String(i + 1).padStart(2, '0')}
+        {FLAGSHIPS.map((f, i) => {
+          const cover = f.photos[0];
+          return (
+            <li key={f.slug}>
+              <motion.button
+                ref={(el) => {
+                  tiles.current[f.slug] = el;
+                }}
+                type="button"
+                layoutId={reduced ? undefined : `project-${f.slug}`}
+                onClick={() => {
+                  setShown(0);
+                  setOpenSlug(f.slug);
+                }}
+                aria-haspopup="dialog"
+                data-placeholder={f.needsPhoto || undefined}
+                className="group relative block h-full min-h-[260px] w-full overflow-hidden rounded-panel bg-navy-900 text-left text-white md:min-h-[320px]"
+              >
+                {cover && (
+                  <>
+                    {/* alt="" on the tile: the button already reads the project's name. */}
+                    <Image
+                      src={cover.image}
+                      alt=""
+                      fill
+                      sizes="(max-width: 640px) 100vw, 50vw"
+                      className="object-cover opacity-80 transition-[opacity,scale] duration-[600ms] ease-out-expo group-hover:scale-[1.04] group-hover:opacity-95 motion-reduce:group-hover:scale-100"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-0 bg-gradient-to-t from-chalk-950/95 via-chalk-950/60 via-45% to-transparent"
+                    />
+                  </>
+                )}
+                <span className="relative flex h-full flex-col justify-end p-5 md:p-6">
+                  {/* white/70 and signal-400 (the over-photography step, §2):
+                      white/55 and `accent` measured 3.5–4.3:1 on the scrim. */}
+                  <span className="label-micro text-white/70">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="mt-2 font-display text-[1.35rem] leading-tight font-semibold tracking-[-0.02em]">
+                    {f.name}
+                  </span>
+                  {f.figure && (
+                    <span className="label-micro mt-2 text-signal-400">
+                      {f.figure} · {f.figureLabel}
+                    </span>
+                  )}
                 </span>
-                <span className="mt-2 font-display text-[1.35rem] leading-tight font-semibold tracking-[-0.02em]">
-                  {f.name}
-                </span>
-                <span className="label-micro mt-2 text-signal-400">
-                  {f.needsContent ? 'Content to come' : `${f.figure} · ${f.figureLabel}`}
-                </span>
-              </span>
-            </motion.button>
-          </li>
-        ))}
+              </motion.button>
+            </li>
+          );
+        })}
       </ul>
 
       <AnimatePresence>
@@ -107,32 +127,61 @@ export function ProjectGrid() {
               aria-modal="true"
               aria-label={open.name}
               // Scrolls on short and landscape screens; clipping hid the Close button.
-              className="relative grid max-h-full w-full max-w-4xl overflow-y-auto overscroll-contain rounded-panel bg-navy-900 text-white md:grid-cols-2"
+              className={`relative grid max-h-full w-full overflow-y-auto overscroll-contain rounded-panel bg-navy-900 text-white ${
+                open.photos.length ? 'max-w-5xl md:grid-cols-[1.15fr_1fr]' : 'max-w-2xl'
+              }`}
             >
-              <div className="relative min-h-[220px]">
-                <Image
-                  src={open.image}
-                  alt={open.imageAlt}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 512px"
-                  className="object-cover"
-                />
-              </div>
+              {open.photos.length > 0 && (
+                <div className="flex flex-col">
+                  {/* Every photo is mounted and stacked; the thumbnails change
+                      which one is opaque (200ms, the colour-change timing), so
+                      a swap never waits on a fresh image load. */}
+                  <div className="relative aspect-[3/2] bg-navy-800">
+                    {open.photos.map((p, i) => (
+                      <Image
+                        key={p.image.src}
+                        src={p.image}
+                        alt={p.alt}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 560px"
+                        aria-hidden={i !== shown}
+                        className={`object-cover transition-opacity duration-200 ${i === shown ? 'opacity-100' : 'opacity-0'}`}
+                      />
+                    ))}
+                  </div>
+                  {open.photos.length > 1 && (
+                    <ul aria-label={`${open.name} photographs`} className="grid auto-cols-fr grid-flow-col gap-2 p-4 md:p-5">
+                      {open.photos.map((p, i) => (
+                        <li key={p.image.src}>
+                          <button
+                            type="button"
+                            data-morph
+                            onClick={() => setShown(i)}
+                            aria-label={`Show photo ${i + 1} of ${open.photos.length}`}
+                            aria-current={i === shown}
+                            className={`press relative block aspect-[3/2] w-full overflow-hidden rounded-media outline-offset-2 ${
+                              i === shown ? 'opacity-100 outline-2 outline-white outline-solid' : 'opacity-60 hover:opacity-100'
+                            }`}
+                          >
+                            <Image src={p.image} alt="" fill sizes="120px" className="object-cover" />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
               <div className="p-6 md:p-10">
                 <p className="label-micro text-accent">{open.name}</p>
-                <p className="mt-4 font-display text-[clamp(2rem,4.4vw,3.2rem)] leading-none font-semibold tracking-[-0.045em]">
-                  {open.figure}
-                </p>
-                <p className="label-micro mt-2.5 text-white/60">{open.figureLabel}</p>
-                <h3 className="mt-6 text-[1.3rem] leading-tight font-semibold tracking-[-0.025em]">
-                  {open.headline}
-                </h3>
-                <p className="mt-3 max-w-[44ch] text-white/80">{open.blurb}</p>
-                {open.needsContent && (
-                  <p className="mt-5 rounded-media border border-white/25 px-3.5 py-2.5 text-[0.82rem] text-white/70">
-                    Placeholder. This project still needs its details from the district.
-                  </p>
+                {open.figure && (
+                  <>
+                    <p className="mt-4 font-display text-[clamp(2rem,4.4vw,3.2rem)] leading-none font-semibold tracking-[-0.045em]">
+                      {open.figure}
+                    </p>
+                    <p className="label-micro mt-2.5 text-white/60">{open.figureLabel}</p>
+                  </>
                 )}
+                <p className={`max-w-[52ch] text-white/85 ${open.figure ? 'mt-6' : 'mt-4'}`}>{open.description}</p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   {open.href && (
                     <Link

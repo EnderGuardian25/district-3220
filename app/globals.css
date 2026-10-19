@@ -546,18 +546,6 @@
   animation: rise-in 550ms var(--ease-out-expo) calc(var(--step, 0) * 70ms + 60ms) both;
 }
 
-/* The hero's slide-progress fill. A keyframe rather than a transition so it
-   always starts from empty (a transition from an already-full bar has nothing
-   to animate) and so pausing can freeze it with animation-play-state. */
-@keyframes progress-fill {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
 /* ==========================================================================
    MOTION
    Everything animated must be reachable by this switch. The audience is

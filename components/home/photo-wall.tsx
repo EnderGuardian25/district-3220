@@ -3,11 +3,13 @@
 import Image from 'next/image';
 import { useRef } from 'react';
 import { useHscrollPan } from '@/components/motion/use-hscroll-pan';
-import { WALL_ITEMS, type WallItem } from '@/lib/home';
+import { TIMELINE, TIMELINE_YEAR, type TimelinePhoto, type TimelineQuarter } from '@/lib/home';
 
 /**
- * "A year of the district, in photographs" as a pinned horizontal collage,
- * threaded by a Line Draw (lab.damiandc.com/line-draw-scroll).
+ * "The year so far, quarter by quarter": the Rotary year as a pinned
+ * horizontal timeline, threaded by a Line Draw
+ * (lab.damiandc.com/line-draw-scroll). Each quarter opens with a marker on the
+ * line, then its photographs; a new quarter is a data change in `TIMELINE`.
  *
  * The line is generated from the same numbers that place the plates, so the
  * nodes sit exactly on each caption rather than being eyeballed. Geometry is
@@ -25,54 +27,49 @@ import { WALL_ITEMS, type WallItem } from '@/lib/home';
 const STAGE_H = 660;
 const GAP = 84;
 const PAD_X = 96;
-
-const WIDTH: Record<WallItem['size'], number> = { sm: 230, md: 310, lg: 420 };
-const RATIO: Record<WallItem['size'], number> = { sm: 1.25, md: 0.75, lg: 0.68 };
-/** Caption baseline for each drop. The image hangs below it. */
-const TOP: Record<WallItem['drop'], number> = { top: 96, mid: 244, low: 372 };
-
-type Placed = WallItem & {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  nodeX: number;
-  nodeY: number;
-};
-
-function layout(items: WallItem[]) {
-  let cursor = PAD_X;
-  const placed: Placed[] = items.map((item) => {
-    const w = WIDTH[item.size];
-    const h = Math.round(w * (1 / RATIO[item.size]) * 0.75);
-    const y = TOP[item.drop];
-    const x = cursor;
-    cursor += w + GAP;
-    // The node is the diamond in the caption row: 3px in, and on the
-    // caption's centre line (the caption is the figure's first row, so its
-    // centre is ~6px below the figure's top), the same geometry as the
-    // Archives rail. This used to be `y - 16`, which ran the line ~22px above
-    // every diamond so it never touched them. Captions are forced to a single
-    // line (whitespace-nowrap) precisely so this stays deterministic: a
-    // wrapped caption would move its own diamond and the line would miss it.
-    return { ...item, x, y, w, h, nodeX: x + 3, nodeY: y + 6 };
-  });
-  return { placed, trackWidth: cursor + PAD_X };
-}
+/** Extra room before every quarter after the first, so the quarters read as groups. */
+const QUARTER_GAP = 72;
+const MARKER_W = 200;
 
 /**
- * The plate is drawn object-cover, so a photo wider than its plate is scaled
- * to the plate's height and needs `aspect / plateAspect` times the plate's
- * width. Asking for the plate width alone served a 420px file into a tall
- * 420x463 plate (2.7x upscaled). Below md the plate is the stack's 92vw.
+ * Plate widths. Every plate keeps its photo's own ratio: the supplied photos
+ * are graphics with the event title set into their lower quarter, and a crop
+ * would cut it (2026-10-14).
  */
-function plateSizes(p: Placed) {
-  const k = Math.max(1, p.aspect / (p.w / p.h));
-  return `(max-width: 767px) ${Math.ceil(92 * k)}vw, ${Math.ceil(p.w * k)}px`;
+const WIDTH: Record<TimelinePhoto['size'], number> = { sm: 300, md: 360, lg: 440 };
+/** Caption top for each drop. The image hangs below it. */
+const TOP: Record<TimelinePhoto['drop'], number> = { top: 96, mid: 200, low: 300 };
+const MARKER_TOP = TOP.mid;
+
+type Node = { x: number; y: number; nodeX: number; nodeY: number };
+type PlacedPhoto = Node & { kind: 'photo'; photo: TimelinePhoto; w: number; n: number };
+type PlacedMarker = Node & { kind: 'quarter'; quarter: TimelineQuarter };
+
+function layout(quarters: TimelineQuarter[]) {
+  let cursor = PAD_X;
+  let n = 0;
+  const placed: (PlacedPhoto | PlacedMarker)[] = [];
+  // The node is the diamond in the caption row: 3px in, and on the caption's
+  // centre line (the caption is the figure's first row, so its centre is ~6px
+  // below the figure's top), the same geometry as the Archives rail. Captions
+  // are forced to a single line (whitespace-nowrap) so this stays
+  // deterministic: a wrapped caption would move its own diamond.
+  const node = (x: number, y: number): Node => ({ x, y, nodeX: x + 3, nodeY: y + 6 });
+  quarters.forEach((quarter, qi) => {
+    if (qi > 0) cursor += QUARTER_GAP;
+    placed.push({ kind: 'quarter', quarter, ...node(cursor, MARKER_TOP) });
+    cursor += MARKER_W + GAP;
+    for (const photo of quarter.photos) {
+      const w = WIDTH[photo.size];
+      placed.push({ kind: 'photo', photo, w, n: ++n, ...node(cursor, TOP[photo.drop]) });
+      cursor += w + GAP;
+    }
+  });
+  return { placed, trackWidth: cursor - GAP + PAD_X };
 }
 
 /** Smooth cubic through the nodes, so the line reads as drawn, not plotted. */
-function pathThrough(points: { nodeX: number; nodeY: number }[]) {
+function pathThrough(points: Node[]) {
   if (points.length < 2) return '';
   let d = `M ${points[0].nodeX} ${points[0].nodeY}`;
   for (let i = 0; i < points.length - 1; i++) {
@@ -84,9 +81,22 @@ function pathThrough(points: { nodeX: number; nodeY: number }[]) {
   return d;
 }
 
+/**
+ * One backing for every label: each curve leaves its node horizontally and
+ * would otherwise run through the caption text.
+ */
+function Caption({ children }: { children: React.ReactNode }) {
+  return (
+    <figcaption className="mb-2.5 flex items-center gap-2 md:whitespace-nowrap">
+      <span aria-hidden="true" className="hidden size-1.5 shrink-0 rotate-45 bg-white/70 md:block" />
+      <span className="label-micro bg-navy-900 text-white/55">{children}</span>
+    </figcaption>
+  );
+}
+
 export function PhotoWall() {
   const railRef = useRef<HTMLDivElement | null>(null);
-  const { placed, trackWidth } = layout(WALL_ITEMS);
+  const { placed, trackWidth } = layout(TIMELINE);
   const d = pathThrough(placed);
 
   useHscrollPan(railRef);
@@ -95,14 +105,16 @@ export function PhotoWall() {
     <section id="work" aria-labelledby="work-heading" className="bg-navy-900 text-white">
       <div className="container-page pt-16 md:pt-24">
         <h2 id="work-heading" className="max-w-[20ch] text-title">
-          A year of the district, in photographs.
+          The year so far, quarter by quarter.
         </h2>
         <p className="mt-3.5 max-w-[56ch] text-white/70">
-          District assemblies and the services of the Media Crew.
+          The {TIMELINE_YEAR} Rotary year in photographs, added as each quarter closes.
         </p>
       </div>
 
-      <div className="hscroll relative mt-10 md:mt-14">
+      {/* Scroll distance scales with the track, so the pan runs at the same
+          speed however many quarters there are (340vh held ~3,260px). */}
+      <div className="hscroll relative mt-10 md:mt-14" style={{ ['--hscroll-h' as string]: `${Math.round(trackWidth / 9.6)}vh` }}>
         <div className="hscroll-pin md:sticky md:top-0 md:flex md:h-dvh md:items-center md:overflow-hidden">
           <div
             ref={railRef}
@@ -144,53 +156,55 @@ export function PhotoWall() {
                 } as React.CSSProperties
               }
             >
-              {placed.map((p, i) => (
+              {placed.map((p) => {
                 // Geometry travels as custom properties and is only applied
                 // from md up. Inline left/top/width would apply at every
-                // breakpoint, and a 420px plate overflows a 390px phone.
-                <figure
-                  key={p.src}
-                  className="w-full md:absolute md:left-[var(--x)] md:top-[var(--y)] md:w-[var(--w)]"
-                  style={
-                    {
-                      '--x': `${p.x}px`,
-                      '--y': `${p.y}px`,
-                      '--w': `${p.w}px`,
-                    } as React.CSSProperties
-                  }
-                >
-                  <figcaption className="mb-2.5 flex items-center gap-2 md:whitespace-nowrap">
-                    <span
-                      aria-hidden="true"
-                      className="hidden size-1.5 shrink-0 rotate-45 bg-white/70 md:block"
-                    />
-                    {/* The label sits on the band colour: each curve leaves
-                        its node horizontally, and ran through the caption
-                        text. One backing for number and caption, with the
-                        space between them as padding inside it, so the line
-                        can't show through the gap either. */}
-                    <span className="label-micro bg-navy-900 text-white/55">
-                      {String(i + 1).padStart(2, '0')}
-                      <span className="pl-2 text-white/80">
-                        {p.caption}
-                        {p.year ? `, ${p.year}` : ''}
-                      </span>
-                    </span>
-                  </figcaption>
-                  <div
-                    className="relative overflow-hidden rounded-media bg-navy-800"
-                    style={{ aspectRatio: `${p.w} / ${p.h}` }}
-                  >
-                    <Image
-                      src={p.src}
-                      alt={p.alt}
-                      fill
-                      sizes={plateSizes(p)}
-                      className="object-cover"
-                    />
-                  </div>
-                </figure>
-              ))}
+                // breakpoint, and a 440px plate overflows a 390px phone.
+                const at = {
+                  '--x': `${p.x}px`,
+                  '--y': `${p.y}px`,
+                  '--w': `${p.kind === 'photo' ? p.w : MARKER_W}px`,
+                } as React.CSSProperties;
+                const place = 'w-full md:absolute md:left-[var(--x)] md:top-[var(--y)] md:w-[var(--w)]';
+
+                if (p.kind === 'quarter') {
+                  return (
+                    <figure
+                      key={p.quarter.label}
+                      className={`${place} border-t border-white/20 pt-6 md:border-t-0 md:pt-0`}
+                      style={at}
+                    >
+                      <Caption>{p.quarter.range}</Caption>
+                      <h3 className="font-display text-[clamp(3rem,6vw,4.5rem)] leading-none font-semibold tracking-[-0.03em]">
+                        {p.quarter.label}
+                      </h3>
+                    </figure>
+                  );
+                }
+
+                const { photo } = p;
+                return (
+                  <figure key={photo.image.src} className={place} style={at}>
+                    <Caption>
+                      {String(p.n).padStart(2, '0')}
+                      <span className="pl-2 text-white/80">{photo.caption}</span>
+                    </Caption>
+                    <div
+                      className="relative overflow-hidden rounded-media bg-navy-800"
+                      style={{ aspectRatio: `${photo.image.width} / ${photo.image.height}` }}
+                    >
+                      {/* The plate is the photo's own shape, so the plate width is the whole ask. */}
+                      <Image
+                        src={photo.image}
+                        alt={photo.alt}
+                        fill
+                        sizes={`(max-width: 767px) 92vw, ${p.w}px`}
+                        className="object-cover"
+                      />
+                    </div>
+                  </figure>
+                );
+              })}
             </div>
           </div>
 

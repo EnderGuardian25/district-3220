@@ -78,15 +78,8 @@ export const EVENT_PAGES: EventPage[] = [
         { name: 'Int. PP. Piyathma De Zoysa', position: 'Project Treasurer', bio: 'Assistant District Interact Treasurer 2025/26.', image: d('dimun-piyathma-de-zoysa-treasurer.png') },
       ],
     },
-    registration: {
-      title: 'Closing ceremony registration.',
-      status: 'closed',
-      detail: 'Registration for the closing ceremony was free of charge and closed on 21 November 2025.',
-    },
-    contact: {
-      title: 'Questions about DIMUN.',
-      lede: 'About this edition, its records, or taking part in a future one. Your message goes to the district council.',
-    },
+    // No registration panel or questions form: the user took both off this
+    // page on 2026-10-14. The template still renders them for other events.
   },
 ];
 
